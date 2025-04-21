@@ -47,12 +47,17 @@ class MainActivity : AppCompatActivity() {
 
 
 
+
+
             lottieHeartGold.setOnClickListener {
                 goldCount++
 
 
+                // Обновление прогресс-бара и текста
+                progressBar.progress = goldCount.coerceAtMost(200)
+                progressText.text = "${goldCount.coerceAtMost(200)} / 200"
 
-                textView.text = goldCount.toString()
+
 
 
 
@@ -267,12 +272,6 @@ class MainActivity : AppCompatActivity() {
                 }
 
 
-                    buttonOut.setOnClickListener { //20
-                        Log.d("MyLog", "Реально выполняется двадцатое действие")
-                        Heart.playLottieAnimation(lottieHeartGold, 0.402f,0.418f)
-                        Heart.playLottieAnimation(lottieTapGold, 0.19f,0.22f)
-                        Log.d("MyLog", "Проверка")
-                    }
 
 
                 }
