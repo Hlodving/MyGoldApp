@@ -1,0 +1,14 @@
+# Built application files
+*.apk
+*.aab
+
+# Files for the Android Studio IDE
+.idea/
+.gradle/
+build/
+captures/
+local.properties
+
+# Other files
+*.log
+*.iml
