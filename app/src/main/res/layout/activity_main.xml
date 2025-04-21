@@ -9,6 +9,7 @@
 
 
 
+
     <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/lottieTapGold"
         android:layout_width="400dp"

@@ -1,5 +1,8 @@
 package com.hlodving.mytestgold
 
+import android.appwidget.AppWidgetManager
+import android.content.ComponentName
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.enableEdgeToEdge
@@ -36,7 +39,6 @@ class MainActivity : AppCompatActivity() {
 
 
 
-
         binding.apply {
 
 
@@ -51,6 +53,18 @@ class MainActivity : AppCompatActivity() {
 
             lottieHeartGold.setOnClickListener {
                 goldCount++
+
+                GoldWidget.currentGold = goldCount
+                val intent = Intent(this@MainActivity, GoldWidget::class.java).apply {
+
+                action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
+                    putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS,
+                        AppWidgetManager.getInstance(this@MainActivity).getAppWidgetIds(
+                            ComponentName(this@MainActivity, GoldWidget::class.java)
+                        ))
+                }
+                sendBroadcast(intent)
+
 
 
                 // Обновление прогресс-бара и текста
