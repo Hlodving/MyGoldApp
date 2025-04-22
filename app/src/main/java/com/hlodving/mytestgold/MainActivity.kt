@@ -25,8 +25,6 @@ class MainActivity : AppCompatActivity() {
     // Список действий для выполнения
     private val actionsSequence = mutableListOf<Int>()
 
-
-
     lateinit var binding: ActivityMainBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
