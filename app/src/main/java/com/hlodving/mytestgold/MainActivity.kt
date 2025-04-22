@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.airbnb.lottie.LottieAnimationView
@@ -25,13 +26,24 @@ class MainActivity : AppCompatActivity() {
     // Список действий для выполнения
     private val actionsSequence = mutableListOf<Int>()
 
+    private var goldCount = 0
+    private val progressColors = listOf(
+        R.drawable.progress_bar_green,
+        R.drawable.progress_bar_blue,
+        R.drawable.progress_bar_orange,
+        R.drawable.progress_bar_purple,
+        R.drawable.progress_bar_yellow,
+        R.drawable.progress_bar_red
+    )
+
+
     lateinit var binding: ActivityMainBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        var goldCount = 0
+
 
         var Heart = HeartAnimation()
 
@@ -65,11 +77,17 @@ class MainActivity : AppCompatActivity() {
 
 
 
-                // Обновление прогресс-бара и текста
-                progressBar.progress = goldCount.coerceAtMost(200)
-                progressText.text = "${goldCount.coerceAtMost(200)} / 200"
+                val currentStage = (goldCount / 200) + 1
+                val stageMax = currentStage * 200
+                val stageStart = (currentStage - 1) * 200
+                val stageProgress = goldCount - stageStart
 
+                binding.progressBar.max = stageMax
+                binding.progressBar.progress = stageProgress.coerceAtMost(stageMax)
+                binding.progressText.text = "$stageProgress / $stageMax"
 
+                val colorDrawableId = progressColors[(currentStage - 1) % progressColors.size]
+                binding.progressBar.progressDrawable = ContextCompat.getDrawable(this@MainActivity, colorDrawableId)
 
 
 
