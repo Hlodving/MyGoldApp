@@ -2,6 +2,7 @@ package com.hlodving.mytestgold
 
 import android.appwidget.AppWidgetManager
 import android.content.ComponentName
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -36,6 +37,41 @@ class MainActivity : AppCompatActivity() {
         R.drawable.progress_bar_red
     )
 
+    private fun saveGoldCount() {
+        val sharedPref = getSharedPreferences("GoldPrefs", Context.MODE_PRIVATE)
+        with(sharedPref.edit()) {
+            putInt("goldCount", goldCount)
+            apply()
+        }
+    }
+
+
+
+    private fun loadGoldCount(): Int {
+        val sharedPref = getSharedPreferences("GoldPrefs", Context.MODE_PRIVATE)
+        return sharedPref.getInt("goldCount", 0)
+    }
+
+    private fun getStageData(gold: Int): Triple<Int, Int, Int> {
+        var stage = 1
+        var requiredGold = 100
+        var accumulated = 0
+
+        while (gold >= accumulated + requiredGold) {
+            accumulated += requiredGold
+            stage++
+            requiredGold = stage * 100
+        }
+
+        val stageProgress = gold - accumulated
+        val stageMax = requiredGold
+
+        return Triple(stageProgress, stageMax, stage)
+    }
+
+
+
+
 
     lateinit var binding: ActivityMainBinding
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -43,15 +79,41 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        // Загружаем сохранённое значение
+        goldCount = loadGoldCount()
+
+        // Обновляем виджет сразу
+        GoldWidget.currentGold = goldCount
+        val widgetIntent = Intent(this@MainActivity, GoldWidget::class.java).apply {
+            action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
+            putExtra(
+                AppWidgetManager.EXTRA_APPWIDGET_IDS,
+                AppWidgetManager.getInstance(this@MainActivity)
+                    .getAppWidgetIds(ComponentName(this@MainActivity, GoldWidget::class.java))
+            )
+        }
+        sendBroadcast(widgetIntent)
 
 
-        var Heart = HeartAnimation()
+
+        val (stageProgress, stageMax, currentStage) = getStageData(goldCount)
 
 
+        binding.progressBar.max = stageMax
+        binding.progressBar.progress = stageProgress.coerceAtMost(stageMax)
+        binding.progressText.text = "$stageProgress / $stageMax"
+
+        val colorDrawableId = progressColors[(currentStage - 1) % progressColors.size]
+        binding.progressBar.progressDrawable = ContextCompat.getDrawable(this@MainActivity, colorDrawableId)
+
+
+
+
+
+        // Анимации
+        val Heart = HeartAnimation()
 
         binding.apply {
-
-
             Heart.animationRestart(lottieHeartGold)
             Heart.animationRestart(lottieViewShineOne)
             Heart.animationRestart(lottieViewShineTwo)
@@ -63,6 +125,7 @@ class MainActivity : AppCompatActivity() {
 
             lottieHeartGold.setOnClickListener {
                 goldCount++
+                saveGoldCount()
 
                 GoldWidget.currentGold = goldCount
                 val intent = Intent(this@MainActivity, GoldWidget::class.java).apply {
@@ -77,10 +140,8 @@ class MainActivity : AppCompatActivity() {
 
 
 
-                val currentStage = (goldCount / 200) + 1
-                val stageMax = currentStage * 200
-                val stageStart = (currentStage - 1) * 200
-                val stageProgress = goldCount - stageStart
+                val (stageProgress, stageMax, currentStage) = getStageData(goldCount)
+
 
                 binding.progressBar.max = stageMax
                 binding.progressBar.progress = stageProgress.coerceAtMost(stageMax)
@@ -88,6 +149,7 @@ class MainActivity : AppCompatActivity() {
 
                 val colorDrawableId = progressColors[(currentStage - 1) % progressColors.size]
                 binding.progressBar.progressDrawable = ContextCompat.getDrawable(this@MainActivity, colorDrawableId)
+
 
 
 
@@ -287,8 +349,6 @@ class MainActivity : AppCompatActivity() {
                             Log.d("MyLog", "Сброс")
                             Heart.playLottieAnimation(lottieHeartGold, 0.402f,0.418f)
                             Heart.playLottieAnimation(lottieTapGold, 0.19f,0.22f)
-//                            lottieHeartGold.setMinProgress(0f)
-//                            lottieHeartGold.setMaxProgress(0f)
                             }
                         }
 
