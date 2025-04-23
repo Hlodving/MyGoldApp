@@ -18,6 +18,9 @@ import com.hlodving.mytestgold.databinding.ActivityMainBinding
 class MainActivity : AppCompatActivity() {
 
 
+    private var lastStage = 1
+
+
     // Общее количество действий
     private val totalActions = 21
 
@@ -36,6 +39,59 @@ class MainActivity : AppCompatActivity() {
         R.drawable.progress_bar_yellow,
         R.drawable.progress_bar_red
     )
+
+    private var timerEndTime: Long = 0L
+    private var timerHandler = android.os.Handler()
+    private lateinit var timerRunnable: Runnable
+
+    private fun startCountdownTimer() {
+        timerRunnable = object : Runnable {
+            override fun run() {
+                val remaining = timerEndTime - System.currentTimeMillis()
+                if (remaining > 0) {
+                    val hours = remaining / (1000 * 60 * 60)
+                    val minutes = (remaining / (1000 * 60)) % 60
+                    val seconds = (remaining / 1000) % 60
+                    binding.timerText.text = String.format("Оберег активен: %02d:%02d:%02d", hours, minutes, seconds)
+                    timerHandler.postDelayed(this, 1000)
+                } else {
+                    binding.timerText.text = "Время вышло!"
+                    goldCount = 0
+                    saveGoldCount()
+                    updateWidget()
+                }
+            }
+        }
+        timerHandler.post(timerRunnable)
+    }
+
+    private fun updateWidget() {
+        GoldWidget.currentGold = goldCount
+        val intent = Intent(this, GoldWidget::class.java).apply {
+            action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
+            putExtra(
+                AppWidgetManager.EXTRA_APPWIDGET_IDS,
+                AppWidgetManager.getInstance(this@MainActivity)
+                    .getAppWidgetIds(ComponentName(this@MainActivity, GoldWidget::class.java))
+            )
+        }
+        sendBroadcast(intent)
+    }
+
+
+    private fun saveTimerEndTime(timeInMillis: Long) {
+        val sharedPref = getSharedPreferences("GoldPrefs", Context.MODE_PRIVATE)
+        with(sharedPref.edit()) {
+            putLong("timerEndTime", timeInMillis)
+            apply()
+        }
+    }
+
+    private fun loadTimerEndTime(): Long {
+        val sharedPref = getSharedPreferences("GoldPrefs", Context.MODE_PRIVATE)
+        return sharedPref.getLong("timerEndTime", 0L)
+    }
+
 
     private fun saveGoldCount() {
         val sharedPref = getSharedPreferences("GoldPrefs", Context.MODE_PRIVATE)
@@ -94,6 +150,16 @@ class MainActivity : AppCompatActivity() {
         }
         sendBroadcast(widgetIntent)
 
+        timerEndTime = loadTimerEndTime()
+        if (timerEndTime > System.currentTimeMillis()) {
+            startCountdownTimer()
+        } else {
+            binding.timerText.text = "Оберег неактивен"
+        }
+
+        goldCount = loadGoldCount()
+        lastStage = getStageData(goldCount).third // <- узнаём начальный этап
+
 
 
         val (stageProgress, stageMax, currentStage) = getStageData(goldCount)
@@ -141,6 +207,18 @@ class MainActivity : AppCompatActivity() {
 
 
                 val (stageProgress, stageMax, currentStage) = getStageData(goldCount)
+
+                // Проверяем переход на новый этап
+                if (currentStage > lastStage) {
+                    // Обновляем таймер на +3 часа
+                    timerEndTime = System.currentTimeMillis() + 3 * 60 * 60 * 1000
+                    saveTimerEndTime(timerEndTime)
+                    startCountdownTimer()
+
+                    Log.d("MyLog", "Переход на этап $currentStage — запускаем таймер +3ч")
+                    lastStage = currentStage // Обновляем сохранённый этап
+                }
+
 
 
                 binding.progressBar.max = stageMax
