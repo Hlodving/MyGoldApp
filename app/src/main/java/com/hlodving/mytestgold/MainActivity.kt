@@ -11,6 +11,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.work.ExistingWorkPolicy
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
 import com.airbnb.lottie.LottieAnimationView
 import com.airbnb.lottie.LottieDrawable
 import com.hlodving.mytestgold.databinding.ActivityMainBinding
@@ -61,6 +64,19 @@ class MainActivity : AppCompatActivity() {
         }
         timerHandler.post(timerRunnable)
     }
+
+    private fun scheduleResetWorker(delayMillis: Long) {
+        val workRequest = OneTimeWorkRequestBuilder<TimerWorker>()
+            .setInitialDelay(delayMillis, java.util.concurrent.TimeUnit.MILLISECONDS)
+            .build()
+
+        WorkManager.getInstance(this).enqueueUniqueWork(
+            "resetGoldWorker", // имя задачи
+            ExistingWorkPolicy.REPLACE, // перезаписываем предыдущую, если она есть
+            workRequest
+        )
+    }
+
 
     //Обновляет виджет при истечении времени
         private fun resetAppState() {
@@ -164,6 +180,9 @@ class MainActivity : AppCompatActivity() {
     lateinit var binding: ActivityMainBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+
+
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -187,15 +206,25 @@ class MainActivity : AppCompatActivity() {
 
 
 
-
         sendBroadcast(widgetIntent)
 
+
+
+// Загружаем сохранённое время таймера
         timerEndTime = loadTimerEndTime()
+
         if (timerEndTime > System.currentTimeMillis()) {
             startCountdownTimer()
+
+            // <<< ДОБАВЛЕНО >>> Перезапускаем WorkManager на случай перезапуска приложения
+            val delayMillis = timerEndTime - System.currentTimeMillis()
+            scheduleResetWorker(delayMillis)
         } else {
             binding.timerText.text = "Оберег неактивен"
         }
+
+
+
 
         lastStage = getStageData(goldCount).third.number
 
@@ -268,17 +297,23 @@ class MainActivity : AppCompatActivity() {
 
 
                 if (currentStage.number > lastStage) {
-                    // Обновляем таймер на +1 мин (или +3 часа при желании)
+                    // Обновляем таймер на +3 часа
                     val now = System.currentTimeMillis()
                     val remaining = timerEndTime - now
                     val safeRemaining = if (remaining > 0) remaining else 0
-                    timerEndTime = now + safeRemaining + 1 * 60 * 1000 // можно заменить на 3 * 60 * 60 * 1000
+                    timerEndTime = now + safeRemaining + 30 * 30 *30 * 1000 // 30 секунд для теста
+
+
                     saveTimerEndTime(timerEndTime)
                     startCountdownTimer()
+
+                    val delayMillis = timerEndTime - System.currentTimeMillis()
+                    scheduleResetWorker(delayMillis)
 
                     Log.d("MyLog", "Переход на этап ${currentStage.number} — запускаем таймер")
                     lastStage = currentStage.number
                 }
+
 
 
 
