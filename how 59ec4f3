@@ -1,0 +1,18 @@
+[33m275f3bc[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mgpt/experiments[m[33m, [m[1;31morigin/gpt/experiments[m[33m, [m[1;32mrestore-my-work[m[33m)[m HEAD@{0}: reset: moving to 275f3bc
+[33macc06dc[m HEAD@{1}: checkout: moving from restore-my-work to gpt/experiments
+[33m275f3bc[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mgpt/experiments[m[33m, [m[1;31morigin/gpt/experiments[m[33m, [m[1;32mrestore-my-work[m[33m)[m HEAD@{2}: checkout: moving from 275f3bc05996a5e35696a08f5dbe1511f954cf59 to restore-my-work
+[33m275f3bc[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mgpt/experiments[m[33m, [m[1;31morigin/gpt/experiments[m[33m, [m[1;32mrestore-my-work[m[33m)[m HEAD@{3}: checkout: moving from gpt/experiments to 275f3bc
+[33macc06dc[m HEAD@{4}: checkout: moving from 59ec4f393a2c54bd7a37701892eda824b8a96924 to gpt/experiments
+[33m59ec4f3[m HEAD@{5}: commit: Продолжение разработки: улучшения виджета, логика таймера, правки Stage.kt
+[33m275f3bc[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mgpt/experiments[m[33m, [m[1;31morigin/gpt/experiments[m[33m, [m[1;32mrestore-my-work[m[33m)[m HEAD@{6}: commit: Правки логики таймера, улучшения виджета и очистка повторов
+[33m6a78b82[m HEAD@{7}: commit: Таймер
+[33m20c92ca[m HEAD@{8}: commit: Сохранение и прогресс 100
+[33m585aa1f[m HEAD@{9}: commit: Бесконечный статус бар
+[33macc06dc[m HEAD@{10}: checkout: moving from gpt/experiments to acc06dc7159feee91ba5128e42738ee79079ce48
+[33macc06dc[m HEAD@{11}: commit: Нормальный размер виджета
+[33m84600e6[m HEAD@{12}: commit: Добавлен виджет
+[33m1ade9e5[m HEAD@{13}: commit: Добавленна шкала прогресса
+[33m080344b[m[33m ([m[1;31morigin/master[m[33m, [m[1;32mmaster[m[33m)[m HEAD@{14}: checkout: moving from master to gpt/experiments
+[33m080344b[m[33m ([m[1;31morigin/master[m[33m, [m[1;32mmaster[m[33m)[m HEAD@{15}: reset: moving to origin/master
+[33m080344b[m[33m ([m[1;31morigin/master[m[33m, [m[1;32mmaster[m[33m)[m HEAD@{16}: Branch: renamed refs/heads/master to refs/heads/master
+[33m080344b[m[33m ([m[1;31morigin/master[m[33m, [m[1;32mmaster[m[33m)[m HEAD@{18}: commit (initial): Initial commit
