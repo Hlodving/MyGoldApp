@@ -17,20 +17,12 @@ import com.hlodving.mytestgold.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
 
-
-    private var lastStage = 1
-
-
-    // Общее количество действий
-    private val totalActions = 21
-
-    // Текущий индекс действия
-    private var currentAction = 1
-
-    // Список действий для выполнения
-    private val actionsSequence = mutableListOf<Int>()
-
-    private var goldCount = 0
+    // Переменные и настройки в начале класса
+    private var lastStage = 1 // Последний достигнутый этап (нужен для проверки перехода на новый)
+    private val totalActions = 21 // Всего действий в специальной анимационной последовательности
+    private var currentAction = 1 // Индекс текущего действия
+    private val actionsSequence = mutableListOf<Int>() // Список действий для выполнения
+    private var goldCount = 0 // Общее количество нажатий
     private val progressColors = listOf(
         R.drawable.progress_bar_green,
         R.drawable.progress_bar_blue,
@@ -38,12 +30,20 @@ class MainActivity : AppCompatActivity() {
         R.drawable.progress_bar_purple,
         R.drawable.progress_bar_yellow,
         R.drawable.progress_bar_red
-    )
+    ) // Список стилей прогресс-бара по фазам
 
-    private var timerEndTime: Long = 0L
-    private var timerHandler = android.os.Handler()
-    private lateinit var timerRunnable: Runnable
 
+    private var resetHappened = false
+
+
+
+    //Таймер обратного отсчёта
+    private var timerEndTime: Long = 0L // Время окончания таймера
+    private var timerHandler = android.os.Handler() // Объект для запуска таймера
+    private lateinit var timerRunnable: Runnable // Код, который будет запускаться каждую секунду
+
+
+    //Эта функция запускает и отображает таймер обратного отсчёта, который при завершении сбрасывает нажатия.
     private fun startCountdownTimer() {
         timerRunnable = object : Runnable {
             override fun run() {
@@ -55,16 +55,43 @@ class MainActivity : AppCompatActivity() {
                     binding.timerText.text = String.format("Оберег активен: %02d:%02d:%02d", hours, minutes, seconds)
                     timerHandler.postDelayed(this, 1000)
                 } else {
-                    binding.timerText.text = "Время вышло!"
-                    goldCount = 0
-                    saveGoldCount()
-                    updateWidget()
+                    resetAppState()
                 }
             }
         }
         timerHandler.post(timerRunnable)
     }
 
+    //Обновляет виджет при истечении времени
+        private fun resetAppState() {
+        resetHappened = true
+        goldCount = 0
+        saveGoldCount()
+
+        lastStage = 1
+        timerEndTime = 0L
+        saveTimerEndTime(timerEndTime)
+
+        binding.timerText.text = "Оберег неактивен"
+
+        // Сброс прогресса
+        val (stageProgress, stageMax, currentStage) = getStageData(goldCount)
+        binding.progressBar.max = stageMax
+        binding.progressBar.progress = stageProgress
+        binding.progressText.text = "$stageProgress / $stageMax"
+
+// тут мы берём номер этапа (Int), вычитаем 1
+        val colorDrawableId = progressColors[(currentStage.number - 1) % progressColors.size]
+        binding.progressBar.progressDrawable = ContextCompat.getDrawable(this, colorDrawableId)
+
+
+        // Обновление виджета
+        updateWidget()
+    }
+
+
+
+    //Этот метод обновляет виджет, подставляя нужную картинку в зависимости от goldCount.
     private fun updateWidget() {
         GoldWidget.currentGold = goldCount
         val intent = Intent(this, GoldWidget::class.java).apply {
@@ -79,6 +106,9 @@ class MainActivity : AppCompatActivity() {
     }
 
 
+
+
+    // Сохраняет время окончания таймера
     private fun saveTimerEndTime(timeInMillis: Long) {
         val sharedPref = getSharedPreferences("GoldPrefs", Context.MODE_PRIVATE)
         with(sharedPref.edit()) {
@@ -86,13 +116,13 @@ class MainActivity : AppCompatActivity() {
             apply()
         }
     }
-
+    //Загружает время окончания таймера
     private fun loadTimerEndTime(): Long {
         val sharedPref = getSharedPreferences("GoldPrefs", Context.MODE_PRIVATE)
         return sharedPref.getLong("timerEndTime", 0L)
     }
 
-
+    // Сохраняет текущее количество кликов
     private fun saveGoldCount() {
         val sharedPref = getSharedPreferences("GoldPrefs", Context.MODE_PRIVATE)
         with(sharedPref.edit()) {
@@ -102,29 +132,31 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-
+    // Загружает сохранённое количество кликов
     private fun loadGoldCount(): Int {
         val sharedPref = getSharedPreferences("GoldPrefs", Context.MODE_PRIVATE)
         return sharedPref.getInt("goldCount", 0)
     }
 
-    private fun getStageData(gold: Int): Triple<Int, Int, Int> {
-        var stage = 1
+
+    //Этот метод считает, на каком этапе сейчас пользователь, сколько кликов нужно на следующий этап и сколько уже накоплено
+    private fun getStageData(gold: Int): Triple<Int, Int, Stage> {
+        var stageNumber = 1
         var requiredGold = 100
         var accumulated = 0
 
         while (gold >= accumulated + requiredGold) {
             accumulated += requiredGold
-            stage++
-            requiredGold = stage * 100
+            stageNumber++
+            requiredGold = stageNumber * 100
         }
 
         val stageProgress = gold - accumulated
         val stageMax = requiredGold
+        val stage = Stage.fromGold(gold)
 
         return Triple(stageProgress, stageMax, stage)
     }
-
 
 
 
@@ -135,10 +167,14 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+
+
         // Загружаем сохранённое значение
         goldCount = loadGoldCount()
 
-        // Обновляем виджет сразу
+
+
+        // Обновляем виджет
         GoldWidget.currentGold = goldCount
         val widgetIntent = Intent(this@MainActivity, GoldWidget::class.java).apply {
             action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
@@ -148,6 +184,10 @@ class MainActivity : AppCompatActivity() {
                     .getAppWidgetIds(ComponentName(this@MainActivity, GoldWidget::class.java))
             )
         }
+
+
+
+
         sendBroadcast(widgetIntent)
 
         timerEndTime = loadTimerEndTime()
@@ -157,8 +197,8 @@ class MainActivity : AppCompatActivity() {
             binding.timerText.text = "Оберег неактивен"
         }
 
-        goldCount = loadGoldCount()
-        lastStage = getStageData(goldCount).third // <- узнаём начальный этап
+        lastStage = getStageData(goldCount).third.number
+
 
 
 
@@ -169,7 +209,8 @@ class MainActivity : AppCompatActivity() {
         binding.progressBar.progress = stageProgress.coerceAtMost(stageMax)
         binding.progressText.text = "$stageProgress / $stageMax"
 
-        val colorDrawableId = progressColors[(currentStage - 1) % progressColors.size]
+        val colorDrawableId = progressColors[(currentStage.number - 1) % progressColors.size]
+
         binding.progressBar.progressDrawable = ContextCompat.getDrawable(this@MainActivity, colorDrawableId)
 
 
@@ -202,22 +243,44 @@ class MainActivity : AppCompatActivity() {
                             ComponentName(this@MainActivity, GoldWidget::class.java)
                         ))
                 }
+
+
                 sendBroadcast(intent)
 
 
 
                 val (stageProgress, stageMax, currentStage) = getStageData(goldCount)
 
-                // Проверяем переход на новый этап
-                if (currentStage > lastStage) {
-                    // Обновляем таймер на +3 часа
-                    timerEndTime = System.currentTimeMillis() + 3 * 60 * 60 * 1000
+                if (resetHappened) {
+                    if (currentStage.number > 1) {
+                        Log.d("MyLog", "После сброса — восстанавливаем таймер")
+                        timerEndTime = System.currentTimeMillis() + 1 * 60 * 1000
+                        saveTimerEndTime(timerEndTime)
+                        startCountdownTimer()
+                    } else {
+                        Log.d("MyLog", "Сброс был, но этап 1 — таймер не запускаем")
+                        binding.timerText.text = "Оберег неактивен"
+                    }
+                    resetHappened = false
+                }
+
+
+
+
+                if (currentStage.number > lastStage) {
+                    // Обновляем таймер на +1 мин (или +3 часа при желании)
+                    val now = System.currentTimeMillis()
+                    val remaining = timerEndTime - now
+                    val safeRemaining = if (remaining > 0) remaining else 0
+                    timerEndTime = now + safeRemaining + 1 * 60 * 1000 // можно заменить на 3 * 60 * 60 * 1000
                     saveTimerEndTime(timerEndTime)
                     startCountdownTimer()
 
-                    Log.d("MyLog", "Переход на этап $currentStage — запускаем таймер +3ч")
-                    lastStage = currentStage // Обновляем сохранённый этап
+                    Log.d("MyLog", "Переход на этап ${currentStage.number} — запускаем таймер")
+                    lastStage = currentStage.number
                 }
+
+
 
 
 
@@ -225,7 +288,8 @@ class MainActivity : AppCompatActivity() {
                 binding.progressBar.progress = stageProgress.coerceAtMost(stageMax)
                 binding.progressText.text = "$stageProgress / $stageMax"
 
-                val colorDrawableId = progressColors[(currentStage - 1) % progressColors.size]
+                val colorDrawableId = progressColors[(currentStage.number - 1) % progressColors.size]
+
                 binding.progressBar.progressDrawable = ContextCompat.getDrawable(this@MainActivity, colorDrawableId)
 
 
@@ -239,46 +303,16 @@ class MainActivity : AppCompatActivity() {
 
 
                 when (goldCount % 10) {
-
-                        1 -> {
-                            Heart.playLottieAnimation(lottie1)
-                        }
-
-                        2 -> {
-                            Heart.playLottieAnimation(lottie2)
-                        }
-
-                        3 -> {
-                            Heart.playLottieAnimation(lottie5)
-                        }
-
-                        4 -> {
-                            Heart.playLottieAnimation(lottie7)
-                        }
-
-                        5 -> {
-                            Heart.playLottieAnimation(lottie4)
-                        }
-
-                        6 -> {
-                            Heart.playLottieAnimation(lottie8)
-                        }
-
-                        7 -> {
-                            Heart.playLottieAnimation(lottie9)
-                        }
-
-                        8 -> {
-                            Heart.playLottieAnimation(lottie6)
-                        }
-
-                        9 -> {
-                            Heart.playLottieAnimation(lottie3)
-                        }
-
-                        0 -> {
-                            Heart.playLottieAnimation(lottie4)
-                        }
+                        1 -> Heart.playLottieAnimation(lottie1)
+                        2 -> Heart.playLottieAnimation(lottie2)
+                        3 -> Heart.playLottieAnimation(lottie5)
+                        4 -> Heart.playLottieAnimation(lottie7)
+                        5 -> Heart.playLottieAnimation(lottie4)
+                        6 -> Heart.playLottieAnimation(lottie8)
+                        7 -> Heart.playLottieAnimation(lottie9)
+                        8 -> Heart.playLottieAnimation(lottie6)
+                        9 -> Heart.playLottieAnimation(lottie3)
+                        0 -> Heart.playLottieAnimation(lottie4)
                     }
 
                 if (goldCount % 27 == 0) {

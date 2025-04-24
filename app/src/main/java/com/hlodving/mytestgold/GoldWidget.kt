@@ -14,8 +14,11 @@
             fun updateWidget(context: Context, appWidgetManager: AppWidgetManager, appWidgetId: Int) {
                 val views = RemoteViews(context.packageName, R.layout.widget_gold)
 
-                val imageRes = if (currentGold >= 100) R.drawable.gold else R.drawable.gold_cb
+                val stage = Stage.fromGold(currentGold)
+                val imageRes = if (stage.number > 1) R.drawable.gold else R.drawable.gold_cb
+
                 views.setImageViewResource(R.id.widgetImage, imageRes)
+
 
                 val intent = Intent(context, MainActivity::class.java)
                 val pendingIntent = PendingIntent.getActivity(
