@@ -1,7 +1,19 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
+    <!-- Базовая тема для тёмного режима -->
     <style name="Base.Theme.MyTestGold" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your dark theme here. -->
-        <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
+        <!-- Цвет фона -->
+        <item name="android:colorBackground">@color/dark_gray</item>
+
+        <!-- Цвет статус-бара (одинаковый с фоном) -->
+        <item name="android:statusBarColor">@color/dark_gray</item>
+
+        <!-- Белые иконки в статус-баре -->
+        <item name="android:windowLightStatusBar">false</item>
+
+        <!-- Белый основной цвет текста (если используешь через ?attr/textColor) -->
+        <item name="android:textColor">@color/text_primary</item>
     </style>
+
+    <!-- Наследуем тему -->
+    <style name="Theme.MyTestGold" parent="Base.Theme.MyTestGold" />
 </resources>
