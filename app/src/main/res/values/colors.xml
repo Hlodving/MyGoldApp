@@ -6,6 +6,7 @@
 
     <color name="dark_gray">#303030</color> <!-- одинаковый для фона и статус-бара -->
     <color name="text_primary">#FFFFFF</color> <!-- белый текст -->
+    <color name="widget_hint_color">#00BFFF</color>
 
 
 

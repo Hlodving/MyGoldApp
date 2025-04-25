@@ -39,6 +39,13 @@ class GoldWidget : AppWidgetProvider() {
             views.setOnClickPendingIntent(R.id.widgetImage, pendingIntent)
 
             appWidgetManager.updateAppWidget(appWidgetId, views)
+
+            // Отправляем broadcast, что виджет установлен
+            val widgetAddedIntent = Intent("com.hlodving.WIDGET_PRESENT")
+            context.sendBroadcast(widgetAddedIntent)
+
+
+
         }
     }
 
@@ -48,4 +55,7 @@ class GoldWidget : AppWidgetProvider() {
             updateWidget(context, manager, id)
         }
     }
+
+
 }
+

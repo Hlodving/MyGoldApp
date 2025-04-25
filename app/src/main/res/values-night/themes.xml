@@ -10,7 +10,7 @@
         <!-- Белые иконки в статус-баре -->
         <item name="android:windowLightStatusBar">false</item>
 
-        <!-- Белый основной цвет текста (если используешь через ?attr/textColor) -->
+        <!-- Белый основной цвет текста -->
         <item name="android:textColor">@color/text_primary</item>
     </style>
 

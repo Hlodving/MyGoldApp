@@ -1,11 +1,14 @@
 package com.hlodving.mytestgold
 
 import android.appwidget.AppWidgetManager
+import android.content.BroadcastReceiver
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -123,6 +126,15 @@ class MainActivity : AppCompatActivity() {
 
 
 
+    private fun isWidgetPresent(): Boolean {
+        val appWidgetManager = AppWidgetManager.getInstance(this)
+        val widgetIds = appWidgetManager.getAppWidgetIds(
+            ComponentName(this, GoldWidget::class.java)
+        )
+        return widgetIds.isNotEmpty()
+    }
+
+
 
     // Сохраняет время окончания таймера
     private fun saveTimerEndTime(timeInMillis: Long) {
@@ -178,6 +190,18 @@ class MainActivity : AppCompatActivity() {
 
 
     lateinit var binding: ActivityMainBinding
+
+
+    private val widgetReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            if (intent?.action == "com.hlodving.WIDGET_PRESENT") {
+                binding.widgetHintText.visibility = View.GONE
+            }
+        }
+    }
+
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -185,6 +209,12 @@ class MainActivity : AppCompatActivity() {
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+
+        if (!isWidgetPresent()) {
+            binding.widgetHintText.visibility = View.VISIBLE
+        }
+
 
 
 
@@ -516,8 +546,24 @@ class MainActivity : AppCompatActivity() {
 
             }
 
+    override fun onResume() {
+        super.onResume()
+        registerReceiver(
+            widgetReceiver,
+            IntentFilter("com.hlodving.WIDGET_PRESENT"),
+            Context.RECEIVER_NOT_EXPORTED
+        )
 
-        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        unregisterReceiver(widgetReceiver)
+    }
+
+
+
+}
 
 
 

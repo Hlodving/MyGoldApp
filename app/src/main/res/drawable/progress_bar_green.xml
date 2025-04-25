@@ -11,7 +11,7 @@
     <item android:id="@android:id/progress">
         <clip>
             <shape android:shape="rectangle">
-                <solid android:color="#228B22"/> <!-- зеленый -->
+                <solid android:color="#4CAF50"/> <!-- зеленый -->
                 <corners android:radius="12dp"/>
             </shape>
         </clip>
