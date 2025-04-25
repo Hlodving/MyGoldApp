@@ -48,5 +48,8 @@
         </activity>
 
 
+        <activity android:name=".OberegInfoActivity" />
+
+
     </application>
 </manifest>

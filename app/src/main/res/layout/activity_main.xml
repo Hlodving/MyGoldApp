@@ -165,6 +165,8 @@
         app:layout_constraintTop_toTopOf="parent"
         app:lottie_fileName="Gold_heart_Final.json" />
 
+    <!-- Таймер -->
+    <!-- Таймер -->
     <TextView
         android:id="@+id/timerText"
         android:layout_width="wrap_content"
@@ -173,25 +175,42 @@
         android:textSize="18sp"
         android:textColor="?android:textColorPrimary"
         android:textStyle="bold"
-        android:layout_marginBottom="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/progressFrame"
+        android:layout_marginTop="16dp"
+        app:layout_constraintTop_toBottomOf="@id/lottieTapGold"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- Прогресс бар и текст в обёртке -->
+    <!-- Кнопка Подробнее -->
+    <TextView
+        android:id="@+id/moreInfoButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Подробнее об обереге"
+        android:textSize="18sp"
+        android:textColor="@color/widget_hint_color"
+        android:textStyle="bold"
+        android:background="?selectableItemBackground"
+        android:gravity="center"
+        android:padding="8dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintTop_toBottomOf="@id/timerText"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Прогресс бар -->
     <FrameLayout
         android:id="@+id/progressFrame"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="132dp"
+        android:layout_marginTop="24dp"
         android:layout_marginStart="32dp"
         android:layout_marginEnd="32dp"
-        app:layout_constraintTop_toBottomOf="@+id/lottieTapGold"
+        app:layout_constraintTop_toBottomOf="@id/moreInfoButton"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent">
+        app:layout_constraintEnd_toEndOf="parent">
 
-        <ProgressBar
+
+    <ProgressBar
             android:id="@+id/progressBar"
             style="?android:attr/progressBarStyleHorizontal"
             android:layout_width="match_parent"
@@ -212,6 +231,7 @@
             android:layout_gravity="center" />
     </FrameLayout>
 
+    <!-- Подсказка про виджет -->
     <TextView
         android:id="@+id/widgetHintText"
         android:layout_width="0dp"
@@ -225,11 +245,8 @@
         android:layout_marginStart="32dp"
         android:layout_marginEnd="32dp"
         android:layout_marginTop="8dp"
-        app:layout_constraintTop_toBottomOf="@+id/progressFrame"
+        app:layout_constraintTop_toBottomOf="@id/progressFrame"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
-
-
 </androidx.constraintlayout.widget.ConstraintLayout>
-
