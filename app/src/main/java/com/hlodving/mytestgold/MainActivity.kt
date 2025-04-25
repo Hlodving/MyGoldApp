@@ -43,7 +43,6 @@ class MainActivity : AppCompatActivity() {
     private var resetHappened = false
 
 
-
     //Таймер обратного отсчёта
     private var timerEndTime: Long = 0L // Время окончания таймера
     private var timerHandler = android.os.Handler() // Объект для запуска таймера
@@ -196,10 +195,16 @@ class MainActivity : AppCompatActivity() {
     private val widgetReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             if (intent?.action == "com.hlodving.WIDGET_PRESENT") {
-                binding.widgetHintText.visibility = View.GONE
+                // 🔥 При получении сигнала — тоже скрываем
+                if (isWidgetPresent()) {
+                    binding.widgetHintText.visibility = View.GONE
+                }
             }
         }
     }
+
+
+
 
 
 
@@ -224,9 +229,9 @@ class MainActivity : AppCompatActivity() {
 
 
 
-        if (!isWidgetPresent()) {
-            binding.widgetHintText.visibility = View.VISIBLE
-        }
+        binding.widgetHintText.visibility = if (isWidgetPresent()) View.GONE else View.VISIBLE
+
+
 
 
 
@@ -561,13 +566,21 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+
+        // 🔥 Проверка сразу: есть ли уже виджет
+        if (isWidgetPresent()) {
+            binding.widgetHintText.visibility = View.GONE
+        }
+
+        // 🔥 Подписка на Broadcast от GoldWidget
         registerReceiver(
             widgetReceiver,
             IntentFilter("com.hlodving.WIDGET_PRESENT"),
             Context.RECEIVER_NOT_EXPORTED
         )
-
     }
+
+
 
     override fun onPause() {
         super.onPause()
