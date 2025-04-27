@@ -345,12 +345,15 @@ class MainActivity : AppCompatActivity() {
 
 
                 if (currentStage.number > lastStage) {
+                    // <<< ТУТ запуск анимаций по переходу этапа >>>
+                    Heart.playLottieAnimation(lottieViewShineOne)
+                    Heart.playLottieAnimation(lottieViewShineTwo)
+
                     // Обновляем таймер на +3 часа
                     val now = System.currentTimeMillis()
                     val remaining = timerEndTime - now
                     val safeRemaining = if (remaining > 0) remaining else 0
-                    timerEndTime = now + safeRemaining + 30 * 30 *30 * 1000 // 30 секунд для теста
-
+                    timerEndTime = now + safeRemaining + 30 * 1000 // 30 секунд для теста
 
                     saveTimerEndTime(timerEndTime)
                     startCountdownTimer()
@@ -361,6 +364,7 @@ class MainActivity : AppCompatActivity() {
                     Log.d("MyLog", "Переход на этап ${currentStage.number} — запускаем таймер")
                     lastStage = currentStage.number
                 }
+
 
 
 
@@ -378,9 +382,9 @@ class MainActivity : AppCompatActivity() {
 
 
 
-                if (goldCount % 50 == 0) Heart.playLottieAnimation(lottieViewShineOne)
+                //if (goldCount % 50 == 0) Heart.playLottieAnimation(lottieViewShineOne)
 
-                if (goldCount % 75 == 0) Heart.playLottieAnimation(lottieViewShineTwo)
+                //if (goldCount % 75 == 0) Heart.playLottieAnimation(lottieViewShineTwo)
 
 
 
