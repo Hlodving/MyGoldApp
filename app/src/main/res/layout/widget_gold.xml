@@ -11,3 +11,4 @@
         android:scaleType="centerInside"
         android:src="@drawable/gold_cb" />
 </FrameLayout>
+

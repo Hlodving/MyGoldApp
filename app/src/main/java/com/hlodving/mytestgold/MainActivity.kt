@@ -374,7 +374,7 @@ class MainActivity : AppCompatActivity() {
                     val now = System.currentTimeMillis()
                     val remaining = timerEndTime - now
                     val safeRemaining = if (remaining > 0) remaining else 0
-                    timerEndTime = now + safeRemaining + 30 * 30 * 30 * 1000 // Настройка таймера
+                    timerEndTime = now + safeRemaining + 3 * 30 * 1000 // Настройка таймера
 
                     saveTimerEndTime(timerEndTime)
                     startCountdownTimer()
