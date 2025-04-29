@@ -1,3 +1,16 @@
 <resources>
     <string name="app_name">MyTestGold</string>
+    <string name="about_amulet">Подробнее об обереге</string>
+    <string name="add_amulet">Вы можете добавить оберег (виджет) на домашний экран</string>
+    <string name="time">Осталось: 03:00:00</string>
+    <string name="power_amulet">Сила оберега</string>
+    <string name="obereg_desc_1">Активированный оберег воздвигает вокруг владельца невидимый щит света, отпугивая всё недоброе</string>
+    <string name="obereg_desc_2">Он дарует:</string>
+    <string name="obereg_desc_3">• Защиту от сглаза, порчи и зла, направленного извне</string>
+    <string name="obereg_desc_4">• Охрану от болезней, несчастий и внезапных бед</string>
+    <string name="obereg_desc_5">• Усиление внутренней веры и обретение душевного покоя</string>
+    <string name="obereg_desc_6">• Поддержку в испытаниях и напоминание о высшей силе, что идёт рядом</string>
+    <string name="obereg_desc_7">• Привлечение удачи, благополучия и света в повседневные дела</string>
+    <string name="obereg_desc_8">Пока оберег пылает в вашей душе, ни одна тьма не приблизится</string>
+
 </resources>
