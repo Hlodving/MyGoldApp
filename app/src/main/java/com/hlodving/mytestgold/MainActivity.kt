@@ -43,6 +43,21 @@ class MainActivity : AppCompatActivity() {
     private var resetHappened = false
 
 
+
+    private var currentTapAnimation: String? = null
+
+    private fun updateTapAnimationForStage(stage: Stage) {
+        val newAnimation = if (stage.number == 1) "Gold_movement_cb.json" else "Gold_movement.json"
+        if (currentTapAnimation != newAnimation) {
+            currentTapAnimation = newAnimation
+            binding.lottieTapGold.setAnimation(newAnimation)
+            // ❗ НЕ вызываем playAnimation() здесь
+        }
+    }
+
+
+
+
     //Таймер обратного отсчёта
     private var timerEndTime: Long = 0L // Время окончания таймера
     private var timerHandler = android.os.Handler() // Объект для запуска таймера
@@ -95,6 +110,8 @@ class MainActivity : AppCompatActivity() {
 
         // Сброс прогресса
         val (stageProgress, stageMax, currentStage) = getStageData(goldCount)
+        updateTapAnimationForStage(currentStage)
+
         binding.progressBar.max = stageMax
         binding.progressBar.progress = stageProgress
         binding.progressText.text = "$stageProgress / $stageMax"
@@ -280,6 +297,8 @@ class MainActivity : AppCompatActivity() {
 
 
         val (stageProgress, stageMax, currentStage) = getStageData(goldCount)
+        updateTapAnimationForStage(currentStage)
+
 
 
         binding.progressBar.max = stageMax
@@ -327,6 +346,8 @@ class MainActivity : AppCompatActivity() {
 
 
                 val (stageProgress, stageMax, currentStage) = getStageData(goldCount)
+                updateTapAnimationForStage(currentStage)
+
 
                 if (resetHappened) {
                     if (currentStage.number > 1) {
