@@ -15,7 +15,7 @@ class GoldWidget : AppWidgetProvider() {
     companion object {
         var currentGold = 0
 
-        private const val TOTAL_FRAMES = 13
+        private const val TOTAL_FRAMES = 23
         private var frameHandler: Handler? = null
         private var frameRunnable: Runnable? = null
         private var delayHandler: Handler? = null
@@ -41,7 +41,8 @@ class GoldWidget : AppWidgetProvider() {
                 views.setImageViewResource(R.id.widgetImage, R.drawable.gold_cb)
             } else {
                 // Фаза больше 1 — показываем кадры shine_frame
-                val frameName = "shine_frame_${currentFrame % TOTAL_FRAMES}"
+                val frameNumber = String.format("%02d", currentFrame % TOTAL_FRAMES)
+                val frameName = "shine_$frameNumber"
                 val resId = context.resources.getIdentifier(frameName, "drawable", context.packageName)
                 if (resId != 0) {
                     views.setImageViewResource(R.id.widgetImage, resId)
@@ -77,7 +78,7 @@ class GoldWidget : AppWidgetProvider() {
                     currentFrame++
 
                     if (currentFrame < TOTAL_FRAMES) {
-                        frameHandler?.postDelayed(this, 30) // 30 мс между кадрами
+                        frameHandler?.postDelayed(this, 40) // 30 мс между кадрами
                     } else {
                         // После завершения всех кадров — старт ожидания снова
                         startDelay(context)
