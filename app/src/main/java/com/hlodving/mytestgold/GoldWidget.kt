@@ -15,7 +15,8 @@ class GoldWidget : AppWidgetProvider() {
     companion object {
         var currentGold = 0
 
-        private const val TOTAL_FRAMES = 23
+        private var useAuraAnimation = false // Перенесено в companion object
+
         private var frameHandler: Handler? = null
         private var frameRunnable: Runnable? = null
         private var delayHandler: Handler? = null
@@ -37,12 +38,18 @@ class GoldWidget : AppWidgetProvider() {
             val stage = Stage.fromGold(currentGold)
 
             if (stage.number == 1) {
-                // Фаза 1 — статичная картинка
                 views.setImageViewResource(R.id.widgetImage, R.drawable.gold_cb)
             } else {
-                // Фаза больше 1 — показываем кадры shine_frame
-                val frameNumber = String.format("%02d", currentFrame % TOTAL_FRAMES)
-                val frameName = "shine_$frameNumber"
+                val frameName = if (useAuraAnimation) {
+                    val frameNum = String.format("%02d", (currentFrame % 60) + 1)
+
+
+                    "aura_$frameNum"
+                } else {
+                    val frameNum = String.format("%02d", currentFrame % 23)
+                    "shine_$frameNum"
+                }
+
                 val resId = context.resources.getIdentifier(frameName, "drawable", context.packageName)
                 if (resId != 0) {
                     views.setImageViewResource(R.id.widgetImage, resId)
@@ -70,6 +77,13 @@ class GoldWidget : AppWidgetProvider() {
             frameHandler = Handler(Looper.getMainLooper())
             currentFrame = 0
 
+            // Переключаемся на другую анимацию
+            useAuraAnimation = !useAuraAnimation
+
+            val totalFrames = if (useAuraAnimation) 60 else 23
+
+
+
             frameRunnable = object : Runnable {
                 override fun run() {
                     for (id in appWidgetIds) {
@@ -77,10 +91,9 @@ class GoldWidget : AppWidgetProvider() {
                     }
                     currentFrame++
 
-                    if (currentFrame < TOTAL_FRAMES) {
-                        frameHandler?.postDelayed(this, 40) // 30 мс между кадрами
+                    if (currentFrame < totalFrames) {
+                        frameHandler?.postDelayed(this, 30)
                     } else {
-                        // После завершения всех кадров — старт ожидания снова
                         startDelay(context)
                     }
                 }
@@ -93,12 +106,11 @@ class GoldWidget : AppWidgetProvider() {
             delayHandler = Handler(Looper.getMainLooper())
             delayHandler?.postDelayed({
                 playOneAnimation(context)
-            }, 15_000L) // 15 секунд ожидания
+            }, 15_000L)
         }
 
         fun startAnimationCycle(context: Context) {
             if (delayHandler == null && frameHandler == null) {
-                // Первая активация
                 startDelay(context)
             }
         }
