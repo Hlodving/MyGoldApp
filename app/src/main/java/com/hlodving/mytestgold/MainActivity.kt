@@ -9,17 +9,14 @@ import android.content.IntentFilter
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.view.animation.AnimationUtils
-import androidx.activity.enableEdgeToEdge
+
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
+
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
-import com.airbnb.lottie.LottieAnimationView
-import com.airbnb.lottie.LottieDrawable
+
 import com.hlodving.mytestgold.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
@@ -42,6 +39,34 @@ class MainActivity : AppCompatActivity() {
 
     private var resetHappened = false
 
+    private var bonusProgress = 0
+    private var bonusMax = 1000
+
+
+    private fun getBonusStage(): Int {
+        return bonusMax / 100
+    }
+
+
+    private fun saveBonusProgress() {
+        val prefs = getSharedPreferences("GoldPrefs", Context.MODE_PRIVATE)
+        prefs.edit().putInt("bonusProgress", bonusProgress).apply()
+    }
+
+    private fun loadBonusProgress(): Int {
+        val prefs = getSharedPreferences("GoldPrefs", Context.MODE_PRIVATE)
+        return prefs.getInt("bonusProgress", 0)
+    }
+
+    private fun saveBonusMax() {
+        val prefs = getSharedPreferences("GoldPrefs", Context.MODE_PRIVATE)
+        prefs.edit().putInt("bonusMax", bonusMax).apply()
+    }
+
+    private fun loadBonusMax(): Int {
+        val prefs = getSharedPreferences("GoldPrefs", Context.MODE_PRIVATE)
+        return prefs.getInt("bonusMax", 1000)
+    }
 
 
     private var currentTapAnimation: String? = null
@@ -51,9 +76,9 @@ class MainActivity : AppCompatActivity() {
         if (currentTapAnimation != newAnimation) {
             currentTapAnimation = newAnimation
             binding.lottieTapGold.setAnimation(newAnimation)
-            // ❗ НЕ вызываем playAnimation() здесь
         }
     }
+
 
 
 
@@ -116,9 +141,25 @@ class MainActivity : AppCompatActivity() {
         binding.progressBar.progress = stageProgress
         binding.progressText.text = "$stageProgress / $stageMax"
 
+        val colorDrawableId2 = progressColors[(getBonusStage() - 1) % progressColors.size]
+        binding.progressBar2.progressDrawable = ContextCompat.getDrawable(this, colorDrawableId2)
+
+
+
 // тут мы берём номер этапа (Int), вычитаем 1
         val colorDrawableId = progressColors[(currentStage.number - 1) % progressColors.size]
         binding.progressBar.progressDrawable = ContextCompat.getDrawable(this, colorDrawableId)
+
+        // Сброс второго прогресс-бара
+        bonusProgress = 0
+        bonusMax = 1000
+        saveBonusProgress()
+        saveBonusMax()
+
+        binding.progressBar2.max = bonusMax
+        binding.progressBar2.progress = bonusProgress
+        binding.progressText2.text = "$bonusProgress / $bonusMax"
+
 
 
         // Обновление виджета
@@ -230,8 +271,23 @@ class MainActivity : AppCompatActivity() {
 
 
 
+
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        bonusProgress = loadBonusProgress()
+
+        bonusMax = loadBonusMax()
+
+
+        binding.progressBar2.max = bonusMax
+        binding.progressBar2.progress = bonusProgress
+        binding.progressText2.text = "$bonusProgress / $bonusMax"
+
+        val colorDrawableId2 = progressColors[(getBonusStage() - 1) % progressColors.size]
+        binding.progressBar2.progressDrawable = ContextCompat.getDrawable(this, colorDrawableId2)
+
+
 
         timerEndTime = loadTimerEndTime()
 
@@ -340,6 +396,34 @@ class MainActivity : AppCompatActivity() {
                         ))
                 }
 
+                bonusProgress++
+                if (bonusProgress >= bonusMax) {
+                    bonusProgress = 0
+                    bonusMax += 100
+                    // +24 часа к таймеру
+                    timerEndTime += 24 * 60 * 60 * 1000
+                    saveTimerEndTime(timerEndTime)
+                    startCountdownTimer()
+                    scheduleResetWorker(timerEndTime - System.currentTimeMillis())
+                }
+                saveBonusProgress()
+                saveBonusMax()
+
+                binding.progressBar2.max = bonusMax
+                binding.progressBar2.progress = bonusProgress
+                binding.progressText2.text = "$bonusProgress / $bonusMax"
+
+
+
+                val colorDrawableId2 = progressColors[(getBonusStage() - 1) % progressColors.size]
+                binding.progressBar2.progressDrawable = ContextCompat.getDrawable(this@MainActivity, colorDrawableId2)
+
+
+
+
+
+
+
 
                 sendBroadcast(intent)
 
@@ -347,6 +431,8 @@ class MainActivity : AppCompatActivity() {
 
                 val (stageProgress, stageMax, currentStage) = getStageData(goldCount)
                 updateTapAnimationForStage(currentStage)
+
+
 
 
                 if (resetHappened) {
@@ -370,11 +456,11 @@ class MainActivity : AppCompatActivity() {
                     Heart.playLottieAnimation(lottieViewShineOne)
                     Heart.playLottieAnimation(lottieViewShineTwo)
 
-                    // Обновляем таймер на +3 часа
+                    // Таймер первого прогрессбара
                     val now = System.currentTimeMillis()
                     val remaining = timerEndTime - now
                     val safeRemaining = if (remaining > 0) remaining else 0
-                    timerEndTime = now + safeRemaining + 3 * 30* 30 * 30 * 1000 // Настройка таймера
+                    timerEndTime = now + safeRemaining + 6 * 60 * 60 * 1000 // Настройка таймера
 
                     saveTimerEndTime(timerEndTime)
                     startCountdownTimer()
