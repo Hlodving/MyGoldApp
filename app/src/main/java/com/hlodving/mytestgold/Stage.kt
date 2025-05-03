@@ -1,5 +1,5 @@
 package com.hlodving.mytestgold
-
+// Класс с этапами
 enum class Stage(val number: Int) {
     STAGE_1(1),
     STAGE_2(2),
@@ -104,7 +104,8 @@ enum class Stage(val number: Int) {
     UNKNOWN(0);
 
     companion object {
-        fun fromGold(gold: Int): Stage {
+        fun fromGold(gold: Int): Stage {  //Функция которая по колличеству кликов определяет на каком этапе
+            //находится пользователь
             var accumulated = 0
             for (i in 1..100) {
                 val required = i * 100

@@ -1,4 +1,6 @@
 package com.hlodving.mytestgold
+//Этот класс это виджет приложения
+
 
 import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
@@ -13,16 +15,18 @@ import android.widget.RemoteViews
 class GoldWidget : AppWidgetProvider() {
 
     companion object {
-        var currentGold = 0
+        var currentGold = 0 //Текущее колличество кликов
 
-        private var useAuraAnimation = false // Перенесено в companion object
+        private var useAuraAnimation = false //Переключает анимацию между aura и shine
 
-        private var frameHandler: Handler? = null
-        private var frameRunnable: Runnable? = null
-        private var delayHandler: Handler? = null
+        private var frameHandler: Handler? = null //используются для проигрывания анимации по кадрам
+        private var frameRunnable: Runnable? = null //используются для проигрывания анимации по кадрам
+        private var delayHandler: Handler? = null //делает паузу между циклами анимации
 
-        private var currentFrame = 0
+        private var currentFrame = 0 //номер текущего кадра анимации (в пределах 0–22 или 0–59)
 
+
+        //Эта функция обнавляет внешний вид виджета
         fun updateWidget(
             context: Context,
             appWidgetManager: AppWidgetManager,
@@ -67,7 +71,7 @@ class GoldWidget : AppWidgetProvider() {
 
             appWidgetManager.updateAppWidget(appWidgetId, views)
         }
-
+        //Анимация виджета
         private fun playOneAnimation(context: Context) {
             val appWidgetManager = AppWidgetManager.getInstance(context)
             val appWidgetIds = appWidgetManager.getAppWidgetIds(
@@ -101,7 +105,7 @@ class GoldWidget : AppWidgetProvider() {
 
             frameHandler?.post(frameRunnable!!)
         }
-
+        // время между анимациями
         private fun startDelay(context: Context) {
             delayHandler = Handler(Looper.getMainLooper())
             delayHandler?.postDelayed({
@@ -109,6 +113,8 @@ class GoldWidget : AppWidgetProvider() {
             }, 15_000L)
         }
 
+
+        //Запуск анимации
         fun startAnimationCycle(context: Context) {
             if (delayHandler == null && frameHandler == null) {
                 startDelay(context)

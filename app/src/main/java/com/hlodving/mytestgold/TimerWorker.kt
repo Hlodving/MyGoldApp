@@ -1,4 +1,5 @@
 package com.hlodving.mytestgold
+//Этот класс сбрасывает виджет при откате таймера даже если приложение закрыто
 
 
 import android.appwidget.AppWidgetManager

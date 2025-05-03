@@ -1,5 +1,5 @@
     package com.hlodving.mytestgold
-
+    // Активирует таймер если устройство было перезапущено
     import android.appwidget.AppWidgetManager
     import android.content.BroadcastReceiver
     import android.content.ComponentName
@@ -9,6 +9,7 @@
     import java.util.concurrent.TimeUnit
 
     class BootReceiver : BroadcastReceiver() {
+        //Этот метот запускается после запуска телефона
         override fun onReceive(context: Context, intent: Intent?) {
             if (intent?.action == Intent.ACTION_BOOT_COMPLETED) {
                 val prefs = context.getSharedPreferences("GoldPrefs", Context.MODE_PRIVATE)

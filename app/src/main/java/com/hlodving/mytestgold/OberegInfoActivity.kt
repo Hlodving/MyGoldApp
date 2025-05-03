@@ -1,5 +1,5 @@
 package com.hlodving.mytestgold
-
+// Активити в котором отображается информация об обереге
 import android.os.Bundle
 import android.view.animation.AnimationUtils
 import androidx.appcompat.app.AppCompatActivity
