@@ -44,8 +44,9 @@ class MainActivity : AppCompatActivity() {
 
 
     private fun getBonusStage(): Int {
-        return bonusMax / 100
+        return ((bonusMax - 1000) / 500) + 1
     }
+
 
 
     private fun saveBonusProgress() {
@@ -268,12 +269,86 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-
-
-
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+
+        //ТЕСТ КНОПКА
+        binding.devAddGoldButton.setOnClickListener {
+            val Heart = HeartAnimation()
+
+            // Увеличиваем оба счётчика
+            goldCount += 100
+            bonusProgress += 100
+
+            saveGoldCount()
+            saveBonusProgress()
+
+            // Если bonusProgress заполнился
+            if (bonusProgress >= bonusMax) {
+                bonusProgress = 0
+                bonusMax += 500 // следующий этап
+                saveBonusProgress()
+                saveBonusMax()
+
+                // +24 часа к таймеру
+                timerEndTime += 24 * 60 * 60 * 1000
+                saveTimerEndTime(timerEndTime)
+                startCountdownTimer()
+                scheduleResetWorker(timerEndTime - System.currentTimeMillis())
+            }
+
+            // Обновление второго прогресс-бара
+            binding.progressBar2.max = bonusMax
+            binding.progressBar2.progress = bonusProgress
+            binding.progressText2.text = "$bonusProgress / $bonusMax"
+
+            val colorDrawableId2 = progressColors[(getBonusStage() - 1) % progressColors.size]
+            binding.progressBar2.progressDrawable = ContextCompat.getDrawable(this, colorDrawableId2)
+
+            // Обновляем основной прогресс-бар
+            val (stageProgress, stageMax, currentStage) = getStageData(goldCount)
+            updateTapAnimationForStage(currentStage)
+
+            if (currentStage.number > lastStage) {
+                val now = System.currentTimeMillis()
+                val remaining = timerEndTime - now
+                val safeRemaining = if (remaining > 0) remaining else 0
+                timerEndTime = now + safeRemaining + 6 * 60 * 60 * 1000 // +6 часов
+                saveTimerEndTime(timerEndTime)
+                startCountdownTimer()
+
+                val delayMillis = timerEndTime - System.currentTimeMillis()
+                scheduleResetWorker(delayMillis)
+
+                Log.d("DEBUG", "Этап ${currentStage.number}, таймер обновлён")
+                lastStage = currentStage.number
+
+                Heart.playLottieAnimation(binding.lottieViewShineOne)
+                Heart.playLottieAnimation(binding.lottieViewShineTwo)
+            }
+
+            binding.progressBar.max = stageMax
+            binding.progressBar.progress = stageProgress.coerceAtMost(stageMax)
+            binding.progressText.text = "$stageProgress / $stageMax"
+
+            val colorDrawableId = progressColors[(currentStage.number - 1) % progressColors.size]
+            binding.progressBar.progressDrawable = ContextCompat.getDrawable(this@MainActivity, colorDrawableId)
+
+            // Обновление виджета
+            GoldWidget.currentGold = goldCount
+            val widgetIntent = Intent(this@MainActivity, GoldWidget::class.java).apply {
+                action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
+                putExtra(
+                    AppWidgetManager.EXTRA_APPWIDGET_IDS,
+                    AppWidgetManager.getInstance(this@MainActivity)
+                        .getAppWidgetIds(ComponentName(this@MainActivity, GoldWidget::class.java))
+                )
+            }
+            sendBroadcast(widgetIntent)
+        }
+
+
 
         bonusProgress = loadBonusProgress()
 
@@ -399,7 +474,7 @@ class MainActivity : AppCompatActivity() {
                 bonusProgress++
                 if (bonusProgress >= bonusMax) {
                     bonusProgress = 0
-                    bonusMax += 100
+                    bonusMax += 500
                     // +24 часа к таймеру
                     timerEndTime += 24 * 60 * 60 * 1000
                     saveTimerEndTime(timerEndTime)
