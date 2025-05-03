@@ -278,8 +278,8 @@ class MainActivity : AppCompatActivity() {
             val Heart = HeartAnimation()
 
             // Увеличиваем оба счётчика
-            goldCount += 100
-            bonusProgress += 100
+            goldCount += 1000
+            bonusProgress += 1000
 
             saveGoldCount()
             saveBonusProgress()
