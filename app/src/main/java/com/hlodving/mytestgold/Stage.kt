@@ -101,19 +101,21 @@ enum class Stage(val number: Int) {
     STAGE_98(98),
     STAGE_99(99),
     STAGE_100(100),
+    STAGE_101(101),
     UNKNOWN(0);
 
     companion object {
         fun fromGold(gold: Int): Stage {  //Функция которая по колличеству кликов определяет на каком этапе
             //находится пользователь
             var accumulated = 0
-            for (i in 1..100) {
+            for (i in 1..101) { // Было 1..100
                 val required = i * 100
                 if (gold < accumulated + required) {
                     return values().find { it.number == i } ?: UNKNOWN
                 }
                 accumulated += required
             }
+
             return UNKNOWN
         }
     }

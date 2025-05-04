@@ -81,6 +81,12 @@ class MainActivity : AppCompatActivity() {
     }
 
 
+    private fun isOberegForever(): Boolean {
+        return timerEndTime == Long.MAX_VALUE
+    }
+
+
+
 
 
 
@@ -92,6 +98,12 @@ class MainActivity : AppCompatActivity() {
 
     //Эта функция запускает и отображает таймер обратного отсчёта, который при завершении сбрасывает нажатия.
     private fun startCountdownTimer() {
+        if (timerEndTime == Long.MAX_VALUE) {
+            binding.timerText.text = getString(R.string.active_forever_amulet)
+            return
+        }
+
+
         timerRunnable = object : Runnable {
             override fun run() {
                 val remaining = timerEndTime - System.currentTimeMillis()
@@ -108,6 +120,7 @@ class MainActivity : AppCompatActivity() {
         }
         timerHandler.post(timerRunnable)
     }
+
 
     private fun scheduleResetWorker(delayMillis: Long) {
         val workRequest = OneTimeWorkRequestBuilder<TimerWorker>()
@@ -132,7 +145,7 @@ class MainActivity : AppCompatActivity() {
         timerEndTime = 0L
         saveTimerEndTime(timerEndTime)
 
-        binding.timerText.text = "Оберег неактивен"
+        binding.timerText.text = getString(R.string.not_active_amulet)
 
         // Сброс прогресса
         val (stageProgress, stageMax, currentStage) = getStageData(goldCount)
@@ -148,7 +161,9 @@ class MainActivity : AppCompatActivity() {
 
 
 // тут мы берём номер этапа (Int), вычитаем 1
-        val colorDrawableId = progressColors[(currentStage.number - 1) % progressColors.size]
+        val safeStageNum = currentStage.number.coerceIn(1, 101)
+        val colorDrawableId = progressColors[(safeStageNum - 1) % progressColors.size]
+
         binding.progressBar.progressDrawable = ContextCompat.getDrawable(this, colorDrawableId)
 
         // Сброс второго прогресс-бара
@@ -275,6 +290,8 @@ class MainActivity : AppCompatActivity() {
 
         //ТЕСТ КНОПКА
         binding.devAddGoldButton.setOnClickListener {
+            if (isOberegForever()) return@setOnClickListener
+
             val Heart = HeartAnimation()
 
             // Увеличиваем оба счётчика
@@ -311,15 +328,29 @@ class MainActivity : AppCompatActivity() {
             updateTapAnimationForStage(currentStage)
 
             if (currentStage.number > lastStage) {
-                val now = System.currentTimeMillis()
-                val remaining = timerEndTime - now
-                val safeRemaining = if (remaining > 0) remaining else 0
-                timerEndTime = now + safeRemaining + 6 * 60 * 60 * 1000 // +6 часов
-                saveTimerEndTime(timerEndTime)
-                startCountdownTimer()
+                if (currentStage.number == 101) {
+                    timerEndTime = Long.MAX_VALUE
+                    saveTimerEndTime(timerEndTime)
+                    timerHandler.removeCallbacksAndMessages(null)
+                    binding.timerText.text = getString(R.string.active_forever_amulet)
+                    WorkManager.getInstance(this).cancelUniqueWork("resetGoldWorker")
+                    // Скрываем оба прогресс-бара и их текст
+                    binding.progressBar.visibility = View.GONE
+                    binding.progressText.visibility = View.GONE
+                    binding.progressBar2.visibility = View.GONE
+                    binding.progressText2.visibility = View.GONE
 
-                val delayMillis = timerEndTime - System.currentTimeMillis()
-                scheduleResetWorker(delayMillis)
+                } else {
+                    val now = System.currentTimeMillis()
+                    val remaining = timerEndTime - now
+                    val safeRemaining = if (remaining > 0) remaining else 0
+                    timerEndTime = now + safeRemaining + 6 * 60 * 60 * 1000
+                    saveTimerEndTime(timerEndTime)
+                    startCountdownTimer()
+
+                    val delayMillis = timerEndTime - System.currentTimeMillis()
+                    scheduleResetWorker(delayMillis)
+                }
 
                 Log.d("DEBUG", "Этап ${currentStage.number}, таймер обновлён")
                 lastStage = currentStage.number
@@ -328,11 +359,14 @@ class MainActivity : AppCompatActivity() {
                 Heart.playLottieAnimation(binding.lottieViewShineTwo)
             }
 
+
             binding.progressBar.max = stageMax
             binding.progressBar.progress = stageProgress.coerceAtMost(stageMax)
             binding.progressText.text = "$stageProgress / $stageMax"
 
-            val colorDrawableId = progressColors[(currentStage.number - 1) % progressColors.size]
+            val safeStageNum = currentStage.number.coerceIn(1, 101)
+            val colorDrawableId = progressColors[(safeStageNum - 1) % progressColors.size]
+
             binding.progressBar.progressDrawable = ContextCompat.getDrawable(this@MainActivity, colorDrawableId)
 
             // Обновление виджета
@@ -364,7 +398,26 @@ class MainActivity : AppCompatActivity() {
 
 
 
+
+
         timerEndTime = loadTimerEndTime()
+
+        if (timerEndTime == Long.MAX_VALUE) {
+            binding.timerText.text = getString(R.string.active_forever_amulet)
+            // Скрываем оба прогресс-бара и их текст
+            binding.progressBar.visibility = View.GONE
+            binding.progressText.visibility = View.GONE
+            binding.progressBar2.visibility = View.GONE
+            binding.progressText2.visibility = View.GONE
+
+        } else if (timerEndTime > System.currentTimeMillis()) {
+            startCountdownTimer()
+            val delayMillis = timerEndTime - System.currentTimeMillis()
+            scheduleResetWorker(delayMillis)
+        } else {
+            binding.timerText.text = getString(R.string.not_active_amulet)
+        }
+
 
 
 
@@ -409,15 +462,22 @@ class MainActivity : AppCompatActivity() {
 // Загружаем сохранённое время таймера
         timerEndTime = loadTimerEndTime()
 
-        if (timerEndTime > System.currentTimeMillis()) {
-            startCountdownTimer()
 
-            // <<< ДОБАВЛЕНО >>> Перезапускаем WorkManager на случай перезапуска приложения
-            val delayMillis = timerEndTime - System.currentTimeMillis()
-            scheduleResetWorker(delayMillis)
-        } else {
-            binding.timerText.text = "Оберег неактивен"
+
+        when {
+            timerEndTime == Long.MAX_VALUE -> {
+                binding.timerText.text = getString(R.string.active_forever_amulet)
+            }
+            timerEndTime > System.currentTimeMillis() -> {
+                startCountdownTimer()
+                val delayMillis = timerEndTime - System.currentTimeMillis()
+                scheduleResetWorker(delayMillis)
+            }
+            else -> {
+                binding.timerText.text = getString(R.string.not_active_amulet)
+            }
         }
+
 
 
 
@@ -436,7 +496,9 @@ class MainActivity : AppCompatActivity() {
         binding.progressBar.progress = stageProgress.coerceAtMost(stageMax)
         binding.progressText.text = "$stageProgress / $stageMax"
 
-        val colorDrawableId = progressColors[(currentStage.number - 1) % progressColors.size]
+        val safeStageNum = currentStage.number.coerceIn(1, 101)
+        val colorDrawableId = progressColors[(safeStageNum - 1) % progressColors.size]
+
 
         binding.progressBar.progressDrawable = ContextCompat.getDrawable(this@MainActivity, colorDrawableId)
 
@@ -458,6 +520,9 @@ class MainActivity : AppCompatActivity() {
 
 
             lottieHeartGold.setOnClickListener {
+
+                if (isOberegForever()) return@setOnClickListener
+
                 goldCount++
                 saveGoldCount()
 
@@ -518,7 +583,7 @@ class MainActivity : AppCompatActivity() {
                         startCountdownTimer()
                     } else {
                         Log.d("MyLog", "Сброс был, но этап 1 — таймер не запускаем")
-                        binding.timerText.text = "Оберег неактивен"
+                        binding.timerText.text = getString(R.string.not_active_amulet)
                     }
                     resetHappened = false
                 }
@@ -527,25 +592,37 @@ class MainActivity : AppCompatActivity() {
 
 
                 if (currentStage.number > lastStage) {
-                    // <<< ТУТ запуск анимаций по переходу этапа >>>
-                    Heart.playLottieAnimation(lottieViewShineOne)
-                    Heart.playLottieAnimation(lottieViewShineTwo)
+                    if (currentStage.number == 101) {
+                        timerEndTime = Long.MAX_VALUE
+                        saveTimerEndTime(timerEndTime)
+                        timerHandler.removeCallbacksAndMessages(null)
+                        binding.timerText.text = getString(R.string.active_forever_amulet)
+                        WorkManager.getInstance(this@MainActivity).cancelUniqueWork("resetGoldWorker")
+                        // Скрываем оба прогресс-бара и их текст
+                        binding.progressBar.visibility = View.GONE
+                        binding.progressText.visibility = View.GONE
+                        binding.progressBar2.visibility = View.GONE
+                        binding.progressText2.visibility = View.GONE
 
-                    // Таймер первого прогрессбара
-                    val now = System.currentTimeMillis()
-                    val remaining = timerEndTime - now
-                    val safeRemaining = if (remaining > 0) remaining else 0
-                    timerEndTime = now + safeRemaining + 6 * 60 * 60 * 1000 // Настройка таймера
+                    } else {
+                        val now = System.currentTimeMillis()
+                        val remaining = timerEndTime - now
+                        val safeRemaining = if (remaining > 0) remaining else 0
+                        timerEndTime = now + safeRemaining + 6 * 60 * 60 * 1000
+                        saveTimerEndTime(timerEndTime)
+                        startCountdownTimer()
 
-                    saveTimerEndTime(timerEndTime)
-                    startCountdownTimer()
+                        val delayMillis = timerEndTime - System.currentTimeMillis()
+                        scheduleResetWorker(delayMillis)
+                    }
 
-                    val delayMillis = timerEndTime - System.currentTimeMillis()
-                    scheduleResetWorker(delayMillis)
-
-                    Log.d("MyLog", "Переход на этап ${currentStage.number} — запускаем таймер")
+                    Log.d("DEBUG", "Этап ${currentStage.number}, таймер обновлён")
                     lastStage = currentStage.number
+
+                    Heart.playLottieAnimation(binding.lottieViewShineOne)
+                    Heart.playLottieAnimation(binding.lottieViewShineTwo)
                 }
+
 
 
 
