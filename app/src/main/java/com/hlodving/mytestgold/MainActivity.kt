@@ -40,8 +40,8 @@ class MainActivity : AppCompatActivity() {
 
     private var resetHappened = false
 
-    private var bonusProgress = 0
-    private var bonusMax = 1000
+    private var bonusProgress = 0 //Это текущий прогресс второго прогресс-бара
+    private var bonusMax = 1000 //Максимальное значение бонусного прогресса
 
 
     private fun getBonusStage(): Int {
@@ -161,21 +161,13 @@ class MainActivity : AppCompatActivity() {
 
 
 
+
+
 // тут мы берём номер этапа (Int), вычитаем 1
         val safeStageNum = currentStage.number.coerceIn(1, 101)
         val colorDrawableId = progressColors[(safeStageNum - 1) % progressColors.size]
 
         binding.progressBar.progressDrawable = ContextCompat.getDrawable(this, colorDrawableId)
-
-        // Сброс второго прогресс-бара
-        bonusProgress = 0
-        bonusMax = 1000
-        saveBonusProgress()
-        saveBonusMax()
-
-        binding.progressBar2.max = bonusMax
-        binding.progressBar2.progress = bonusProgress
-        binding.progressText2.text = "$bonusProgress / $bonusMax"
 
 
 
@@ -281,107 +273,11 @@ class MainActivity : AppCompatActivity() {
 
 
 
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-
-        //ТЕСТ КНОПКА
-        binding.devAddGoldButton.setOnClickListener {
-            if (isOberegForever()) return@setOnClickListener
-
-            val Heart = HeartAnimation()
-
-            // Увеличиваем оба счётчика
-            goldCount += 1000
-            bonusProgress += 1000
-
-            saveGoldCount()
-            saveBonusProgress()
-
-            // Если bonusProgress заполнился
-            if (bonusProgress >= bonusMax) {
-                bonusProgress = 0
-                bonusMax += 500 // следующий этап
-                saveBonusProgress()
-                saveBonusMax()
-
-                // +24 часа к таймеру
-                timerEndTime += 24 * 60 * 60 * 1000
-                saveTimerEndTime(timerEndTime)
-                startCountdownTimer()
-                scheduleResetWorker(timerEndTime - System.currentTimeMillis())
-            }
-
-            // Обновление второго прогресс-бара
-            binding.progressBar2.max = bonusMax
-            binding.progressBar2.progress = bonusProgress
-            binding.progressText2.text = "$bonusProgress / $bonusMax"
-
-            val colorDrawableId2 = progressColors[(getBonusStage() - 1) % progressColors.size]
-            binding.progressBar2.progressDrawable = ContextCompat.getDrawable(this, colorDrawableId2)
-
-            // Обновляем основной прогресс-бар
-            val (stageProgress, stageMax, currentStage) = getStageData(goldCount)
-            updateTapAnimationForStage(currentStage)
-
-            if (currentStage.number > lastStage) {
-                if (currentStage.number == 101) {
-                    timerEndTime = Long.MAX_VALUE
-                    saveTimerEndTime(timerEndTime)
-                    timerHandler.removeCallbacksAndMessages(null)
-                    binding.timerText.text = getString(R.string.active_forever_amulet)
-                    WorkManager.getInstance(this).cancelUniqueWork("resetGoldWorker")
-                    // Скрываем оба прогресс-бара и их текст
-                    binding.progressBar.visibility = View.GONE
-                    binding.progressText.visibility = View.GONE
-                    binding.progressBar2.visibility = View.GONE
-                    binding.progressText2.visibility = View.GONE
-
-                } else {
-                    val now = System.currentTimeMillis()
-                    val remaining = timerEndTime - now
-                    val safeRemaining = if (remaining > 0) remaining else 0
-                    timerEndTime = now + safeRemaining + 6 * 60 * 60 * 1000
-                    saveTimerEndTime(timerEndTime)
-                    startCountdownTimer()
-
-                    val delayMillis = timerEndTime - System.currentTimeMillis()
-                    scheduleResetWorker(delayMillis)
-                }
-
-                Log.d("DEBUG", "Этап ${currentStage.number}, таймер обновлён")
-                lastStage = currentStage.number
-
-                Heart.playLottieAnimation(binding.lottieViewShineOne)
-                Heart.playLottieAnimation(binding.lottieViewShineTwo)
-            }
-
-
-            binding.progressBar.max = stageMax
-            binding.progressBar.progress = stageProgress.coerceAtMost(stageMax)
-            binding.progressText.text = "$stageProgress / $stageMax"
-
-            val safeStageNum = currentStage.number.coerceIn(1, 101)
-            val colorDrawableId = progressColors[(safeStageNum - 1) % progressColors.size]
-
-            binding.progressBar.progressDrawable = ContextCompat.getDrawable(this@MainActivity, colorDrawableId)
-
-            // Обновление виджета
-            GoldWidget.currentGold = goldCount
-            val widgetIntent = Intent(this@MainActivity, GoldWidget::class.java).apply {
-                action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
-                putExtra(
-                    AppWidgetManager.EXTRA_APPWIDGET_IDS,
-                    AppWidgetManager.getInstance(this@MainActivity)
-                        .getAppWidgetIds(ComponentName(this@MainActivity, GoldWidget::class.java))
-                )
-            }
-            sendBroadcast(widgetIntent)
-        }
 
 
 
@@ -542,7 +438,10 @@ class MainActivity : AppCompatActivity() {
                     bonusProgress = 0
                     bonusMax += 500
                     // +24 часа к таймеру
-                    timerEndTime += 24 * 60 * 60 * 1000
+                    timerEndTime += 60 * 1000
+
+                    // timerEndTime += 24 * 60 * 60 * 1000
+
                     saveTimerEndTime(timerEndTime)
                     startCountdownTimer()
                     scheduleResetWorker(timerEndTime - System.currentTimeMillis())
@@ -609,7 +508,10 @@ class MainActivity : AppCompatActivity() {
                         val now = System.currentTimeMillis()
                         val remaining = timerEndTime - now
                         val safeRemaining = if (remaining > 0) remaining else 0
-                        timerEndTime = now + safeRemaining + 6 * 60 * 60 * 1000
+                        timerEndTime = now + safeRemaining + 60 * 1000
+
+                        // timerEndTime = now + safeRemaining + 6 * 60 * 60 * 1000
+
                         saveTimerEndTime(timerEndTime)
                         startCountdownTimer()
 
