@@ -193,13 +193,6 @@ class MainActivity : AppCompatActivity() {
 
 
 
-    private fun isWidgetPresent(): Boolean {
-        val appWidgetManager = AppWidgetManager.getInstance(this)
-        val widgetIds = appWidgetManager.getAppWidgetIds(
-            ComponentName(this, GoldWidget::class.java)
-        )
-        return widgetIds.isNotEmpty()
-    }
 
 
 
@@ -259,16 +252,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var binding: ActivityMainBinding
 
 
-    private val widgetReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent?) {
-            if (intent?.action == "com.hlodving.WIDGET_PRESENT") {
-                // 🔥 При получении сигнала — тоже скрываем
-                if (isWidgetPresent()) {
-                    binding.widgetHintText.visibility = View.GONE
-                }
-            }
-        }
-    }
+
 
 
 
@@ -325,9 +309,6 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-
-
-        binding.widgetHintText.visibility = if (isWidgetPresent()) View.GONE else View.VISIBLE
 
 
 
@@ -732,25 +713,12 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-
-        // 🔥 Проверка сразу: есть ли уже виджет
-        if (isWidgetPresent()) {
-            binding.widgetHintText.visibility = View.GONE
-        }
-
-        // 🔥 Подписка на Broadcast от GoldWidget
-        registerReceiver(
-            widgetReceiver,
-            IntentFilter("com.hlodving.WIDGET_PRESENT"),
-            Context.RECEIVER_NOT_EXPORTED
-        )
     }
 
 
 
     override fun onPause() {
         super.onPause()
-        unregisterReceiver(widgetReceiver)
     }
 
 
