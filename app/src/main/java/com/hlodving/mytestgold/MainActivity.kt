@@ -41,33 +41,35 @@ class MainActivity : AppCompatActivity() {
     private var resetHappened = false
 
     private var bonusProgress = 0 //Это текущий прогресс второго прогресс-бара
-    private var bonusMax = 1000 //Максимальное значение бонусного прогресса
+    private var bonusMax = 0 //Максимальное значение бонусного прогресса
+
+    //номер текущего этапа второго прогресс-бара
+    private var bonusStageNumber = 1
+    private var currentBonusStage = BonusStage.fromNumber(bonusStageNumber)
 
 
-    private fun getBonusStage(): Int {
-        return ((bonusMax - 1000) / 500) + 1
-    }
 
 
 
+    //Сохранение тапов в втором прогресс баре
     private fun saveBonusProgress() {
         val prefs = getSharedPreferences("GoldPrefs", Context.MODE_PRIVATE)
         prefs.edit().putInt("bonusProgress", bonusProgress).apply()
     }
-
+    //Загрузка тапов в втором прогресс баре
     private fun loadBonusProgress(): Int {
         val prefs = getSharedPreferences("GoldPrefs", Context.MODE_PRIVATE)
         return prefs.getInt("bonusProgress", 0)
     }
-
-    private fun saveBonusMax() {
+    //Загрузка состояния второго прогресс бара
+    private fun loadBonusStageNumber(): Int {
         val prefs = getSharedPreferences("GoldPrefs", Context.MODE_PRIVATE)
-        prefs.edit().putInt("bonusMax", bonusMax).apply()
+        return prefs.getInt("bonusStageNumber", 1).coerceIn(1, 30)
     }
-
-    private fun loadBonusMax(): Int {
+    //Сохранение состояния второго прогресс бара
+    private fun saveBonusStageNumber() {
         val prefs = getSharedPreferences("GoldPrefs", Context.MODE_PRIVATE)
-        return prefs.getInt("bonusMax", 1000)
+        prefs.edit().putInt("bonusStageNumber", bonusStageNumber).apply()
     }
 
 
@@ -156,7 +158,8 @@ class MainActivity : AppCompatActivity() {
         binding.progressBar.progress = stageProgress
         binding.progressText.text = "$stageProgress / $stageMax"
 
-        val colorDrawableId2 = progressColors[(getBonusStage() - 1) % progressColors.size]
+        val colorDrawableId2 = progressColors[(bonusStageNumber - 1) % progressColors.size]
+
         binding.progressBar2.progressDrawable = ContextCompat.getDrawable(this, colorDrawableId2)
 
 
@@ -263,18 +266,24 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
 
+        //Загрузка состояния второго прогресс бара
+        bonusStageNumber = loadBonusStageNumber()
+        currentBonusStage = BonusStage.fromNumber(bonusStageNumber)
+        bonusMax = currentBonusStage.max
+
 
 
         bonusProgress = loadBonusProgress()
 
-        bonusMax = loadBonusMax()
+
 
 
         binding.progressBar2.max = bonusMax
         binding.progressBar2.progress = bonusProgress
         binding.progressText2.text = "$bonusProgress / $bonusMax"
 
-        val colorDrawableId2 = progressColors[(getBonusStage() - 1) % progressColors.size]
+        val colorDrawableId2 = progressColors[(bonusStageNumber - 1) % progressColors.size]
+
         binding.progressBar2.progressDrawable = ContextCompat.getDrawable(this, colorDrawableId2)
 
 
@@ -415,20 +424,27 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 bonusProgress++
+
+                saveBonusProgress()
+
                 if (bonusProgress >= bonusMax) {
                     bonusProgress = 0
-                    bonusMax += 500
-                    // +24 часа к таймеру
-                    timerEndTime += 60 * 1000
+
+                    // Переход к следующей стадии
+                    bonusStageNumber = (bonusStageNumber + 1).coerceAtMost(30)
+                    saveBonusStageNumber()
+
+                    currentBonusStage = BonusStage.fromNumber(bonusStageNumber)
+                    bonusMax = currentBonusStage.max
 
                     // timerEndTime += 24 * 60 * 60 * 1000
-
+                    timerEndTime += 60 * 1000
                     saveTimerEndTime(timerEndTime)
                     startCountdownTimer()
                     scheduleResetWorker(timerEndTime - System.currentTimeMillis())
                 }
-                saveBonusProgress()
-                saveBonusMax()
+
+
 
                 binding.progressBar2.max = bonusMax
                 binding.progressBar2.progress = bonusProgress
@@ -436,13 +452,9 @@ class MainActivity : AppCompatActivity() {
 
 
 
-                val colorDrawableId2 = progressColors[(getBonusStage() - 1) % progressColors.size]
+                val colorDrawableId2 = progressColors[(bonusStageNumber - 1) % progressColors.size]
+
                 binding.progressBar2.progressDrawable = ContextCompat.getDrawable(this@MainActivity, colorDrawableId2)
-
-
-
-
-
 
 
 
