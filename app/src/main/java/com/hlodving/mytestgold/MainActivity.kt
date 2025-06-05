@@ -265,6 +265,26 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        //ВРЕМЕННАЯ КНОПКА ДЛЯ ТЕСТА
+        binding.debugAdd500Button.setOnClickListener {
+            bonusProgress += 499
+            if (bonusProgress >= bonusMax) {
+                bonusProgress = 0
+                bonusStageNumber = (bonusStageNumber + 1).coerceAtMost(30)
+                saveBonusStageNumber()
+                currentBonusStage = BonusStage.fromNumber(bonusStageNumber)
+                bonusMax = currentBonusStage.max
+            }
+            saveBonusProgress()
+
+            binding.progressBar2.max = bonusMax
+            binding.progressBar2.progress = bonusProgress
+            binding.progressText2.text = "$bonusProgress / $bonusMax"
+
+            val colorDrawableId2 = progressColors[(bonusStageNumber - 1) % progressColors.size]
+            binding.progressBar2.progressDrawable = ContextCompat.getDrawable(this, colorDrawableId2)
+        }
+
 
         //Загрузка состояния второго прогресс бара
         bonusStageNumber = loadBonusStageNumber()
