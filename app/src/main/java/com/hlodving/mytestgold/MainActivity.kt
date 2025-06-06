@@ -467,8 +467,10 @@ class MainActivity : AppCompatActivity() {
                     currentBonusStage = BonusStage.fromNumber(bonusStageNumber)
                     bonusMax = currentBonusStage.max
 
-                    // timerEndTime += 24 * 60 * 60 * 1000
-                    timerEndTime += 60 * 1000
+                    //Отвечает за добавляемое время по заполнению второго прогресс бара
+                    timerEndTime += currentBonusStage.bonusTimeMillis
+
+
                     saveTimerEndTime(timerEndTime)
                     startCountdownTimer()
                     scheduleResetWorker(timerEndTime - System.currentTimeMillis())
@@ -739,104 +741,104 @@ class MainActivity : AppCompatActivity() {
                         18 -> {//  сердец
                             Heart.playNextHeartAnimation(
                                 binding.lottieHeartGold,
-                                0.371f, 0.388f, 0.402f,
-                                0.387f, 0.4f, 0.421f
+                                0.578f, 0.595f, 0.612f,
+                                0.593f, 0.610f, 0.625f
                             )
                            Heart.playLottieAnimation(lottieTapGold, 0.19f,0.22f)
                         }
                         19 -> {//  сердец
                             Heart.playNextHeartAnimation(
                                 binding.lottieHeartGold,
-                                0.371f, 0.388f, 0.402f,
-                                0.387f, 0.4f, 0.421f
+                                0.578f, 0.595f, 0.612f,
+                                0.593f, 0.610f, 0.625f
                             )
                            Heart.playLottieAnimation(lottieTapGold, 0.19f,0.22f)
                         }
                         20 -> {//  сердец
                             Heart.playNextHeartAnimation(
                                 binding.lottieHeartGold,
-                                0.371f, 0.388f, 0.402f,
-                                0.387f, 0.4f, 0.421f
+                                0.578f, 0.595f, 0.612f,
+                                0.593f, 0.610f, 0.625f
                             )
                            Heart.playLottieAnimation(lottieTapGold, 0.19f,0.22f)
                         }
                         21 -> {//  сердец
                             Heart.playNextHeartAnimation(
                                 binding.lottieHeartGold,
-                                0.371f, 0.388f, 0.402f,
-                                0.387f, 0.4f, 0.421f
+                                0.578f, 0.595f, 0.612f,
+                                0.593f, 0.610f, 0.625f
                             )
                            Heart.playLottieAnimation(lottieTapGold, 0.19f,0.22f)
                         }
                         22 -> {//  сердец
                             Heart.playNextHeartAnimation(
                                 binding.lottieHeartGold,
-                                0.371f, 0.388f, 0.402f,
-                                0.387f, 0.4f, 0.421f
+                                0.578f, 0.595f, 0.612f,
+                                0.593f, 0.610f, 0.625f
                             )
                            Heart.playLottieAnimation(lottieTapGold, 0.19f,0.22f)
                         }
                         23 -> {//  сердец
                             Heart.playNextHeartAnimation(
                                 binding.lottieHeartGold,
-                                0.371f, 0.388f, 0.402f,
-                                0.387f, 0.4f, 0.421f
+                                0.578f, 0.595f, 0.612f,
+                                0.593f, 0.610f, 0.625f
                             )
                            Heart.playLottieAnimation(lottieTapGold, 0.19f,0.22f)
                         }
                         24 -> {//  сердец
                             Heart.playNextHeartAnimation(
                                 binding.lottieHeartGold,
-                                0.371f, 0.388f, 0.402f,
-                                0.387f, 0.4f, 0.421f
+                                0.578f, 0.595f, 0.612f,
+                                0.593f, 0.610f, 0.625f
                             )
                            Heart.playLottieAnimation(lottieTapGold, 0.19f,0.22f)
                         }
                         25 -> {//  сердец
                             Heart.playNextHeartAnimation(
                                 binding.lottieHeartGold,
-                                0.371f, 0.388f, 0.402f,
-                                0.387f, 0.4f, 0.421f
+                                0.578f, 0.595f, 0.612f,
+                                0.593f, 0.610f, 0.625f
                             )
                            Heart.playLottieAnimation(lottieTapGold, 0.19f,0.22f)
                             }
                         26 -> {  //  сердец
                             Heart.playNextHeartAnimation(
                                 binding.lottieHeartGold,
-                                0.371f, 0.388f, 0.402f,
-                                0.387f, 0.4f, 0.421f
+                                0.578f, 0.595f, 0.612f,
+                                0.593f, 0.610f, 0.625f
                             )
                             Heart.playLottieAnimation(lottieTapGold, 0.19f,0.22f)
                         }
                         27 -> {  //  сердец
                             Heart.playNextHeartAnimation(
                                 binding.lottieHeartGold,
-                                0.371f, 0.388f, 0.402f,
-                                0.387f, 0.4f, 0.421f
+                                0.578f, 0.595f, 0.612f,
+                                0.593f, 0.610f, 0.625f
                             )
                             Heart.playLottieAnimation(lottieTapGold, 0.19f,0.22f)
                         }
                         28 -> {  //  сердец
                             Heart.playNextHeartAnimation(
                                 binding.lottieHeartGold,
-                                0.371f, 0.388f, 0.402f,
-                                0.387f, 0.4f, 0.421f
+                                0.578f, 0.595f, 0.612f,
+                                0.593f, 0.610f, 0.625f
                             )
                             Heart.playLottieAnimation(lottieTapGold, 0.19f,0.22f)
                         }
                         29 -> {  //  сердец
                             Heart.playNextHeartAnimation(
                                 binding.lottieHeartGold,
-                                0.371f, 0.388f, 0.402f,
-                                0.387f, 0.4f, 0.421f
+                                0.578f, 0.595f, 0.612f,
+                                0.593f, 0.610f, 0.625f
                             )
                             Heart.playLottieAnimation(lottieTapGold, 0.19f,0.22f)
                         }
                         30 -> {  //  сердец
                             Heart.playNextHeartAnimation(
                                 binding.lottieHeartGold,
-                                0.371f, 0.388f, 0.402f,
-                                0.387f, 0.4f, 0.421f
+                                0.578f, 0.595f, 0.612f,
+                                0.593f, 0.610f, 0.625f
                             )
                             Heart.playLottieAnimation(lottieTapGold, 0.19f,0.22f)
                         }
