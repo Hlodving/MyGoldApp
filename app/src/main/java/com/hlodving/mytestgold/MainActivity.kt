@@ -1,5 +1,6 @@
 package com.hlodving.mytestgold
 
+import HeartAnimation
 import android.appwidget.AppWidgetManager
 import android.content.BroadcastReceiver
 import android.content.ComponentName
@@ -24,9 +25,6 @@ class MainActivity : AppCompatActivity() {
 
     // Переменные и настройки в начале класса
     private var lastStage = 1 // Последний достигнутый этап (нужен для проверки перехода на новый)
-    private val totalActions = 21 // Всего действий в специальной анимационной последовательности
-    private var currentAction = 1 // Индекс текущего действия
-    private val actionsSequence = mutableListOf<Int>() // Список действий для выполнения
     private var goldCount = 0 // Общее количество нажатий
     private val progressColors = listOf(
         R.drawable.progress_bar_green,
@@ -36,6 +34,7 @@ class MainActivity : AppCompatActivity() {
         R.drawable.progress_bar_yellow,
         R.drawable.progress_bar_red
     ) // Список стилей прогресс-бара по фазам
+
 
 
     private var resetHappened = false
@@ -166,7 +165,7 @@ class MainActivity : AppCompatActivity() {
 
 
 
-// тут мы берём номер этапа (Int), вычитаем 1
+        // тут мы берём номер этапа (Int), вычитаем 1
         val safeStageNum = currentStage.number.coerceIn(1, 101)
         val colorDrawableId = progressColors[(safeStageNum - 1) % progressColors.size]
 
@@ -267,6 +266,8 @@ class MainActivity : AppCompatActivity() {
 
         //ВРЕМЕННАЯ КНОПКА ДЛЯ ТЕСТА
         binding.debugAdd500Button.setOnClickListener {
+
+
             bonusProgress += 499
             if (bonusProgress >= bonusMax) {
                 bonusProgress = 0
@@ -283,6 +284,10 @@ class MainActivity : AppCompatActivity() {
 
             val colorDrawableId2 = progressColors[(bonusStageNumber - 1) % progressColors.size]
             binding.progressBar2.progressDrawable = ContextCompat.getDrawable(this, colorDrawableId2)
+
+            val heart = HeartAnimation()
+            heart.playLottieAnimation(binding.lottieHeartGold, 0.083f,0.095f)
+
         }
 
 
@@ -580,154 +585,111 @@ class MainActivity : AppCompatActivity() {
                 if (goldCount % 27 == 0) {
 
 
-                // Генерация последовательности выполнения действий
-                fun generateActionsSequence() {
-                    // Добавляем действия в последовательности
-                    for (stage in 1..totalActions) {
-                        // Первое действие
-                        actionsSequence.add(1)
-
-                        // Промежуточные действия
-                        for (i in 2..stage) {
-                            actionsSequence.add(i)
-                        }
-
-                        // Последнее действие
-                        actionsSequence.add(totalActions)
-                    }
-                }
-
-                generateActionsSequence()
 
 
-                // Выполнение следующего действия
-                 fun executeNextAction() {
-                    // Если действия завершились
-                    if (currentAction > actionsSequence.size) {
-                        Log.d("MyLog", "Все действия выполнены.")
-                        Heart.playLottieAnimation(lottieHeartGoldFinish)
-                        Heart.playLottieAnimation(lottieTapGold, 0.19f,0.22f)
-                        return
-                    }
-
-
-                    // Выполняем текущее действие
-                    val actionNumber = actionsSequence[currentAction - 1]
-                    Log.d("MyLog", "Выполняется  $actionNumber")
-
-                    // Переходим к следующему действию
-                    currentAction++
-
-                    when (actionNumber) {
+                    // Выполнение следующего действия
+                    when (currentBonusStage.number) {
                         1 -> {
-                            Log.d("MyLog", "Реально выполняется первое действие $currentAction")
-                            Heart.playLottieAnimation(lottieHeartGold, 0.01f, 0.025f)
+                            Heart.playNextHeartAnimation(
+                                binding.lottieHeartGold,
+                                0.01f, 0.027f, 0.045f,
+                                0.025f, 0.04f, 0.06f
+                            )
                             Heart.playLottieAnimation(lottieTapGold, 0.19f, 0.22f)
                         }
                         2 -> {
-                            Log.d("MyLog", "Реально выполняется второе действие $currentAction")
-                            Heart.playLottieAnimation(lottieHeartGold, 0.027f,0.04f)
-                            Heart.playLottieAnimation(lottieTapGold, 0.19f,0.22f)
+                            Heart.playNextHeartAnimation(
+                                binding.lottieHeartGold,
+                                0.083f, 0.1f, 0.115f,
+                                0.095f, 0.112f, 0.132f
+                            )
+                            Heart.playLottieAnimation(lottieTapGold, 0.19f, 0.22f)
                         }
                         3 -> {
-                            Log.d("MyLog", "Реально выполняется третье действие $currentAction")
-                            Heart.playLottieAnimation(lottieHeartGold, 0.045f,0.06f)
-                            Heart.playLottieAnimation(lottieTapGold, 0.19f,0.22f)
+                            Heart.playNextHeartAnimation(
+                                binding.lottieHeartGold,
+                                0.135f, 0.151f, 0.17f,
+                                0.148f, 0.165f, 0.185f
+                            )
+                           Heart.playLottieAnimation(lottieTapGold, 0.19f,0.22f)
                         }
                         4 -> {
-                            Log.d("MyLog", "Реально выполняется четвертое действие $currentAction")
-                            Heart.playLottieAnimation(lottieHeartGold, 0.083f,0.095f)
-                            Heart.playLottieAnimation(lottieTapGold, 0.19f,0.22f)
+                            Heart.playNextHeartAnimation(
+                                binding.lottieHeartGold,
+                                0.19f, 0.207f, 0.226f,
+                                0.205f, 0.225f, 0.24f
+                            )
+                           Heart.playLottieAnimation(lottieTapGold, 0.19f,0.22f)
                         }
                         5 -> {
-                            Log.d("MyLog", "Реально выполняется пятое действие $currentAction")
-                            Heart.playLottieAnimation(lottieHeartGold, 0.1f,0.112f)
-                            Heart.playLottieAnimation(lottieTapGold, 0.19f,0.22f)
+                            Heart.playNextHeartAnimation(
+                                binding.lottieHeartGold,
+                                0.243f, 0.262f, 0.280f,
+                                0.258f, 0.276f, 0.295f
+                            )
+                           Heart.playLottieAnimation(lottieTapGold, 0.19f,0.22f)
                         }
                         6 -> {
-                            Log.d("MyLog", "Реально выполняется шестое действие $currentAction")
-                            Heart.playLottieAnimation(lottieHeartGold, 0.115f,0.132f)
-                            Heart.playLottieAnimation(lottieTapGold, 0.19f,0.22f)
+                            Heart.playNextHeartAnimation(
+                                binding.lottieHeartGold,
+                                0.298f, 0.333f, 0.352f,
+                                0.311f, 0.351f, 0.368f
+                            )
+                           Heart.playLottieAnimation(lottieTapGold, 0.19f,0.22f)
                         }
                         7 -> {
-                            Log.d("MyLog", "Реально выполняется седьмое действие $currentAction")
-                            Heart.playLottieAnimation(lottieHeartGold, 0.135f,0.148f)
-                            Heart.playLottieAnimation(lottieTapGold, 0.19f,0.22f)
+                            Heart.playNextHeartAnimation(
+                                binding.lottieHeartGold,
+                                0.371f, 0.388f, 0.402f,
+                                0.387f, 0.4f, 0.421f
+                            )
+                           Heart.playLottieAnimation(lottieTapGold, 0.19f,0.22f)
                         }
                         8 -> {
-                            Log.d("MyLog", "Реально выполняется восьмое действие $currentAction")
-                            Heart.playLottieAnimation(lottieHeartGold, 0.151f,0.165f)
                             Heart.playLottieAnimation(lottieTapGold, 0.19f,0.22f)
                         }
                         9 -> {
-                            Log.d("MyLog", "Реально выполняется девятое действие $currentAction")
-                            Heart.playLottieAnimation(lottieHeartGold, 0.17f,0.185f)
                             Heart.playLottieAnimation(lottieTapGold, 0.19f,0.22f)
                         }
                         10 -> {
-                            Log.d("MyLog", "Реально выполняется десятое действие $currentAction")
-                            Heart.playLottieAnimation(lottieHeartGold, 0.19f,0.205f)
-                            Heart.playLottieAnimation(lottieTapGold, 0.19f,0.22f)
+                           Heart.playLottieAnimation(lottieTapGold, 0.19f,0.22f)
                         }
                         11 -> {
-                            Log.d("MyLog", "Реально выполняется одиннадцатое действие $currentAction")
-                            Heart.playLottieAnimation(lottieHeartGold, 0.207f,0.225f)
                             Heart.playLottieAnimation(lottieTapGold, 0.19f,0.22f)
                         }
                         12 -> {
-                            Log.d("MyLog", "Реально выполняется двенадцатое действие $currentAction")
-                            Heart.playLottieAnimation(lottieHeartGold, 0.226f,0.24f)
-                            Heart.playLottieAnimation(lottieTapGold, 0.19f,0.22f)
+                           Heart.playLottieAnimation(lottieTapGold, 0.19f,0.22f)
                         }
                         13 -> {
-                            Log.d("MyLog", "Реально выполняется тринадцатое действие")
-                            Heart.playLottieAnimation(lottieHeartGold, 0.243f,0.258f)
-                            Heart.playLottieAnimation(lottieTapGold, 0.19f,0.22f)
+                           Heart.playLottieAnimation(lottieTapGold, 0.19f,0.22f)
                         }
                         14 -> {
-                            Log.d("MyLog", "Реально выполняется четырнадцатое действие")
-                            Heart.playLottieAnimation(lottieHeartGold, 0.262f,0.276f)
-                            Heart.playLottieAnimation(lottieTapGold, 0.19f,0.22f)
+                           Heart.playLottieAnimation(lottieTapGold, 0.19f,0.22f)
                         }
                         15 -> {
-                            Log.d("MyLog", "Реально выполняется пятнадцатое действие")
-                            Heart.playLottieAnimation(lottieHeartGold, 0.280f,0.295f)
-                            Heart.playLottieAnimation(lottieTapGold, 0.19f,0.22f)
+                           Heart.playLottieAnimation(lottieTapGold, 0.19f,0.22f)
                         }
                         16 -> {
-                            Log.d("MyLog", "Реально выполняется шестнадцатое действие")
-                            Heart.playLottieAnimation(lottieHeartGold, 0.298f,0.311f)
-                            Heart.playLottieAnimation(lottieTapGold, 0.19f,0.22f)
+                           Heart.playLottieAnimation(lottieTapGold, 0.19f,0.22f)
                         }
                         17 -> {
-                            Log.d("MyLog", "Реально выполняется семнадцатое действие")
-                            Heart.playLottieAnimation(lottieHeartGold, 0.333f,0.351f)
-                            Heart.playLottieAnimation(lottieTapGold, 0.19f,0.22f)
+                           Heart.playLottieAnimation(lottieTapGold, 0.19f,0.22f)
                         }
                         18 -> {
-                            Log.d("MyLog", "Реально выполняется восемнадцатое действие")
-                            Heart.playLottieAnimation(lottieHeartGold, 0.352f,0.368f)
-                            Heart.playLottieAnimation(lottieTapGold, 0.19f,0.22f)
+                           Heart.playLottieAnimation(lottieTapGold, 0.19f,0.22f)
                         }
                         19 -> {
-                            Log.d("MyLog", "Реально выполняется девятнадцатое действие")
-                            Heart.playLottieAnimation(lottieHeartGold, 0.371f,0.387f)
-                            Heart.playLottieAnimation(lottieTapGold, 0.19f,0.22f)
+                           Heart.playLottieAnimation(lottieTapGold, 0.19f,0.22f)
                         }
                         20 -> {
-                            Log.d("MyLog", "Реально выполняется двадцатое действие")
-                            Heart.playLottieAnimation(lottieHeartGold, 0.388f,0.4f)
-                            Heart.playLottieAnimation(lottieTapGold, 0.19f,0.22f)
+                           Heart.playLottieAnimation(lottieTapGold, 0.19f,0.22f)
                         }
                         21 -> {
-                            Log.d("MyLog", "Сброс")
-                            Heart.playLottieAnimation(lottieHeartGold, 0.402f,0.418f)
-                            Heart.playLottieAnimation(lottieTapGold, 0.19f,0.22f)
+                           Heart.playLottieAnimation(lottieTapGold, 0.19f,0.22f)
                             }
                         }
 
-                    }
-                    executeNextAction()
+
 
                 }
 
