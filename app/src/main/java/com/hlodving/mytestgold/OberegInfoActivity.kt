@@ -1,7 +1,7 @@
 package com.hlodving.mytestgold
-// Активити в котором отображается информация об обереге
+
+import android.content.Intent
 import android.os.Bundle
-import android.view.animation.AnimationUtils
 import androidx.appcompat.app.AppCompatActivity
 import com.hlodving.mytestgold.databinding.ActivityOberegInfoBinding
 
@@ -14,8 +14,14 @@ class OberegInfoActivity : AppCompatActivity() {
         binding = ActivityOberegInfoBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Пульсация текста "Сила оберега"
-        val pulseAnimation = AnimationUtils.loadAnimation(this, R.anim.pulse_animation)
+        // Пульсация заголовка
+        val pulseAnimation = android.view.animation.AnimationUtils.loadAnimation(this, R.anim.pulse_animation)
         binding.oberegTitle.startAnimation(pulseAnimation)
+
+        // Обработка кнопки "ВАЖНО"
+        binding.widgetHelpButton.setOnClickListener {
+            val intent = Intent(this, WidgetInfoActivity::class.java)
+            startActivity(intent)
+        }
     }
 }

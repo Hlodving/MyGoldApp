@@ -46,6 +46,7 @@
             </intent-filter>
         </activity>
 
+        <activity android:name=".WidgetInfoActivity" />
 
         <activity android:name=".OberegInfoActivity" />
 
