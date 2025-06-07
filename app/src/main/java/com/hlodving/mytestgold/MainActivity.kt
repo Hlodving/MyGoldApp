@@ -36,6 +36,21 @@ class MainActivity : AppCompatActivity() {
     ) // Список стилей прогресс-бара по фазам
 
 
+    //Меняет цитату по заполнению второго прогресс бара
+    private fun updateBonusQuote() {
+        val quoteId = resources.getIdentifier(
+            "bonus_stage_${bonusStageNumber}",
+            "string",
+            packageName
+        )
+        if (quoteId != 0) {
+            binding.bonusQuoteText.text = getString(quoteId)
+        } else {
+            binding.bonusQuoteText.text = ""
+        }
+    }
+
+
 
     private var resetHappened = false
 
@@ -45,9 +60,6 @@ class MainActivity : AppCompatActivity() {
     //номер текущего этапа второго прогресс-бара
     private var bonusStageNumber = 1
     private var currentBonusStage = BonusStage.fromNumber(bonusStageNumber)
-
-
-
 
 
     //Сохранение тапов в втором прогресс баре
@@ -86,11 +98,6 @@ class MainActivity : AppCompatActivity() {
     private fun isOberegForever(): Boolean {
         return timerEndTime == Long.MAX_VALUE
     }
-
-
-
-
-
 
     //Таймер обратного отсчёта
     private var timerEndTime: Long = 0L // Время окончания таймера
@@ -162,21 +169,15 @@ class MainActivity : AppCompatActivity() {
         binding.progressBar2.progressDrawable = ContextCompat.getDrawable(this, colorDrawableId2)
 
 
-
-
-
         // тут мы берём номер этапа (Int), вычитаем 1
         val safeStageNum = currentStage.number.coerceIn(1, 101)
         val colorDrawableId = progressColors[(safeStageNum - 1) % progressColors.size]
 
         binding.progressBar.progressDrawable = ContextCompat.getDrawable(this, colorDrawableId)
 
-
-
         // Обновление виджета
         updateWidget()
     }
-
 
 
     //Этот метод обновляет виджет, подставляя нужную картинку в зависимости от goldCount.
@@ -192,11 +193,6 @@ class MainActivity : AppCompatActivity() {
         }
         sendBroadcast(intent)
     }
-
-
-
-
-
 
     // Сохраняет время окончания таймера
     private fun saveTimerEndTime(timeInMillis: Long) {
@@ -221,13 +217,11 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-
     // Загружает сохранённое количество кликов
     private fun loadGoldCount(): Int {
         val sharedPref = getSharedPreferences("GoldPrefs", Context.MODE_PRIVATE)
         return sharedPref.getInt("goldCount", 0)
     }
-
 
     //Этот метод считает, на каком этапе сейчас пользователь, сколько кликов нужно на следующий этап и сколько уже накоплено
     private fun getStageData(gold: Int): Triple<Int, Int, Stage> {
@@ -240,7 +234,6 @@ class MainActivity : AppCompatActivity() {
             stageNumber++
             requiredGold = stageNumber * 100
         }
-
         val stageProgress = gold - accumulated
         val stageMax = requiredGold
         val stage = Stage.fromGold(gold)
@@ -249,16 +242,7 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-
-
     lateinit var binding: ActivityMainBinding
-
-
-
-
-
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -286,12 +270,9 @@ class MainActivity : AppCompatActivity() {
             binding.progressBar2.progressDrawable = ContextCompat.getDrawable(this, colorDrawableId2)
 
             val heart = HeartAnimation()
-            //heart.playLottieAnimation(binding.lottieHeartGold, 0.578f,0.593f)
-            //heart.playLottieAnimation(binding.lottieHeartGold, 0.595f,0.610f)
-            //heart.playLottieAnimation(binding.lottieHeartGold, 0.612f,0.625f)
-
-
-
+            //heart.playLottieAnimation(binding.lottieHeartGold, 0.950f,0.966f)
+            //heart.playLottieAnimation(binding.lottieHeartGold, 0.967f,0.981f)
+            //heart.playLottieAnimation(binding.lottieHeartGold, 0.982f,0.999f)
 
         }
 
@@ -302,11 +283,10 @@ class MainActivity : AppCompatActivity() {
         bonusMax = currentBonusStage.max
 
 
-
         bonusProgress = loadBonusProgress()
 
-
-
+        // Показываем цитату сразу при запуске
+        updateBonusQuote()
 
         binding.progressBar2.max = bonusMax
         binding.progressBar2.progress = bonusProgress
@@ -315,9 +295,6 @@ class MainActivity : AppCompatActivity() {
         val colorDrawableId2 = progressColors[(bonusStageNumber - 1) % progressColors.size]
 
         binding.progressBar2.progressDrawable = ContextCompat.getDrawable(this, colorDrawableId2)
-
-
-
 
 
         timerEndTime = loadTimerEndTime()
@@ -339,8 +316,6 @@ class MainActivity : AppCompatActivity() {
         }
 
 
-
-
         binding.moreInfoButton.setOnClickListener {
 
 
@@ -348,16 +323,8 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-
-
-
-
-
-
         // Загружаем сохранённое значение
         goldCount = loadGoldCount()
-
-
 
         // Обновляем виджет
         GoldWidget.currentGold = goldCount
@@ -371,10 +338,7 @@ class MainActivity : AppCompatActivity() {
         }
 
 
-
         sendBroadcast(widgetIntent)
-
-
 
 // Загружаем сохранённое время таймера
         timerEndTime = loadTimerEndTime()
@@ -396,17 +360,11 @@ class MainActivity : AppCompatActivity() {
         }
 
 
-
-
-
         lastStage = getStageData(goldCount).third.number
-
-
 
 
         val (stageProgress, stageMax, currentStage) = getStageData(goldCount)
         updateTapAnimationForStage(currentStage)
-
 
 
         binding.progressBar.max = stageMax
@@ -420,9 +378,6 @@ class MainActivity : AppCompatActivity() {
         binding.progressBar.progressDrawable = ContextCompat.getDrawable(this@MainActivity, colorDrawableId)
 
 
-
-
-
         // Анимации
         val Heart = HeartAnimation()
 
@@ -431,9 +386,6 @@ class MainActivity : AppCompatActivity() {
             Heart.animationRestart(lottieViewShineOne)
             Heart.animationRestart(lottieViewShineTwo)
             Heart.animationRestart(lottieTapGold)
-
-
-
 
 
             lottieHeartGold.setOnClickListener {
@@ -469,13 +421,14 @@ class MainActivity : AppCompatActivity() {
 
                     //Отвечает за добавляемое время по заполнению второго прогресс бара
                     timerEndTime += currentBonusStage.bonusTimeMillis
-
-
                     saveTimerEndTime(timerEndTime)
+
                     startCountdownTimer()
                     scheduleResetWorker(timerEndTime - System.currentTimeMillis())
-                }
 
+                    // Обновляем цитату для текущей стадии
+                    updateBonusQuote()
+                }
 
 
                 binding.progressBar2.max = bonusMax
@@ -489,15 +442,10 @@ class MainActivity : AppCompatActivity() {
                 binding.progressBar2.progressDrawable = ContextCompat.getDrawable(this@MainActivity, colorDrawableId2)
 
 
-
                 sendBroadcast(intent)
-
-
 
                 val (stageProgress, stageMax, currentStage) = getStageData(goldCount)
                 updateTapAnimationForStage(currentStage)
-
-
 
 
                 if (resetHappened) {
@@ -512,8 +460,6 @@ class MainActivity : AppCompatActivity() {
                     }
                     resetHappened = false
                 }
-
-
 
 
                 if (currentStage.number > lastStage) {
@@ -552,12 +498,6 @@ class MainActivity : AppCompatActivity() {
                 }
 
 
-
-
-
-
-
-
                 binding.progressBar.max = stageMax
                 binding.progressBar.progress = stageProgress.coerceAtMost(stageMax)
                 binding.progressText.text = "$stageProgress / $stageMax"
@@ -567,13 +507,9 @@ class MainActivity : AppCompatActivity() {
                 binding.progressBar.progressDrawable = ContextCompat.getDrawable(this@MainActivity, colorDrawableId)
 
 
-
-
                 //if (goldCount % 50 == 0) Heart.playLottieAnimation(lottieViewShineOne)
 
                 //if (goldCount % 75 == 0) Heart.playLottieAnimation(lottieViewShineTwo)
-
-
 
 
                 when (goldCount % 10) {
@@ -590,8 +526,6 @@ class MainActivity : AppCompatActivity() {
                     }
 
                 if (goldCount % 27 == 0) {
-
-
 
 
                     // Выполнение следующего действия
@@ -837,9 +771,10 @@ class MainActivity : AppCompatActivity() {
                         30 -> {  //  сердец
                             Heart.playNextHeartAnimation(
                                 binding.lottieHeartGold,
-                                0.578f, 0.595f, 0.612f,
-                                0.593f, 0.610f, 0.625f
+                                0.950f, 0.967f, 0.982f,
+                                0.966f, 0.981f, 0.999f
                             )
+
                             Heart.playLottieAnimation(lottieTapGold, 0.19f,0.22f)
                         }
                     }
@@ -852,14 +787,9 @@ class MainActivity : AppCompatActivity() {
         super.onResume()
     }
 
-
-
     override fun onPause() {
         super.onPause()
     }
-
-
-
 }
 
 
