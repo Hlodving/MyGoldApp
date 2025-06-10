@@ -50,6 +50,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private var bonusJustFilled = false // предотвращает сброс при заполнении бонус-прогресса
 
 
     private var resetHappened = false
@@ -123,8 +124,12 @@ class MainActivity : AppCompatActivity() {
                     binding.timerText.text = String.format("Оберег активен: %02d:%02d:%02d", hours, minutes, seconds)
                     timerHandler.postDelayed(this, 1000)
                 } else {
-                    resetAppState()
+                    if (!bonusJustFilled) {
+                        resetAppState()
+                    }
+                    bonusJustFilled = false // всегда сбрасываем флаг после проверки
                 }
+
             }
         }
         timerHandler.post(timerRunnable)
@@ -410,6 +415,8 @@ class MainActivity : AppCompatActivity() {
                 saveBonusProgress()
 
                 if (bonusProgress >= bonusMax) {
+                    bonusJustFilled = true
+
                     bonusProgress = 0
 
                     // Переход к следующей стадии
