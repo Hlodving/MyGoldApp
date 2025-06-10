@@ -300,5 +300,16 @@
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent" />
 
+    <Button
+        android:id="@+id/debugShortenTimerButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Тест: 10 сек"
+        app:layout_constraintBottom_toTopOf="@+id/debugAdd500Button"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/lottieTapGold"
+        app:layout_constraintVertical_bias="0.963" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

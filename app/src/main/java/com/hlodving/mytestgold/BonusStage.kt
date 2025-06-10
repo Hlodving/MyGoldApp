@@ -3,12 +3,12 @@ package com.hlodving.mytestgold
 //Список всех этапов второго прогресс бара
 
 enum class BonusStage(val number: Int, val max: Int, val bonusTimeMillis: Long) {
-    STAGE_1(1, 1000, 1 * 60_000L),
-    STAGE_2(2, 1500, 2 * 60_000L),
-    STAGE_3(3, 2000, 3 * 60_000L),
-    STAGE_4(4, 2500, 4 * 60_000L),
-    STAGE_5(5, 3000, 5 * 60_000L),
-    STAGE_6(6, 3500, 6 * 60_000L),
+    STAGE_1(1, 1000, 10 * 60_000L),
+    STAGE_2(2, 1500, 10 * 60_000L),
+    STAGE_3(3, 2000, 10 * 60_000L),
+    STAGE_4(4, 2500, 10 * 60_000L),
+    STAGE_5(5, 3000, 10 * 60_000L),
+    STAGE_6(6, 3500, 5 * 60_000L),
     STAGE_7(7, 4000, 7 * 60_000L),
     STAGE_8(8, 4500, 8 * 60_000L),
     STAGE_9(9, 5000, 9 * 60_000L),

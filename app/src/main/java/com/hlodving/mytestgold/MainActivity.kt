@@ -254,6 +254,20 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         //ВРЕМЕННАЯ КНОПКА ДЛЯ ТЕСТА
+        binding.debugShortenTimerButton.setOnClickListener {
+            // «почти обнуляем» таймер, оставляя всего 10 секунд
+            val now = System.currentTimeMillis()
+            timerEndTime = now + 10_000L   // +10 секунд
+            saveTimerEndTime(timerEndTime)
+            startCountdownTimer()
+            scheduleResetWorker(10_000L)
+
+            // опционально: сразу обновить виджет, чтобы отразить новую оставшуюся длительность
+            updateWidget()
+        }
+
+
+        //ВРЕМЕННАЯ КНОПКА ДЛЯ ТЕСТА
         binding.debugAdd500Button.setOnClickListener {
 
 
@@ -416,26 +430,55 @@ class MainActivity : AppCompatActivity() {
 
                 if (bonusProgress >= bonusMax) {
                     bonusJustFilled = true
-
                     bonusProgress = 0
-
-                    // Переход к следующей стадии
                     bonusStageNumber = (bonusStageNumber + 1).coerceAtMost(30)
                     saveBonusStageNumber()
-
                     currentBonusStage = BonusStage.fromNumber(bonusStageNumber)
                     bonusMax = currentBonusStage.max
 
-                    //Отвечает за добавляемое время по заполнению второго прогресс бара
-                    timerEndTime += currentBonusStage.bonusTimeMillis
-                    saveTimerEndTime(timerEndTime)
+                    // Обновляем UI второго прогресс-бара
+                    binding.progressBar2.max = bonusMax
+                    binding.progressBar2.progress = bonusProgress
+                    binding.progressText2.text = "$bonusProgress / $bonusMax"
+                    binding.progressBar2.progressDrawable =
+                        ContextCompat.getDrawable(this@MainActivity, progressColors[(bonusStageNumber - 1) % progressColors.size])
 
-                    startCountdownTimer()
-                    scheduleResetWorker(timerEndTime - System.currentTimeMillis())
+                    // ——— Логика старта/добавления таймера ———
+                    val now = System.currentTimeMillis()
+                    if (timerEndTime == 0L || timerEndTime <= now) {
+                        // Таймер ещё не был активен — инициализируем его
+                        val stage = Stage.fromGold(goldCount)
+                        if (stage.number == 1) {
+                            // Принудительно перевести в Stage 2
+                            goldCount = 100
+                            saveGoldCount()
+                            lastStage = 2
+                        }
+
+                        val bonusTime = currentBonusStage.bonusTimeMillis
+                        timerEndTime = now + bonusTime
+                        saveTimerEndTime(timerEndTime)
+                        startCountdownTimer()
+                        scheduleResetWorker(bonusTime)
+
+                        // Shine-анимации (только при первом старте)
+                        val Heart = HeartAnimation()
+                        Heart.playLottieAnimation(binding.lottieViewShineOne)
+                        Heart.playLottieAnimation(binding.lottieViewShineTwo)
+
+                    } else {
+                        // Таймер уже идёт — просто добавляем бонусное время
+                        timerEndTime += currentBonusStage.bonusTimeMillis
+                        saveTimerEndTime(timerEndTime)
+                        startCountdownTimer()
+                        scheduleResetWorker(timerEndTime - now)
+                    }
+                    // ————————————————————————————————
 
                     // Обновляем цитату для текущей стадии
                     updateBonusQuote()
                 }
+
 
 
                 binding.progressBar2.max = bonusMax
@@ -468,8 +511,9 @@ class MainActivity : AppCompatActivity() {
                     resetHappened = false
                 }
 
-
+                // Действия при заполнении первого прогресс бара
                 if (currentStage.number > lastStage) {
+                    //То что просходит по достижению 101 стадии
                     if (currentStage.number == 101) {
                         timerEndTime = Long.MAX_VALUE
                         saveTimerEndTime(timerEndTime)
@@ -482,7 +526,7 @@ class MainActivity : AppCompatActivity() {
                         binding.progressBar2.visibility = View.GONE
                         binding.progressText2.visibility = View.GONE
 
-                    } else {
+                    } else { //Увеличивается время в таймере
                         val now = System.currentTimeMillis()
                         val remaining = timerEndTime - now
                         val safeRemaining = if (remaining > 0) remaining else 0
@@ -497,7 +541,6 @@ class MainActivity : AppCompatActivity() {
                         scheduleResetWorker(delayMillis)
                     }
 
-                    Log.d("DEBUG", "Этап ${currentStage.number}, таймер обновлён")
                     lastStage = currentStage.number
 
                     Heart.playLottieAnimation(binding.lottieViewShineOne)
