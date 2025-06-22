@@ -512,18 +512,6 @@
                     updateTapAnimationForStage(currentStage)
 
 
-                    if (resetHappened) {
-                        if (currentStage.number > 1) {
-                            Log.d("MyLog", "После сброса — восстанавливаем таймер")
-                            timerEndTime = System.currentTimeMillis() + 1 * 60 * 1000
-                            saveTimerEndTime(timerEndTime)
-                            startCountdownTimer()
-                        } else {
-                            Log.d("MyLog", "Сброс был, но этап 1 — таймер не запускаем")
-                            binding.timerText.text = getString(R.string.not_active_amulet)
-                        }
-                        resetHappened = false
-                    }
 
                     // Действия при заполнении первого прогресс бара
                     if (currentStage.number > lastStage) {
@@ -544,9 +532,8 @@
                             val now = System.currentTimeMillis()
                             val remaining = timerEndTime - now
                             val safeRemaining = if (remaining > 0) remaining else 0
-                            timerEndTime = now + safeRemaining + 15 * 60 * 1000
 
-                            // timerEndTime = now + safeRemaining + 6 * 60 * 60 * 1000
+                            timerEndTime = now + safeRemaining + 6 * 60 * 60 * 1000
 
                             saveTimerEndTime(timerEndTime)
                             startCountdownTimer()
