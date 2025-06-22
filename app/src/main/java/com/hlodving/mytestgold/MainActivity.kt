@@ -255,7 +255,7 @@
             setContentView(binding.root)
 
 
-    /*
+
             //ВРЕМЕННАЯ КНОПКА ДЛЯ ТЕСТА
             binding.debugShortenTimerButton.setOnClickListener {
                 // «почти обнуляем» таймер, оставляя всего 10 секунд
@@ -267,6 +267,17 @@
 
                 // опционально: сразу обновить виджет, чтобы отразить новую оставшуюся длительность
                 updateWidget()
+            }
+
+            //ВРЕМЕННАЯ КНОПКА ДЛЯ ТЕСТА
+            binding.debugAdd99MainButton.setOnClickListener {
+                goldCount += 99
+
+                val maxProgress = binding.progressBar.max
+                val newProgress = (binding.progressBar.progress + 99).coerceAtMost(maxProgress)
+                binding.progressBar.progress = newProgress
+                binding.progressText.text = "$newProgress / $maxProgress"
+
             }
 
 
@@ -297,7 +308,7 @@
                 //heart.playLottieAnimation(binding.lottieHeartGold, 0.917f,0.930f)
 
             }
-    */
+
 
             //Загрузка состояния второго прогресс бара
             bonusStageNumber = loadBonusStageNumber()
