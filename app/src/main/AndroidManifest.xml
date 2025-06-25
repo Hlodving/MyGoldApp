@@ -18,6 +18,7 @@
         android:theme="@style/Theme.MyTestGold"
         tools:targetApi="31">
 
+        <activity android:name=".ProvidesInformation" />
 
         <receiver android:name=".BootReceiver" android:enabled="true" android:exported="true">
             <intent-filter>

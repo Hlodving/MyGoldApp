@@ -6,9 +6,7 @@
     import android.content.ComponentName
     import android.content.Context
     import android.content.Intent
-    import android.content.IntentFilter
     import android.os.Bundle
-    import android.util.Log
     import android.view.View
 
 
@@ -18,7 +16,6 @@
     import androidx.work.ExistingWorkPolicy
     import androidx.work.OneTimeWorkRequestBuilder
     import androidx.work.WorkManager
-    import com.bumptech.glide.Glide
 
     import com.hlodving.mytestgold.databinding.ActivityMainBinding
 
@@ -50,6 +47,9 @@
                 binding.bonusQuoteText.text = ""
             }
         }
+
+        private var baseHoursToAdd = 2L // Начальная прибавка — 2 часа
+
 
         private var bonusJustFilled = false // предотвращает сброс при заполнении бонус-прогресса
 
@@ -255,7 +255,7 @@
             setContentView(binding.root)
 
 
-
+/*
             //ВРЕМЕННАЯ КНОПКА ДЛЯ ТЕСТА
             binding.debugShortenTimerButton.setOnClickListener {
                 // «почти обнуляем» таймер, оставляя всего 10 секунд
@@ -308,7 +308,7 @@
                 //heart.playLottieAnimation(binding.lottieHeartGold, 0.917f,0.930f)
 
             }
-
+*/
 
             //Загрузка состояния второго прогресс бара
             bonusStageNumber = loadBonusStageNumber()
@@ -533,7 +533,11 @@
                             val remaining = timerEndTime - now
                             val safeRemaining = if (remaining > 0) remaining else 0
 
-                            timerEndTime = now + safeRemaining + 6 * 60 * 60 * 1000
+                            // Каждая следующая стадия добавляет на 1 час больше
+                            val additionalHours = baseHoursToAdd + (currentStage.number - 2)
+                            val additionalMillis = additionalHours * 60 * 60 * 1000
+
+                            timerEndTime = now + safeRemaining + additionalMillis
 
                             saveTimerEndTime(timerEndTime)
                             startCountdownTimer()

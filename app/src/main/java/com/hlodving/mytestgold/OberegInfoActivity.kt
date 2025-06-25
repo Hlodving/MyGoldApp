@@ -18,9 +18,15 @@ class OberegInfoActivity : AppCompatActivity() {
         val pulseAnimation = android.view.animation.AnimationUtils.loadAnimation(this, R.anim.pulse_animation)
         binding.oberegTitle.startAnimation(pulseAnimation)
 
-        // Обработка кнопки "ВАЖНО"
+        // Обработка кнопки "widgetHelpButton"
         binding.widgetHelpButton.setOnClickListener {
             val intent = Intent(this, WidgetInfoActivity::class.java)
+            startActivity(intent)
+        }
+
+        // Обработка кнопки "providesInformationButton"
+        binding.providesInformationButton.setOnClickListener {
+            val intent = Intent(this, ProvidesInformation::class.java)
             startActivity(intent)
         }
     }
