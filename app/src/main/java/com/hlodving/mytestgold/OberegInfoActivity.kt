@@ -29,5 +29,11 @@ class OberegInfoActivity : AppCompatActivity() {
             val intent = Intent(this, ProvidesInformation::class.java)
             startActivity(intent)
         }
+
+        // Обработка кнопки "connectionButton"
+        binding.connectionButton.setOnClickListener {
+            val intent = Intent(this, ConnectionActivity::class.java)
+            startActivity(intent)
+        }
     }
 }

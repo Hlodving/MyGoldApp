@@ -6,7 +6,7 @@
     <string name="power_amulet">Сила оберега</string>
     <string name="active_forever_amulet">Оберег активен навсегда</string>
     <string name="not_active_amulet">Оберег неактивен</string>
-    <string name="obereg_desc_1">Активированный оберег воздвигает вокруг владельца невидимый щит света, отпугивая всё недоброе</string>
+    <string name="obereg_desc_1">Активированный оберег создаёт вокруг владельца невидимую защиту, отталкивая всё недоброе</string>
     <string name="obereg_desc_2">Оберег дарует:</string>
     <string name="obereg_desc_3">• Защиту от сглаза, порчи и зла, направленного извне</string>
     <string name="obereg_desc_4">• Охрану от несчастий и внезапных бед</string>
@@ -16,8 +16,14 @@
     <string name="obereg_desc_8">Пока оберег пылает в вашей душе, ни одна тьма не приблизится</string>
     <string name="how_add_widget">Как добавить на экран телефона</string>
     <string name="obereg_importent">Оберег, в первую очередь, это символ показывающий принадлежность к христианской вере</string>
-    <string name="obereg_widget_imformation">Поэтому его стоит разместить\n на видном месте \n (на домашней странице вашего телефона)</string>
+    <string name="obereg_widget_information">Поэтому его стоит разместить на видном месте — на домашней странице вашего телефона</string>
+    <string name="obereg_widget_connection">Поделитесь идеей, сообщите об ошибке или скажите спасибо</string>
     <string name="provides_information_button">Подробнее</string>
+    <string name="connection_button">Обратная связь</string>
+    <string name="email">digital.amulet@yandex.ru</string>
+    <string name="email_info">Связаться с автором</string>
+    <string name="donat">2202 2050 0076 8587</string>
+    <string name="donat_info">Поблагодарить автора</string>
 
     <string name="bonus_stage_1">Ибо возмездие за труд — достойное.\n(1 Тим 5:18)</string>
     <string name="bonus_stage_2">В усердии не ослабевайте; духом пламенейте; Господу служите.\n(Рим 12:11)</string>
@@ -50,15 +56,12 @@
     <string name="bonus_stage_29">Свет во тьме светит, и тьма не объяла его.\n(Ин 1:5)</string>
     <string name="bonus_stage_30">Ты в трудах не утомился и терпел ради имени Моего.\n(Откр 2:3)</string>
 
-
-    <string name="widget_instructions">
-    Как добавить виджет на главный экран:\n\n
-    1. Зажмите палец на пустом месте главного экрана.\n
-    2. Выберите пункт "Виджеты".\n
-    3. Найдите виджет "Оберег".\n
-    4. Перетащите его на экран.\n
-    5. Всё! Виджет будет активен.
-</string>
+    <string name="obereg_add_1">Как добавить виджет на главный экран:</string>
+    <string name="obereg_add_2">1. Нажмите и удерживайте палец на свободной области главного экрана.</string>
+    <string name="obereg_add_3">2. В открывшемся меню выберите раздел «Виджеты».</string>
+    <string name="obereg_add_4">3. Найдите виджет с названием «Цифровой оберег».</string>
+    <string name="obereg_add_5">4. Перетащите его на экран.</string>
+    <string name="obereg_add_6">5. Всё! Виджет будет активен.</string>
 
 
 </resources>

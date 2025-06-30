@@ -14,8 +14,6 @@ class WidgetInfoActivity : AppCompatActivity() {
         binding = ActivityWidgetInfoBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Текстовые инструкции
-        binding.widgetInstructions.text = getString(R.string.widget_instructions)
 
         // Загрузка и отображение GIF
         Glide.with(this)
