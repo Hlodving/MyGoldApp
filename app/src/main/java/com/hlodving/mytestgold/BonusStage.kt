@@ -1,5 +1,7 @@
 package com.hlodving.mytestgold
 
+import android.content.Context
+
 //Список всех этапов второго прогресс бара
 
 enum class BonusStage(val number: Int, val max: Int, val bonusTimeMillis: Long) {
@@ -42,3 +44,55 @@ enum class BonusStage(val number: Int, val max: Int, val bonusTimeMillis: Long) 
             fromNumber((current.number + 1).coerceAtMost(30))
     }
 }
+
+class BonusStageManager(private val context: Context) {
+
+    var stageNumber = 1
+        private set
+
+    var progress = 0
+        private set
+
+    val currentStage: BonusStage
+        get() = BonusStage.fromNumber(stageNumber)
+
+    val maxProgress: Int
+        get() = currentStage.max
+
+    var justFilled = false
+
+    fun loadState() {
+        val prefs = context.getSharedPreferences("GoldPrefs", Context.MODE_PRIVATE)
+        stageNumber = prefs.getInt("bonusStageNumber", 1).coerceIn(1, 30)
+        progress = prefs.getInt("bonusProgress", 0)
+    }
+
+    fun saveState() {
+        val prefs = context.getSharedPreferences("GoldPrefs", Context.MODE_PRIVATE)
+        prefs.edit()
+            .putInt("bonusStageNumber", stageNumber)
+            .putInt("bonusProgress", progress)
+            .apply()
+    }
+
+    fun increment(): Boolean {
+        progress++
+        if (progress >= maxProgress) {
+            progress = 0
+            stageNumber = (stageNumber + 1).coerceAtMost(30)
+            justFilled = true
+            saveState()
+            return true
+        }
+        saveState()
+        return false
+    }
+
+    fun getQuote(): String {
+        val quoteId = context.resources.getIdentifier(
+            "bonus_stage_$stageNumber", "string", context.packageName
+        )
+        return if (quoteId != 0) context.getString(quoteId) else ""
+    }
+}
+

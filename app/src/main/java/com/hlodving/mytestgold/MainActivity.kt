@@ -7,11 +7,8 @@
     import android.content.Intent
     import android.os.Bundle
     import android.view.View
-
-
     import androidx.appcompat.app.AppCompatActivity
     import androidx.core.content.ContextCompat
-
     import androidx.work.ExistingWorkPolicy
     import androidx.work.OneTimeWorkRequestBuilder
     import androidx.work.WorkManager
@@ -22,6 +19,9 @@
 
         // Переменная с таймером
         private lateinit var countdownTimerManager: CountdownTimerManager
+        //Переменная с бонусным прогрессбаром
+        private lateinit var bonusManager: BonusStageManager
+
 
 
         // Переменные и настройки в начале класса
@@ -43,54 +43,10 @@
         private var baseHoursToAdd = 2L // Начальная прибавка — 2 часа
 
 
-        private var bonusJustFilled = false // предотвращает сброс при заполнении бонус-прогресса
 
 
         private var resetHappened = false // Флаг, отмечает факт сброса
 
-
-        private var bonusProgress = 0 //Это текущий прогресс второго прогресс-бара
-        private var bonusMax = 0 //Максимальное значение бонусного прогресса
-
-
-        private var bonusStageNumber = 1 //номер текущего этапа второго прогресс-бара
-        private var currentBonusStage = BonusStage.fromNumber(bonusStageNumber) // Сожержит данные стадии колличество тапов и добавляемое время
-
-
-        //Меняет цитату по заполнению второго прогресс бара
-        private fun updateBonusQuote() {
-            val quoteId = resources.getIdentifier(
-                "bonus_stage_${bonusStageNumber}",
-                "string",
-                packageName
-            )
-            if (quoteId != 0) {
-                binding.bonusQuoteText.text = getString(quoteId)
-            } else {
-                binding.bonusQuoteText.text = ""
-            }
-        }
-
-        //Сохранение тапов в втором прогресс баре
-        private fun saveBonusProgress() {
-            val prefs = getSharedPreferences("GoldPrefs", Context.MODE_PRIVATE)
-            prefs.edit().putInt("bonusProgress", bonusProgress).apply()
-        }
-        //Загрузка тапов в втором прогресс баре
-        private fun loadBonusProgress(): Int {
-            val prefs = getSharedPreferences("GoldPrefs", Context.MODE_PRIVATE)
-            return prefs.getInt("bonusProgress", 0)
-        }
-        //Загрузка состояния второго прогресс бара
-        private fun loadBonusStageNumber(): Int {
-            val prefs = getSharedPreferences("GoldPrefs", Context.MODE_PRIVATE)
-            return prefs.getInt("bonusStageNumber", 1).coerceIn(1, 30)
-        }
-        //Сохранение состояния второго прогресс бара
-        private fun saveBonusStageNumber() {
-            val prefs = getSharedPreferences("GoldPrefs", Context.MODE_PRIVATE)
-            prefs.edit().putInt("bonusStageNumber", bonusStageNumber).apply()
-        }
 
 
         private var currentTapAnimation: String? = null //Текущий файл анимации для нажатий json от Lottie Это нужно, чтобы не переустанавливать один и тот же файл, если он не изменился.
@@ -151,7 +107,7 @@
             binding.progressText.text = "$stageProgress / $stageMax"
 
             //Обновляются оба прогресс-бара
-            val colorDrawableId2 = progressColors[(bonusStageNumber - 1) % progressColors.size]
+            val colorDrawableId2 = progressColors[(bonusManager.stageNumber - 1) % progressColors.size]
             binding.progressBar2.progressDrawable = ContextCompat.getDrawable(this, colorDrawableId2)
             // тут мы берём номер этапа (Int), вычитаем 1
             val safeStageNum = currentStage.number.coerceIn(1, 101)
@@ -226,6 +182,10 @@
             binding = ActivityMainBinding.inflate(layoutInflater)
             setContentView(binding.root)
 
+            bonusManager = BonusStageManager(this)
+            bonusManager.loadState()
+
+
             //инициализируем таймер
             countdownTimerManager = CountdownTimerManager(
                 context = this,
@@ -233,31 +193,24 @@
                     binding.timerText.text = formattedTime
                 },
                 onFinished = {
-                    if (!bonusJustFilled) {
+                    if (!bonusManager.justFilled) {
                         resetAppState()
                     }
-                    bonusJustFilled = false
+                    bonusManager.justFilled = false
                 }
             )
 
 
 
-            //Загрузка состояния второго прогресс бара
-            bonusStageNumber = loadBonusStageNumber()
-            currentBonusStage = BonusStage.fromNumber(bonusStageNumber)
-            bonusMax = currentBonusStage.max
-
-
-            bonusProgress = loadBonusProgress()
-
             // Показываем цитату сразу при запуске
-            updateBonusQuote()
+            binding.bonusQuoteText.text = bonusManager.getQuote()
 
-            binding.progressBar2.max = bonusMax
-            binding.progressBar2.progress = bonusProgress
-            binding.progressText2.text = "$bonusProgress / $bonusMax"
 
-            val colorDrawableId2 = progressColors[(bonusStageNumber - 1) % progressColors.size]
+            binding.progressBar2.max = bonusManager.maxProgress
+            binding.progressBar2.progress = bonusManager.progress
+            binding.progressText2.text = "${bonusManager.progress} / ${bonusManager.maxProgress}"
+
+            val colorDrawableId2 = progressColors[(bonusManager.stageNumber - 1) % progressColors.size]
 
             binding.progressBar2.progressDrawable = ContextCompat.getDrawable(this, colorDrawableId2)
 
@@ -360,73 +313,41 @@
                             ))
                     }
 
-                    bonusProgress++
+                    if (bonusManager.increment()) {
+                        // 1. Увеличиваем таймер на бонусное время
+                        val bonusTime = bonusManager.currentStage.bonusTimeMillis
+                        val newBonusEndTime = countdownTimerManager.getRemainingTimeMillis() + System.currentTimeMillis() + bonusTime
+                        countdownTimerManager.timerEndTime = newBonusEndTime
+                        countdownTimerManager.saveTimerEndTime(newBonusEndTime)
+                        countdownTimerManager.startTimer()
+                        scheduleResetWorker(newBonusEndTime - System.currentTimeMillis())
 
-                    saveBonusProgress()
+                        // 2. Обновляем цитату
+                        binding.bonusQuoteText.text = bonusManager.getQuote()
 
-                    if (bonusProgress >= bonusMax) {
-                        bonusJustFilled = true
-                        bonusProgress = 0
-                        bonusStageNumber = (bonusStageNumber + 1).coerceAtMost(30)
-                        saveBonusStageNumber()
-                        currentBonusStage = BonusStage.fromNumber(bonusStageNumber)
-                        bonusMax = currentBonusStage.max
+                        // 3. Проигрываем shine-анимации
+                        Heart.playLottieAnimation(binding.lottieViewShineOne)
+                        Heart.playLottieAnimation(binding.lottieViewShineTwo)
 
-                        // Обновляем UI второго прогресс-бара
-                        binding.progressBar2.max = bonusMax
-                        binding.progressBar2.progress = bonusProgress
-                        binding.progressText2.text = "$bonusProgress / $bonusMax"
-                        binding.progressBar2.progressDrawable =
-                            ContextCompat.getDrawable(this@MainActivity, progressColors[(bonusStageNumber - 1) % progressColors.size])
+                        // 4. Обновляем UI прогресса (progressBar2)
+                        binding.progressBar2.max = bonusManager.maxProgress
+                        binding.progressBar2.progress = bonusManager.progress
+                        binding.progressText2.text = "${bonusManager.progress} / ${bonusManager.maxProgress}"
+                        val colorDrawableId2 = progressColors[(bonusManager.stageNumber - 1) % progressColors.size]
+                        binding.progressBar2.progressDrawable = ContextCompat.getDrawable(this@MainActivity, colorDrawableId2)
 
-                        // Логика старта добавления таймера
-                        val now = System.currentTimeMillis()
-                        val endTime = countdownTimerManager.timerEndTime
-                        if (endTime == 0L || endTime <= now) {
-                            // Таймер ещё не был активен — инициализируем его
-                            val stage = Stage.fromGold(goldCount)
-                            if (stage.number == 1) {
-                                // Принудительно перевести в Stage 2
-                                goldCount = 100
-                                saveGoldCount()
-                                lastStage = 2
-                            }
-
-                            val bonusTime = currentBonusStage.bonusTimeMillis
-                            val newTime = now + bonusTime
-                            countdownTimerManager.timerEndTime = newTime
-                            countdownTimerManager.saveTimerEndTime(newTime)
-                            countdownTimerManager.startTimer()
-                            scheduleResetWorker(bonusTime)
-
-                            // Shine-анимации (только при первом старте)
-                            val Heart = HeartAnimation()
-                            Heart.playLottieAnimation(binding.lottieViewShineOne)
-                            Heart.playLottieAnimation(binding.lottieViewShineTwo)
-
-                        } else {
-                            // Таймер уже идёт — просто добавляем бонусное время
-                            val newTime = endTime + currentBonusStage.bonusTimeMillis
-                            countdownTimerManager.timerEndTime += currentBonusStage.bonusTimeMillis
-                            countdownTimerManager.timerEndTime = newTime
-                            countdownTimerManager.saveTimerEndTime(newTime)
-                            countdownTimerManager.startTimer()
-                            scheduleResetWorker(newTime - now)
-                        }
-
-                        // Обновляем цитату для текущей стадии
-                        updateBonusQuote()
                     }
 
 
 
-                    binding.progressBar2.max = bonusMax
-                    binding.progressBar2.progress = bonusProgress
-                    binding.progressText2.text = "$bonusProgress / $bonusMax"
+
+                    binding.progressBar2.max = bonusManager.maxProgress
+                    binding.progressBar2.progress = bonusManager.progress
+                    binding.progressText2.text = "${bonusManager.progress} / ${bonusManager.maxProgress}"
 
 
 
-                    val colorDrawableId2 = progressColors[(bonusStageNumber - 1) % progressColors.size]
+                    val colorDrawableId2 = progressColors[(bonusManager.stageNumber - 1) % progressColors.size]
 
                     binding.progressBar2.progressDrawable = ContextCompat.getDrawable(this@MainActivity, colorDrawableId2)
 
@@ -512,7 +433,7 @@
 
 
                         // Выполнение следующего действия
-                        when (currentBonusStage.number) {
+                        when (bonusManager.currentStage.number) {
                             1 -> { // Одно сердце
                                 Heart.playNextHeartAnimation(
                                     binding.lottieHeartGold,
