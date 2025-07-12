@@ -7,6 +7,7 @@
     <string name="active_forever_amulet">Оберег активен навсегда</string>
     <string name="not_active_amulet">Оберег неактивен</string>
     <string name="obereg_desc_1">Активированный оберег создаёт вокруг владельца невидимую защиту, отталкивая всё недоброе</string>
+    <string name="main_progress">Ваш прогресс</string>
     <string name="obereg_desc_2">Оберег дарует:</string>
     <string name="obereg_desc_3">• Защиту от сглаза, порчи и зла, направленного извне</string>
     <string name="obereg_desc_4">• Охрану от несчастий и внезапных бед</string>
@@ -17,9 +18,10 @@
     <string name="how_add_widget">Как добавить на экран телефона</string>
     <string name="obereg_importent">Оберег, в первую очередь, это символ показывающий принадлежность к христианской вере</string>
     <string name="obereg_widget_information">Поэтому его стоит разместить на видном месте — на домашней странице вашего телефона</string>
-    <string name="obereg_widget_connection">Поделитесь идеей, сообщите об ошибке или скажите спасибо</string>
+    <string name="obereg_widget_connection">Связь</string>
     <string name="provides_information_button">Подробнее</string>
     <string name="connection_button">Обратная связь</string>
+    <string name="progress_button">Прогресс</string>
     <string name="email">digital.amulet@yandex.ru</string>
     <string name="email_info">Связаться с автором</string>
     <string name="donat">2202 2050 0076 8587</string>

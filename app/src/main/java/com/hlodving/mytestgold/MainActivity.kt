@@ -19,14 +19,14 @@
 
         // Переменная с таймером
         private lateinit var countdownTimerManager: CountdownTimerManager
-        //Переменная с бонусным прогрессбаром
-        private lateinit var bonusManager: BonusStageManager
+        //Переменная с вторым прогресс баром
+        private lateinit var secondProgressManager: BonusStageManager
 
 
 
         // Переменные и настройки в начале класса
         private var lastStage = 1 // Последний достигнутый этап (нужен для проверки перехода на новый)
-        private var goldCount = 0 // Общее количество нажатий для первого прогресс бара
+        private var CountFirstProgress = 0 // Общее количество нажатий для первого прогресс бара
 
 
         private val progressColors = listOf(
@@ -88,7 +88,7 @@
             private fun resetAppState() {
             //Обнуляет золото
             resetHappened = true
-            goldCount = 0
+            CountFirstProgress = 0
             saveGoldCount()
 
             //Сбрасывает стадию и таймер
@@ -99,7 +99,7 @@
 
 
             // Обновляет прогрессбар с учетом новой стадии
-            val (stageProgress, stageMax, currentStage) = getStageData(goldCount)
+            val (stageProgress, stageMax, currentStage) = getStageData(CountFirstProgress)
             updateTapAnimationForStage(currentStage)
 
             binding.progressBar.max = stageMax
@@ -107,7 +107,7 @@
             binding.progressText.text = "$stageProgress / $stageMax"
 
             //Обновляются оба прогресс-бара
-            val colorDrawableId2 = progressColors[(bonusManager.stageNumber - 1) % progressColors.size]
+            val colorDrawableId2 = progressColors[(secondProgressManager.stageNumber - 1) % progressColors.size]
             binding.progressBar2.progressDrawable = ContextCompat.getDrawable(this, colorDrawableId2)
             // тут мы берём номер этапа (Int), вычитаем 1
             val safeStageNum = currentStage.number.coerceIn(1, 101)
@@ -123,7 +123,7 @@
         //Этот метод обновляет виджет, подставляя нужную картинку в зависимости от goldCount.
         private fun updateWidget() {
 
-            GoldWidget.currentGold = goldCount //Устанавливаем текущее колличество золота
+            GoldWidget.currentGold = CountFirstProgress //Устанавливаем текущее колличество золота
 
             //Создаём Intent, чтобы отправить сигнал системе обновть виджет
             val intent = Intent(this, GoldWidget::class.java).apply {
@@ -146,7 +146,7 @@
         private fun saveGoldCount() {
             val sharedPref = getSharedPreferences("GoldPrefs", Context.MODE_PRIVATE)
             with(sharedPref.edit()) {
-                putInt("goldCount", goldCount)
+                putInt("goldCount", CountFirstProgress)
                 apply()
             }
         }
@@ -182,8 +182,8 @@
             binding = ActivityMainBinding.inflate(layoutInflater)
             setContentView(binding.root)
 
-            bonusManager = BonusStageManager(this)
-            bonusManager.loadState()
+            secondProgressManager = BonusStageManager(this)
+            secondProgressManager.loadState()
 
 
             //инициализируем таймер
@@ -193,24 +193,24 @@
                     binding.timerText.text = formattedTime
                 },
                 onFinished = {
-                    if (!bonusManager.justFilled) {
+                    if (!secondProgressManager.justFilled) {
                         resetAppState()
                     }
-                    bonusManager.justFilled = false
+                    secondProgressManager.justFilled = false
                 }
             )
 
 
 
             // Показываем цитату сразу при запуске
-            binding.bonusQuoteText.text = bonusManager.getQuote()
+            binding.bonusQuoteText.text = secondProgressManager.getQuote()
 
 
-            binding.progressBar2.max = bonusManager.maxProgress
-            binding.progressBar2.progress = bonusManager.progress
-            binding.progressText2.text = "${bonusManager.progress} / ${bonusManager.maxProgress}"
+            binding.progressBar2.max = secondProgressManager.maxProgress
+            binding.progressBar2.progress = secondProgressManager.countSecondProgress
+            binding.progressText2.text = "${secondProgressManager.countSecondProgress} / ${secondProgressManager.maxProgress}"
 
-            val colorDrawableId2 = progressColors[(bonusManager.stageNumber - 1) % progressColors.size]
+            val colorDrawableId2 = progressColors[(secondProgressManager.stageNumber - 1) % progressColors.size]
 
             binding.progressBar2.progressDrawable = ContextCompat.getDrawable(this, colorDrawableId2)
 
@@ -246,10 +246,10 @@
             }
 
             // Загружаем сохранённое значение
-            goldCount = loadGoldCount()
+            CountFirstProgress = loadGoldCount()
 
             // Обновляем виджет
-            GoldWidget.currentGold = goldCount
+            GoldWidget.currentGold = CountFirstProgress
             val widgetIntent = Intent(this@MainActivity, GoldWidget::class.java).apply {
                 action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
                 putExtra(
@@ -268,10 +268,10 @@
 
 
 
-            lastStage = getStageData(goldCount).third.number
+            lastStage = getStageData(CountFirstProgress).third.number
 
 
-            val (stageProgress, stageMax, currentStage) = getStageData(goldCount)
+            val (stageProgress, stageMax, currentStage) = getStageData(CountFirstProgress)
             updateTapAnimationForStage(currentStage)
 
 
@@ -300,10 +300,10 @@
 
                     if (isOberegForever()) return@setOnClickListener
 
-                    goldCount++
+                    CountFirstProgress++
                     saveGoldCount()
 
-                    GoldWidget.currentGold = goldCount
+                    GoldWidget.currentGold = CountFirstProgress
                     val intent = Intent(this@MainActivity, GoldWidget::class.java).apply {
 
                     action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
@@ -313,9 +313,9 @@
                             ))
                     }
 
-                    if (bonusManager.increment()) {
+                    if (secondProgressManager.increment()) {
                         // 1. Увеличиваем таймер на бонусное время
-                        val bonusTime = bonusManager.currentStage.bonusTimeMillis
+                        val bonusTime = secondProgressManager.currentStage.bonusTimeMillis
                         val newBonusEndTime = countdownTimerManager.getRemainingTimeMillis() + System.currentTimeMillis() + bonusTime
                         countdownTimerManager.timerEndTime = newBonusEndTime
                         countdownTimerManager.saveTimerEndTime(newBonusEndTime)
@@ -323,17 +323,17 @@
                         scheduleResetWorker(newBonusEndTime - System.currentTimeMillis())
 
                         // 2. Обновляем цитату
-                        binding.bonusQuoteText.text = bonusManager.getQuote()
+                        binding.bonusQuoteText.text = secondProgressManager.getQuote()
 
                         // 3. Проигрываем shine-анимации
                         Heart.playLottieAnimation(binding.lottieViewShineOne)
                         Heart.playLottieAnimation(binding.lottieViewShineTwo)
 
                         // 4. Обновляем UI прогресса (progressBar2)
-                        binding.progressBar2.max = bonusManager.maxProgress
-                        binding.progressBar2.progress = bonusManager.progress
-                        binding.progressText2.text = "${bonusManager.progress} / ${bonusManager.maxProgress}"
-                        val colorDrawableId2 = progressColors[(bonusManager.stageNumber - 1) % progressColors.size]
+                        binding.progressBar2.max = secondProgressManager.maxProgress
+                        binding.progressBar2.progress = secondProgressManager.countSecondProgress
+                        binding.progressText2.text = "${secondProgressManager.countSecondProgress} / ${secondProgressManager.maxProgress}"
+                        val colorDrawableId2 = progressColors[(secondProgressManager.stageNumber - 1) % progressColors.size]
                         binding.progressBar2.progressDrawable = ContextCompat.getDrawable(this@MainActivity, colorDrawableId2)
 
                     }
@@ -341,20 +341,20 @@
 
 
 
-                    binding.progressBar2.max = bonusManager.maxProgress
-                    binding.progressBar2.progress = bonusManager.progress
-                    binding.progressText2.text = "${bonusManager.progress} / ${bonusManager.maxProgress}"
+                    binding.progressBar2.max = secondProgressManager.maxProgress
+                    binding.progressBar2.progress = secondProgressManager.countSecondProgress
+                    binding.progressText2.text = "${secondProgressManager.countSecondProgress} / ${secondProgressManager.maxProgress}"
 
 
 
-                    val colorDrawableId2 = progressColors[(bonusManager.stageNumber - 1) % progressColors.size]
+                    val colorDrawableId2 = progressColors[(secondProgressManager.stageNumber - 1) % progressColors.size]
 
                     binding.progressBar2.progressDrawable = ContextCompat.getDrawable(this@MainActivity, colorDrawableId2)
 
 
                     sendBroadcast(intent)
 
-                    val (stageProgress, stageMax, currentStage) = getStageData(goldCount)
+                    val (stageProgress, stageMax, currentStage) = getStageData(CountFirstProgress)
                     updateTapAnimationForStage(currentStage)
 
 
@@ -411,12 +411,9 @@
                     binding.progressBar.progressDrawable = ContextCompat.getDrawable(this@MainActivity, colorDrawableId)
 
 
-                    //if (goldCount % 50 == 0) Heart.playLottieAnimation(lottieViewShineOne)
-
-                    //if (goldCount % 75 == 0) Heart.playLottieAnimation(lottieViewShineTwo)
 
 
-                    when (goldCount % 10) {
+                    when (secondProgressManager.countSecondProgress % 10) {
                             1 -> Heart.playLottieAnimation(lottie1)
                             2 -> Heart.playLottieAnimation(lottie2)
                             3 -> Heart.playLottieAnimation(lottie5)
@@ -429,11 +426,11 @@
                             0 -> Heart.playLottieAnimation(lottie4)
                         }
 
-                    if (goldCount % 27 == 0) {
+                    if (secondProgressManager.countSecondProgress % 27 == 0) {
 
 
                         // Выполнение следующего действия
-                        when (bonusManager.currentStage.number) {
+                        when (secondProgressManager.currentStage.number) {
                             1 -> { // Одно сердце
                                 Heart.playNextHeartAnimation(
                                     binding.lottieHeartGold,

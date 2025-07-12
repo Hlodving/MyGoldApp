@@ -50,7 +50,8 @@ class BonusStageManager(private val context: Context) {
     var stageNumber = 1
         private set
 
-    var progress = 0
+    // Основной счетчик второго прогресс бара
+    var countSecondProgress = 0
         private set
 
     val currentStage: BonusStage
@@ -64,21 +65,21 @@ class BonusStageManager(private val context: Context) {
     fun loadState() {
         val prefs = context.getSharedPreferences("GoldPrefs", Context.MODE_PRIVATE)
         stageNumber = prefs.getInt("bonusStageNumber", 1).coerceIn(1, 30)
-        progress = prefs.getInt("bonusProgress", 0)
+        countSecondProgress = prefs.getInt("bonusProgress", 0)
     }
 
     fun saveState() {
         val prefs = context.getSharedPreferences("GoldPrefs", Context.MODE_PRIVATE)
         prefs.edit()
             .putInt("bonusStageNumber", stageNumber)
-            .putInt("bonusProgress", progress)
+            .putInt("bonusProgress", countSecondProgress)
             .apply()
     }
 
     fun increment(): Boolean {
-        progress++
-        if (progress >= maxProgress) {
-            progress = 0
+        countSecondProgress++
+        if (countSecondProgress >= maxProgress) {
+            countSecondProgress = 0
             stageNumber = (stageNumber + 1).coerceAtMost(30)
             justFilled = true
             saveState()
