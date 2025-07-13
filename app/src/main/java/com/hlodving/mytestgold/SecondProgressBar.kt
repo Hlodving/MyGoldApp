@@ -37,7 +37,7 @@ enum class BonusStage(val number: Int, val max: Int, val bonusTimeMillis: Long) 
     STAGE_30(30, 100000, 30 * 24 * 60 * 60_000L);
 
     companion object {
-        fun fromNumber(number: Int): BonusStage =
+            fun fromNumber(number: Int): BonusStage =
             values().find { it.number == number } ?: STAGE_1
 
         fun nextStage(current: BonusStage): BonusStage =
@@ -46,28 +46,32 @@ enum class BonusStage(val number: Int, val max: Int, val bonusTimeMillis: Long) 
 }
 
 class BonusStageManager(private val context: Context) {
-
+    // Начальное значение номера стадии
     var stageNumber = 1
         private set
 
     // Основной счетчик второго прогресс бара
     var countSecondProgress = 0
         private set
-
+    //Возвращает текущую стадию на основе stageNumber
     val currentStage: BonusStage
         get() = BonusStage.fromNumber(stageNumber)
 
+    //Возвращает максимум нажатий
     val maxProgress: Int
         get() = currentStage.max
 
+    //Флаг который отмечает, что стадия была заполнена
     var justFilled = false
 
+    //Загружает текущее состояние второго прогресс бара
     fun loadState() {
         val prefs = context.getSharedPreferences("GoldPrefs", Context.MODE_PRIVATE)
         stageNumber = prefs.getInt("bonusStageNumber", 1).coerceIn(1, 30)
         countSecondProgress = prefs.getInt("bonusProgress", 0)
     }
 
+    //Сохраняет текущее состояние второго прогресс бара
     fun saveState() {
         val prefs = context.getSharedPreferences("GoldPrefs", Context.MODE_PRIVATE)
         prefs.edit()
@@ -76,6 +80,7 @@ class BonusStageManager(private val context: Context) {
             .apply()
     }
 
+    //Увеличивает и сбрасывает второй прогресс бар
     fun increment(): Boolean {
         countSecondProgress++
         if (countSecondProgress >= maxProgress) {
@@ -89,6 +94,7 @@ class BonusStageManager(private val context: Context) {
         return false
     }
 
+    //Подставляет строку с цитатой в зависимости от фазы
     fun getQuote(): String {
         val quoteId = context.resources.getIdentifier(
             "bonus_stage_$stageNumber", "string", context.packageName

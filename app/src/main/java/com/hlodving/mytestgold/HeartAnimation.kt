@@ -1,15 +1,19 @@
     import com.airbnb.lottie.LottieAnimationView
     import com.airbnb.lottie.LottieDrawable
 
+    //Анимация в приложении
     class HeartAnimation {
 
+        //Чередует анимации
         private var animationIndex = 0
 
+        //Запуск анимации 1 раз с сначал до конца
         fun animationRestart(lottieFile: LottieAnimationView) {
             lottieFile.repeatCount = 0
             lottieFile.repeatMode = LottieDrawable.RESTART
         }
 
+        //Проигрывает анимацию в заданном диапазоне
         fun playLottieAnimation(
             lottieView: LottieAnimationView,
             minProgress: Float = 0f,
@@ -19,6 +23,7 @@
             lottieView.playAnimation()
         }
 
+        //Чередует 3 анимации
         fun playNextHeartAnimation(
             lottieView: LottieAnimationView,
             minProgressOne: Float,

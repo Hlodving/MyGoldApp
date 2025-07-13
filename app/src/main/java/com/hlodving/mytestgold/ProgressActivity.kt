@@ -1,13 +1,14 @@
 package com.hlodving.mytestgold
 
 
-import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.hlodving.mytestgold.databinding.ActivityProgressBinding
 
 class ProgressActivity : AppCompatActivity() {
+
+    //Переменная с основным счетчиком
+    private lateinit var globalTapCounter: GlobalTapCounter
 
 
     private lateinit var binding: ActivityProgressBinding
@@ -17,12 +18,15 @@ class ProgressActivity : AppCompatActivity() {
         binding = ActivityProgressBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        // Создаём объект и загружаем данные
+        globalTapCounter = GlobalTapCounter(this)
+        globalTapCounter.load()
 
-        // Загружаем прогресс из SharedPreferences
-        val prefs = getSharedPreferences("GoldPrefs", Context.MODE_PRIVATE)
-        val yourProgress = prefs.getInt("bonusProgress", 0)
+        // Показываем общее количество тапов
+        val allTaps = globalTapCounter.totalTaps
+        binding.myProgress.text = "Прогресс: $allTaps"
 
-        binding.myProgress.text = "Прогресс: $yourProgress"
+
 
     }
 }

@@ -21,7 +21,8 @@
         private lateinit var countdownTimerManager: CountdownTimerManager
         //Переменная с вторым прогресс баром
         private lateinit var secondProgressManager: BonusStageManager
-
+        //Переменная с основным счетчиком
+        private lateinit var globalTapCounter: GlobalTapCounter
 
 
         // Переменные и настройки в начале класса
@@ -186,6 +187,11 @@
             secondProgressManager.loadState()
 
 
+            globalTapCounter = GlobalTapCounter(this)
+            globalTapCounter.load()
+
+
+
             //инициализируем таймер
             countdownTimerManager = CountdownTimerManager(
                 context = this,
@@ -297,6 +303,8 @@
 
 
                 lottieHeartGold.setOnClickListener {
+
+                    globalTapCounter.increment()
 
                     if (isOberegForever()) return@setOnClickListener
 
