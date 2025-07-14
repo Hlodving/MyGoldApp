@@ -9,9 +9,8 @@
     import android.view.View
     import androidx.appcompat.app.AppCompatActivity
     import androidx.core.content.ContextCompat
-    import androidx.work.ExistingWorkPolicy
-    import androidx.work.OneTimeWorkRequestBuilder
     import androidx.work.WorkManager
+
 
     import com.hlodving.mytestgold.databinding.ActivityMainBinding
 
@@ -67,22 +66,6 @@
             return countdownTimerManager.loadTimerEndTime() == Long.MAX_VALUE
         }
 
-
-
-
-
-        //Создаётся задание WorkManager
-        private fun scheduleResetWorker(delayMillis: Long) {
-            val workRequest = OneTimeWorkRequestBuilder<TimerWorker>()
-                .setInitialDelay(delayMillis, java.util.concurrent.TimeUnit.MILLISECONDS)
-                .build()
-
-            WorkManager.getInstance(this).enqueueUniqueWork(
-                "resetGoldWorker", // имя задачи
-                ExistingWorkPolicy.REPLACE, // перезаписываем предыдущую, если она есть
-                workRequest
-            )
-        }
 
 
             //Обновляет виджет при истечении времени
@@ -217,7 +200,8 @@
             } else if (endTime > now) {
                 countdownTimerManager.startTimer()
                 val delayMillis = endTime - now
-                scheduleResetWorker(delayMillis)
+                ResetScheduler.scheduleResetWorker(this, delayMillis)
+
 
             } else {
                 binding.timerText.text = getString(R.string.not_active_amulet)
@@ -297,7 +281,8 @@
                         countdownTimerManager.timerEndTime = newBonusEndTime
                         countdownTimerManager.saveTimerEndTime(newBonusEndTime)
                         countdownTimerManager.startTimer()
-                        scheduleResetWorker(newBonusEndTime - System.currentTimeMillis())
+                        ResetScheduler.scheduleResetWorker(this@MainActivity, newBonusEndTime - System.currentTimeMillis())
+
 
                         // 2. Обновляем цитату
                         binding.bonusQuoteText.text = secondProgressManager.getQuote()
@@ -362,7 +347,7 @@
                             //val additionalHours = baseHoursToAdd + (currentStage.number - 2)
                             //val additionalMillis = additionalHours * 60 * 60 * 1000
                             // Это для теста
-                            val additionalMillis = 100_000L // 10 секунд
+                            val additionalMillis = 10_000L // 10 секунд
 
 
                             val newTime = now + safeRemaining + additionalMillis
@@ -372,7 +357,8 @@
 
                             countdownTimerManager.startTimer()
 
-                            scheduleResetWorker(delayMillis)
+                            ResetScheduler.scheduleResetWorker(this@MainActivity, delayMillis)
+
                         }
 
                         lastStage = currentStage.number
