@@ -200,6 +200,8 @@
             binding.progressBar2.progressDrawable = ContextCompat.getDrawable(this, colorDrawableId2)
 
 
+            // Загружаем сохранённое время таймера
+            countdownTimerManager.loadTimerEndTime()
 
 
             val endTime = countdownTimerManager.timerEndTime
@@ -236,9 +238,6 @@
             // Обновляем виджет
             GoldWidget.updateAllWidgets(this, CountFirstProgress)
 
-
-    // Загружаем сохранённое время таймера
-            countdownTimerManager.loadTimerEndTime()
 
 
 
