@@ -21,12 +21,8 @@ class TimerWorker(appContext: Context, workerParams: WorkerParameters) : Worker(
         }
 
         // Обновление виджета
-        GoldWidget.currentGold = 0
-        val manager = AppWidgetManager.getInstance(context)
-        val ids = manager.getAppWidgetIds(ComponentName(context, GoldWidget::class.java))
-        for (id in ids) {
-            GoldWidget.updateWidget(context, manager, id)
-        }
+        GoldWidget.updateAllWidgets(context, 0)
+
 
         return Result.success()
     }

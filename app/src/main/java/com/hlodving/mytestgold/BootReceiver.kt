@@ -32,13 +32,7 @@
                         )
 
                         // Обновляем виджет вручную после перезапуска устройства
-                        GoldWidget.currentGold = goldCount
-                        val appWidgetManager = AppWidgetManager.getInstance(context)
-                        val ids =
-                            appWidgetManager.getAppWidgetIds(ComponentName(context, GoldWidget::class.java))
-                        for (id in ids) {
-                            GoldWidget.updateWidget(context, appWidgetManager, id)
-                        }
+                        GoldWidget.updateAllWidgets(context, goldCount)
                     }
                 }
 

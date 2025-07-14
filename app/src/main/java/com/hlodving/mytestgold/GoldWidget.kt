@@ -15,7 +15,7 @@ import android.widget.RemoteViews
 class GoldWidget : AppWidgetProvider() {
 
     companion object {
-        var currentGold = 0 //Текущее колличество кликов
+        private var currentGold = 0 //Текущее колличество кликов
 
         private var useAuraAnimation = false //Переключает анимацию между aura и shine
 
@@ -26,8 +26,24 @@ class GoldWidget : AppWidgetProvider() {
         private var currentFrame = 0 //номер текущего кадра анимации (в пределах 0–22 или 0–59)
 
 
+        fun updateAllWidgets(context: Context, goldCount: Int) {
+            currentGold = goldCount
+
+            val intent = Intent(context, GoldWidget::class.java).apply {
+                action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
+                putExtra(
+                    AppWidgetManager.EXTRA_APPWIDGET_IDS,
+                    AppWidgetManager.getInstance(context)
+                        .getAppWidgetIds(ComponentName(context, GoldWidget::class.java))
+                )
+            }
+
+            context.sendBroadcast(intent)
+        }
+
+
         //Эта функция обнавляет внешний вид виджета
-        fun updateWidget(
+        fun updateWidgetAnimation(
             context: Context,
             appWidgetManager: AppWidgetManager,
             appWidgetId: Int
@@ -91,7 +107,7 @@ class GoldWidget : AppWidgetProvider() {
             frameRunnable = object : Runnable {
                 override fun run() {
                     for (id in appWidgetIds) {
-                        updateWidget(context, appWidgetManager, id)
+                        updateWidgetAnimation(context, appWidgetManager, id)
                     }
                     currentFrame++
 
@@ -124,7 +140,7 @@ class GoldWidget : AppWidgetProvider() {
 
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
         for (id in appWidgetIds) {
-            updateWidget(context, appWidgetManager, id)
+            updateWidgetAnimation(context, appWidgetManager, id)
         }
         startAnimationCycle(context)
     }

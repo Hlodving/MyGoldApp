@@ -117,29 +117,8 @@
             binding.progressBar.progressDrawable = ContextCompat.getDrawable(this, colorDrawableId)
 
             // Обновление виджета
-            updateWidget()
-        }
-
-
-        //Этот метод обновляет виджет, подставляя нужную картинку в зависимости от goldCount.
-        private fun updateWidget() {
-
-            GoldWidget.currentGold = CountFirstProgress //Устанавливаем текущее колличество золота
-
-            //Создаём Intent, чтобы отправить сигнал системе обновть виджет
-            val intent = Intent(this, GoldWidget::class.java).apply {
-                action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
-                putExtra(
-                    AppWidgetManager.EXTRA_APPWIDGET_IDS,
-                    AppWidgetManager.getInstance(this@MainActivity)
-                        .getAppWidgetIds(ComponentName(this@MainActivity, GoldWidget::class.java))
-                )
+                GoldWidget.updateAllWidgets(this, CountFirstProgress)
             }
-
-            sendBroadcast(intent) //Отправляем этот сигнал
-        }
-
-
 
 
 
@@ -255,18 +234,8 @@
             CountFirstProgress = loadGoldCount()
 
             // Обновляем виджет
-            GoldWidget.currentGold = CountFirstProgress
-            val widgetIntent = Intent(this@MainActivity, GoldWidget::class.java).apply {
-                action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
-                putExtra(
-                    AppWidgetManager.EXTRA_APPWIDGET_IDS,
-                    AppWidgetManager.getInstance(this@MainActivity)
-                        .getAppWidgetIds(ComponentName(this@MainActivity, GoldWidget::class.java))
-                )
-            }
+            GoldWidget.updateAllWidgets(this, CountFirstProgress)
 
-
-            sendBroadcast(widgetIntent)
 
     // Загружаем сохранённое время таймера
             countdownTimerManager.loadTimerEndTime()
@@ -311,7 +280,8 @@
                     CountFirstProgress++
                     saveGoldCount()
 
-                    GoldWidget.currentGold = CountFirstProgress
+                    GoldWidget.updateAllWidgets(this@MainActivity, CountFirstProgress)
+
                     val intent = Intent(this@MainActivity, GoldWidget::class.java).apply {
 
                     action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
@@ -390,8 +360,11 @@
 
 
                             // Каждая следующая стадия добавляет на 1 час больше
-                            val additionalHours = baseHoursToAdd + (currentStage.number - 2)
-                            val additionalMillis = additionalHours * 60 * 60 * 1000
+                            //val additionalHours = baseHoursToAdd + (currentStage.number - 2)
+                            //val additionalMillis = additionalHours * 60 * 60 * 1000
+                            // Это для теста
+                            val additionalMillis = 100_000L // 10 секунд
+
 
                             val newTime = now + safeRemaining + additionalMillis
                             countdownTimerManager.timerEndTime = newTime
