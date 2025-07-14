@@ -43,23 +43,10 @@
         private var baseHoursToAdd = 2L // Начальная прибавка — 2 часа
 
 
-
-
         private var resetHappened = false // Флаг, отмечает факт сброса
 
 
 
-        private var currentTapAnimation: String? = null //Текущий файл анимации для нажатий json от Lottie Это нужно, чтобы не переустанавливать один и тот же файл, если он не изменился.
-
-
-        // Меняет анимацию активную и не активную
-        private fun updateTapAnimationForStage(stage: Stage) {
-            val newAnimation = if (stage.number == 1) "Gold_movement_cb.json" else "Gold_movement.json"
-            if (currentTapAnimation != newAnimation) {
-                currentTapAnimation = newAnimation
-                binding.lottieTapGold.setAnimation(newAnimation)
-            }
-        }
 
         //Проверка вечного таймера
         private fun isOberegForever(): Boolean {
@@ -81,12 +68,15 @@
             countdownTimerManager.saveTimerEndTime(countdownTimerManager.timerEndTime)
             binding.timerText.text = getString(R.string.not_active_amulet)
 
+            val Heart = HeartAnimation()
+
 
             // Обновляет прогрессбар с учетом новой стадии
             val (stageProgress, stageMax, currentStage) = getStageData(CountFirstProgress)
-            updateTapAnimationForStage(currentStage)
+                Heart.updateTapAnimationForStage(binding.lottieTapGold, currentStage)
 
-            binding.progressBar.max = stageMax
+
+                binding.progressBar.max = stageMax
             binding.progressBar.progress = stageProgress
             binding.progressText.text = "$stageProgress / $stageMax"
 
@@ -223,14 +213,16 @@
             GoldWidget.updateAllWidgets(this, CountFirstProgress)
 
 
-
+            val Heart = HeartAnimation()
 
 
             lastStage = getStageData(CountFirstProgress).third.number
 
 
+
             val (stageProgress, stageMax, currentStage) = getStageData(CountFirstProgress)
-            updateTapAnimationForStage(currentStage)
+            Heart.updateTapAnimationForStage(binding.lottieTapGold, currentStage)
+
 
 
             binding.progressBar.max = stageMax
@@ -244,8 +236,6 @@
             binding.progressBar.progressDrawable = ContextCompat.getDrawable(this@MainActivity, colorDrawableId)
 
 
-            // Анимации
-            val Heart = HeartAnimation()
 
             binding.apply {
                 Heart.animationRestart(lottieHeartGold)
@@ -317,7 +307,8 @@
                     sendBroadcast(intent)
 
                     val (stageProgress, stageMax, currentStage) = getStageData(CountFirstProgress)
-                    updateTapAnimationForStage(currentStage)
+                    Heart.updateTapAnimationForStage(binding.lottieTapGold, currentStage)
+
 
 
 
