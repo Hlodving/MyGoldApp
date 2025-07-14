@@ -118,5 +118,25 @@
 
                 return UNKNOWN
             }
+
+            fun getStageData(gold: Int): Triple<Int, Int, Stage> {
+                var stageNumber = 1
+                var requiredGold = 100
+                var accumulated = 0
+
+                while (gold >= accumulated + requiredGold) {
+                    accumulated += requiredGold
+                    stageNumber++
+                    requiredGold = stageNumber * 100
+                }
+
+                val stageProgress = gold - accumulated
+                val stageMax = requiredGold
+                val stage = fromGold(gold)
+
+                return Triple(stageProgress, stageMax, stage)
+            }
         }
+
+
     }

@@ -10,6 +10,7 @@
     import androidx.appcompat.app.AppCompatActivity
     import androidx.core.content.ContextCompat
     import androidx.work.WorkManager
+    import com.hlodving.mytestgold.Stage.Companion.getStageData
 
 
     import com.hlodving.mytestgold.databinding.ActivityMainBinding
@@ -54,44 +55,17 @@
         }
 
 
-
-            //Обновляет виджет при истечении времени
-            private fun resetAppState() {
-            //Обнуляет золото
+        //Функция логики сброса
+        private fun resetGoldLogic() {
             resetHappened = true
             CountFirstProgress = 0
             saveGoldCount()
 
-            //Сбрасывает стадию и таймер
             lastStage = 1
             countdownTimerManager.timerEndTime = 0L
             countdownTimerManager.saveTimerEndTime(countdownTimerManager.timerEndTime)
-            binding.timerText.text = getString(R.string.not_active_amulet)
+        }
 
-            val Heart = HeartAnimation()
-
-
-            // Обновляет прогрессбар с учетом новой стадии
-            val (stageProgress, stageMax, currentStage) = getStageData(CountFirstProgress)
-                Heart.updateTapAnimationForStage(binding.lottieTapGold, currentStage)
-
-
-                binding.progressBar.max = stageMax
-            binding.progressBar.progress = stageProgress
-            binding.progressText.text = "$stageProgress / $stageMax"
-
-            //Обновляются оба прогресс-бара
-            val colorDrawableId2 = progressColors[(secondProgressManager.stageNumber - 1) % progressColors.size]
-            binding.progressBar2.progressDrawable = ContextCompat.getDrawable(this, colorDrawableId2)
-            // тут мы берём номер этапа (Int), вычитаем 1
-            val safeStageNum = currentStage.number.coerceIn(1, 101)
-            val colorDrawableId = progressColors[(safeStageNum - 1) % progressColors.size]
-
-            binding.progressBar.progressDrawable = ContextCompat.getDrawable(this, colorDrawableId)
-
-            // Обновление виджета
-                GoldWidget.updateAllWidgets(this, CountFirstProgress)
-            }
 
 
 
@@ -110,23 +84,6 @@
             return sharedPref.getInt("goldCount", 0)
         }
 
-        //Этот метод считает, на каком этапе сейчас пользователь, сколько кликов нужно на следующий этап и сколько уже накоплено
-        private fun getStageData(gold: Int): Triple<Int, Int, Stage> {
-            var stageNumber = 1 //Номер стадии
-            var requiredGold = 100 //Нужно тапов
-            var accumulated = 0 //Накоплено
-
-            while (gold >= accumulated + requiredGold) { //Цикл ищет на какой стадии находится пользователь
-                accumulated += requiredGold
-                stageNumber++
-                requiredGold = stageNumber * 100
-            }
-            val stageProgress = gold - accumulated
-            val stageMax = requiredGold
-            val stage = Stage.fromGold(gold)
-
-            return Triple(stageProgress, stageMax, stage)
-        }
 
 
         lateinit var binding: ActivityMainBinding
@@ -152,7 +109,15 @@
                 },
                 onFinished = {
                     if (!secondProgressManager.justFilled) {
-                        resetAppState()
+                        resetGoldLogic()
+                        HeartAnimation.applyResetUI(
+                            context = this,
+                            binding = binding,
+                            progressColors = progressColors,
+                            countFirstProgress = CountFirstProgress,
+                            secondStageNumber = secondProgressManager.stageNumber
+                        )
+
                     }
                     secondProgressManager.justFilled = false
                 }
@@ -195,6 +160,14 @@
 
             } else {
                 binding.timerText.text = getString(R.string.not_active_amulet)
+
+                HeartAnimation.applyResetUI(
+                    context = this,
+                    binding = binding,
+                    progressColors = progressColors,
+                    countFirstProgress = CountFirstProgress,
+                    secondStageNumber = secondProgressManager.stageNumber
+                )
             }
 
 
@@ -213,7 +186,7 @@
             GoldWidget.updateAllWidgets(this, CountFirstProgress)
 
 
-            val Heart = HeartAnimation()
+            val Heart = HeartAnimation
 
 
             lastStage = getStageData(CountFirstProgress).third.number
@@ -643,7 +616,34 @@
 
         override fun onResume() {
             super.onResume()
+            val endTime = countdownTimerManager.timerEndTime
+            val now = System.currentTimeMillis()
+
+            if (endTime == Long.MAX_VALUE) {
+                binding.timerText.text = getString(R.string.active_forever_amulet)
+                binding.progressBar.visibility = View.GONE
+                binding.progressText.visibility = View.GONE
+                binding.progressBar2.visibility = View.GONE
+                binding.progressText2.visibility = View.GONE
+
+            } else if (endTime > now) {
+                countdownTimerManager.startTimer()
+                val delayMillis = endTime - now
+                ResetScheduler.scheduleResetWorker(this, delayMillis)
+
+            } else {
+                binding.timerText.text = getString(R.string.not_active_amulet)
+
+                HeartAnimation.applyResetUI(
+                    context = this,
+                    binding = binding,
+                    progressColors = progressColors,
+                    countFirstProgress = CountFirstProgress,
+                    secondStageNumber = secondProgressManager.stageNumber
+                )
+            }
         }
+
 
         override fun onPause() {
             super.onPause()
