@@ -9,6 +9,8 @@
     tools:context=".MainActivity">
 
 
+
+
     <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/lottieTapGold"
         android:layout_width="350dp"
@@ -282,40 +284,13 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!--
-        <Button
-            android:id="@+id/debugAdd99MainButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="56dp"
-            android:layout_marginBottom="36dp"
-            android:text="Добавить +99 в первый"
-            app:layout_constraintBottom_toTopOf="@+id/timerText"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/debugShortenTimerButton"
-            app:layout_constraintVertical_bias="0.975" />
-
-        <Button
-            android:id="@+id/debugAdd500Button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="24dp"
-            android:layout_marginBottom="84dp"
-            android:text="Добавить +499 во второй"
-            app:layout_constraintBottom_toBottomOf="@+id/lottieTapGold"
-            app:layout_constraintEnd_toEndOf="parent" />
-
-        <Button
-            android:id="@+id/debugShortenTimerButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Скинуть до 10 сек"
-            app:layout_constraintBottom_toTopOf="@+id/debugAdd500Button"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.518"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/lottieTapGold"
-            app:layout_constraintVertical_bias="0.939" />
--->
+    <Button
+        android:id="@+id/buttonAdd49"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Добавить 49"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/progressFrame2" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

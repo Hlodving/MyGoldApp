@@ -41,33 +41,6 @@
 
 
 
-        private var baseHoursToAdd = 2L // Начальная прибавка — 2 часа
-
-
-        private var resetHappened = false // Флаг, отмечает факт сброса
-
-
-
-
-        //Проверка вечного таймера
-        private fun isOberegForever(): Boolean {
-            return countdownTimerManager.loadTimerEndTime() == Long.MAX_VALUE
-        }
-
-
-        //Функция логики сброса
-        private fun resetGoldLogic() {
-            resetHappened = true
-            CountFirstProgress = 0
-            saveGoldCount()
-
-            lastStage = 1
-            countdownTimerManager.timerEndTime = 0L
-            countdownTimerManager.saveTimerEndTime(countdownTimerManager.timerEndTime)
-        }
-
-
-
 
         // Сохраняет текущее количество кликов
         private fun saveGoldCount() {
@@ -99,6 +72,12 @@
             globalTapCounter = GlobalTapCounter(this)
             globalTapCounter.load()
 
+            //Тест кнопка
+            binding.buttonAdd49.setOnClickListener {
+                repeat(49) {
+                    binding.lottieHeartGold.performClick()
+                }
+            }
 
 
             //инициализируем таймер
@@ -109,7 +88,13 @@
                 },
                 onFinished = {
                     if (!secondProgressManager.justFilled) {
-                        resetGoldLogic()
+                        countdownTimerManager.resetHappened = true
+                        CountFirstProgress = 0
+                        saveGoldCount()
+
+                        lastStage = 1
+                        countdownTimerManager.resetTimer()
+
                         HeartAnimation.applyResetUI(
                             context = this,
                             binding = binding,
@@ -142,33 +127,32 @@
             countdownTimerManager.loadTimerEndTime()
 
 
-            val endTime = countdownTimerManager.timerEndTime
-            val now = System.currentTimeMillis()
-            //Скрываем оба прогресс бара и их текст
-            if (endTime == Long.MAX_VALUE) {
-                binding.timerText.text = getString(R.string.active_forever_amulet)
-                binding.progressBar.visibility = View.GONE
-                binding.progressText.visibility = View.GONE
-                binding.progressBar2.visibility = View.GONE
-                binding.progressText2.visibility = View.GONE
+            when (val state = countdownTimerManager.getTimerState()) {
+                is CountdownTimerManager.TimerState.Forever -> {
+                    binding.timerText.text = getString(R.string.active_forever_amulet)
+                    binding.progressBar.visibility = View.GONE
+                    binding.progressText.visibility = View.GONE
+                    binding.progressBar2.visibility = View.GONE
+                    binding.progressText2.visibility = View.GONE
+                }
 
-            } else if (endTime > now) {
-                countdownTimerManager.startTimer()
-                val delayMillis = endTime - now
-                ResetScheduler.scheduleResetWorker(this, delayMillis)
+                is CountdownTimerManager.TimerState.Running -> {
+                    countdownTimerManager.startTimer()
+                    ResetScheduler.scheduleResetWorker(this, state.remainingMillis)
+                }
 
-
-            } else {
-                binding.timerText.text = getString(R.string.not_active_amulet)
-
-                HeartAnimation.applyResetUI(
-                    context = this,
-                    binding = binding,
-                    progressColors = progressColors,
-                    countFirstProgress = CountFirstProgress,
-                    secondStageNumber = secondProgressManager.stageNumber
-                )
+                is CountdownTimerManager.TimerState.Expired -> {
+                    binding.timerText.text = getString(R.string.not_active_amulet)
+                    HeartAnimation.applyResetUI(
+                        context = this,
+                        binding = binding,
+                        progressColors = progressColors,
+                        countFirstProgress = CountFirstProgress,
+                        secondStageNumber = secondProgressManager.stageNumber
+                    )
+                }
             }
+
 
 
 
@@ -221,7 +205,8 @@
 
                     globalTapCounter.increment()
 
-                    if (isOberegForever()) return@setOnClickListener
+                    if (countdownTimerManager.isOberegForever()) return@setOnClickListener
+
 
                     CountFirstProgress++
                     saveGoldCount()
@@ -307,11 +292,12 @@
                             val safeRemaining = countdownTimerManager.getRemainingTimeMillis()
 
 
+
                             // Каждая следующая стадия добавляет на 1 час больше
-                            //val additionalHours = baseHoursToAdd + (currentStage.number - 2)
+                            //val additionalHours = countdownTimerManager.baseHoursToAdd + (currentStage.number - 2)
                             //val additionalMillis = additionalHours * 60 * 60 * 1000
                             // Это для теста
-                            val additionalMillis = 10_000L // 10 секунд
+                            val additionalMillis = 15_000L // 10 секунд
 
 
                             val newTime = now + safeRemaining + additionalMillis
@@ -616,32 +602,34 @@
 
         override fun onResume() {
             super.onResume()
-            val endTime = countdownTimerManager.timerEndTime
-            val now = System.currentTimeMillis()
 
-            if (endTime == Long.MAX_VALUE) {
-                binding.timerText.text = getString(R.string.active_forever_amulet)
-                binding.progressBar.visibility = View.GONE
-                binding.progressText.visibility = View.GONE
-                binding.progressBar2.visibility = View.GONE
-                binding.progressText2.visibility = View.GONE
 
-            } else if (endTime > now) {
-                countdownTimerManager.startTimer()
-                val delayMillis = endTime - now
-                ResetScheduler.scheduleResetWorker(this, delayMillis)
+            when (val state = countdownTimerManager.getTimerState()) {
+                is CountdownTimerManager.TimerState.Forever -> {
+                    binding.timerText.text = getString(R.string.active_forever_amulet)
+                    binding.progressBar.visibility = View.GONE
+                    binding.progressText.visibility = View.GONE
+                    binding.progressBar2.visibility = View.GONE
+                    binding.progressText2.visibility = View.GONE
+                }
 
-            } else {
-                binding.timerText.text = getString(R.string.not_active_amulet)
+                is CountdownTimerManager.TimerState.Running -> {
+                    countdownTimerManager.startTimer()
+                    ResetScheduler.scheduleResetWorker(this, state.remainingMillis)
+                }
 
-                HeartAnimation.applyResetUI(
-                    context = this,
-                    binding = binding,
-                    progressColors = progressColors,
-                    countFirstProgress = CountFirstProgress,
-                    secondStageNumber = secondProgressManager.stageNumber
-                )
+                is CountdownTimerManager.TimerState.Expired -> {
+                    binding.timerText.text = getString(R.string.not_active_amulet)
+                    HeartAnimation.applyResetUI(
+                        context = this,
+                        binding = binding,
+                        progressColors = progressColors,
+                        countFirstProgress = CountFirstProgress,
+                        secondStageNumber = secondProgressManager.stageNumber
+                    )
+                }
             }
+
         }
 
 
