@@ -23,11 +23,9 @@
         private lateinit var secondProgressManager: BonusStageManager
         //Переменная с основным счетчиком
         private lateinit var globalTapCounter: GlobalTapCounter
+        //Переменная с первым прогресс баром
+        private lateinit var goldProgressManager: GoldProgressManager
 
-
-        // Переменные и настройки в начале класса
-        private var lastStage = 1 // Последний достигнутый этап (нужен для проверки перехода на новый)
-        private var CountFirstProgress = 0 // Общее количество нажатий для первого прогресс бара
 
 
         private val progressColors = listOf(
@@ -42,28 +40,18 @@
 
 
 
-        // Сохраняет текущее количество кликов
-        private fun saveGoldCount() {
-            val sharedPref = getSharedPreferences("GoldPrefs", Context.MODE_PRIVATE)
-            with(sharedPref.edit()) {
-                putInt("goldCount", CountFirstProgress)
-                apply()
-            }
-        }
-
-        // Загружает сохранённое количество кликов
-        private fun loadGoldCount(): Int {
-            val sharedPref = getSharedPreferences("GoldPrefs", Context.MODE_PRIVATE)
-            return sharedPref.getInt("goldCount", 0)
-        }
-
-
 
         lateinit var binding: ActivityMainBinding
         override fun onCreate(savedInstanceState: Bundle?) {
             super.onCreate(savedInstanceState)
             binding = ActivityMainBinding.inflate(layoutInflater)
             setContentView(binding.root)
+
+            goldProgressManager = GoldProgressManager(this, binding, progressColors)
+            goldProgressManager.load()
+            goldProgressManager.updateUI()
+            GoldWidget.updateAllWidgets(this, goldProgressManager.count)
+
 
             secondProgressManager = BonusStageManager(this)
             secondProgressManager.loadState()
@@ -89,17 +77,15 @@
                 onFinished = {
                     if (!secondProgressManager.justFilled) {
                         countdownTimerManager.resetHappened = true
-                        CountFirstProgress = 0
-                        saveGoldCount()
+                        goldProgressManager.reset()
 
-                        lastStage = 1
                         countdownTimerManager.resetTimer()
 
                         HeartAnimation.applyResetUI(
                             context = this,
                             binding = binding,
                             progressColors = progressColors,
-                            countFirstProgress = CountFirstProgress,
+                            countFirstProgress = goldProgressManager.count,
                             secondStageNumber = secondProgressManager.stageNumber
                         )
 
@@ -147,7 +133,7 @@
                         context = this,
                         binding = binding,
                         progressColors = progressColors,
-                        countFirstProgress = CountFirstProgress,
+                        countFirstProgress = goldProgressManager.count,
                         secondStageNumber = secondProgressManager.stageNumber
                     )
                 }
@@ -163,21 +149,12 @@
                 startActivity(intent)
             }
 
-            // Загружаем сохранённое значение
-            CountFirstProgress = loadGoldCount()
-
-            // Обновляем виджет
-            GoldWidget.updateAllWidgets(this, CountFirstProgress)
 
 
             val Heart = HeartAnimation
 
 
-            lastStage = getStageData(CountFirstProgress).third.number
-
-
-
-            val (stageProgress, stageMax, currentStage) = getStageData(CountFirstProgress)
+            val (stageProgress, stageMax, currentStage) = goldProgressManager.getProgressInfo()
             Heart.updateTapAnimationForStage(binding.lottieTapGold, currentStage)
 
 
@@ -208,10 +185,10 @@
                     if (countdownTimerManager.isOberegForever()) return@setOnClickListener
 
 
-                    CountFirstProgress++
-                    saveGoldCount()
+                    val (stageProgress, stageMax, currentStage) = goldProgressManager.increment()
+                    GoldWidget.updateAllWidgets(this@MainActivity, goldProgressManager.count)
+                    goldProgressManager.updateUI()
 
-                    GoldWidget.updateAllWidgets(this@MainActivity, CountFirstProgress)
 
                     val intent = Intent(this@MainActivity, GoldWidget::class.java).apply {
 
@@ -264,14 +241,13 @@
 
                     sendBroadcast(intent)
 
-                    val (stageProgress, stageMax, currentStage) = getStageData(CountFirstProgress)
                     Heart.updateTapAnimationForStage(binding.lottieTapGold, currentStage)
 
 
 
 
                     // Действия при заполнении первого прогресс бара
-                    if (currentStage.number > lastStage) {
+                    if (goldProgressManager.isNextStage(currentStage)) {
                         //То что просходит по достижению 101 стадии
                         if (currentStage.number == 101) {
 
@@ -311,7 +287,7 @@
 
                         }
 
-                        lastStage = currentStage.number
+                        goldProgressManager.markStageReached(currentStage)
 
                         Heart.playLottieAnimation(binding.lottieViewShineOne)
                         Heart.playLottieAnimation(binding.lottieViewShineTwo)
@@ -624,7 +600,7 @@
                         context = this,
                         binding = binding,
                         progressColors = progressColors,
-                        countFirstProgress = CountFirstProgress,
+                        countFirstProgress = goldProgressManager.count,
                         secondStageNumber = secondProgressManager.stageNumber
                     )
                 }
