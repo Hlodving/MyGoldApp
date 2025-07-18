@@ -3,14 +3,12 @@
     import HeartAnimation
     import android.appwidget.AppWidgetManager
     import android.content.ComponentName
-    import android.content.Context
     import android.content.Intent
     import android.os.Bundle
     import android.view.View
     import androidx.appcompat.app.AppCompatActivity
     import androidx.core.content.ContextCompat
     import androidx.work.WorkManager
-    import com.hlodving.mytestgold.Stage.Companion.getStageData
 
 
     import com.hlodving.mytestgold.databinding.ActivityMainBinding
@@ -47,34 +45,28 @@
             binding = ActivityMainBinding.inflate(layoutInflater)
             setContentView(binding.root)
 
+            //Инициализация первого прогресс-бара
             goldProgressManager = GoldProgressManager(this, binding, progressColors)
             goldProgressManager.load()
             goldProgressManager.updateUI()
             GoldWidget.updateAllWidgets(this, goldProgressManager.count)
 
-
+            //Инициализация второго прогресс-бара
             secondProgressManager = BonusStageManager(this)
             secondProgressManager.loadState()
 
-
+            //Инициализация глобального счётчика нажатий
             globalTapCounter = GlobalTapCounter(this)
             globalTapCounter.load()
 
-            //Тест кнопка
-            binding.buttonAdd49.setOnClickListener {
-                repeat(49) {
-                    binding.lottieHeartGold.performClick()
-                }
-            }
 
-
-            //инициализируем таймер
+            //Инициализация и запуск таймера
             countdownTimerManager = CountdownTimerManager(
                 context = this,
                 onTick = { formattedTime ->
                     binding.timerText.text = formattedTime
                 },
-                onFinished = {
+                onFinished = { //Сброс прогресса при завершении таймера
                     if (!secondProgressManager.justFilled) {
                         countdownTimerManager.resetHappened = true
                         goldProgressManager.reset()
@@ -95,26 +87,23 @@
             )
 
 
-
             // Показываем цитату сразу при запуске
             binding.bonusQuoteText.text = secondProgressManager.getQuote()
 
-
+            //Настройка второго прогресс-бара
             binding.progressBar2.max = secondProgressManager.maxProgress
             binding.progressBar2.progress = secondProgressManager.countSecondProgress
             binding.progressText2.text = "${secondProgressManager.countSecondProgress} / ${secondProgressManager.maxProgress}"
-
             val colorDrawableId2 = progressColors[(secondProgressManager.stageNumber - 1) % progressColors.size]
-
             binding.progressBar2.progressDrawable = ContextCompat.getDrawable(this, colorDrawableId2)
 
 
-            // Загружаем сохранённое время таймера
+            // Загрузка времени таймера
             countdownTimerManager.loadTimerEndTime()
 
-
+            //Проверка состояния таймера при запуске
             when (val state = countdownTimerManager.getTimerState()) {
-                is CountdownTimerManager.TimerState.Forever -> {
+                is CountdownTimerManager.TimerState.Forever -> { // Вечный оберег (скрывает прогресс бары)
                     binding.timerText.text = getString(R.string.active_forever_amulet)
                     binding.progressBar.visibility = View.GONE
                     binding.progressText.visibility = View.GONE
@@ -122,12 +111,12 @@
                     binding.progressText2.visibility = View.GONE
                 }
 
-                is CountdownTimerManager.TimerState.Running -> {
+                is CountdownTimerManager.TimerState.Running -> { //Активный таймер
                     countdownTimerManager.startTimer()
                     ResetScheduler.scheduleResetWorker(this, state.remainingMillis)
                 }
 
-                is CountdownTimerManager.TimerState.Expired -> {
+                is CountdownTimerManager.TimerState.Expired -> { //Таймер истёк сброс первого прогресс бара
                     binding.timerText.text = getString(R.string.not_active_amulet)
                     HeartAnimation.applyResetUI(
                         context = this,
@@ -139,47 +128,46 @@
                 }
             }
 
-
-
-
+            //Кнопка информации об обереге
             binding.moreInfoButton.setOnClickListener {
-
-
                 val intent = Intent(this, OberegInfoActivity::class.java)
                 startActivity(intent)
             }
 
 
+            //Тест кнопка
+            binding.buttonAdd49.setOnClickListener {
+                repeat(49) {
+                    binding.lottieHeartGold.performClick()
+                }
+            }
+
 
             val Heart = HeartAnimation
 
-
+            //Устанавливает активную или не активную анимацию
             val (stageProgress, stageMax, currentStage) = goldProgressManager.getProgressInfo()
             Heart.updateTapAnimationForStage(binding.lottieTapGold, currentStage)
 
 
-
+            //Настройка первого прогресс-бара
             binding.progressBar.max = stageMax
             binding.progressBar.progress = stageProgress.coerceAtMost(stageMax)
             binding.progressText.text = "$stageProgress / $stageMax"
-
             val safeStageNum = currentStage.number.coerceIn(1, 101)
             val colorDrawableId = progressColors[(safeStageNum - 1) % progressColors.size]
-
-
             binding.progressBar.progressDrawable = ContextCompat.getDrawable(this@MainActivity, colorDrawableId)
 
 
-
+            //Запуск анимаций
             binding.apply {
                 Heart.animationRestart(lottieHeartGold)
                 Heart.animationRestart(lottieViewShineOne)
                 Heart.animationRestart(lottieViewShineTwo)
                 Heart.animationRestart(lottieTapGold)
 
-
+                // Оснавная кнопка оберег
                 lottieHeartGold.setOnClickListener {
-
                     globalTapCounter.increment()
 
                     if (countdownTimerManager.isOberegForever()) return@setOnClickListener
@@ -189,9 +177,8 @@
                     GoldWidget.updateAllWidgets(this@MainActivity, goldProgressManager.count)
                     goldProgressManager.updateUI()
 
-
+                    //Обновление виджета
                     val intent = Intent(this@MainActivity, GoldWidget::class.java).apply {
-
                     action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
                         putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS,
                             AppWidgetManager.getInstance(this@MainActivity).getAppWidgetIds(
@@ -199,8 +186,7 @@
                             ))
                     }
 
-                    if (secondProgressManager.increment()) {
-                        // 1. Увеличиваем таймер на бонусное время
+                    if (secondProgressManager.increment()) { // Увеличиваем таймер на время из второго прогресс бара
                         val bonusTime = secondProgressManager.currentStage.bonusTimeMillis
                         val newBonusEndTime = countdownTimerManager.getRemainingTimeMillis() + System.currentTimeMillis() + bonusTime
                         countdownTimerManager.timerEndTime = newBonusEndTime
@@ -209,14 +195,14 @@
                         ResetScheduler.scheduleResetWorker(this@MainActivity, newBonusEndTime - System.currentTimeMillis())
 
 
-                        // 2. Обновляем цитату
+                        // Обновляем цитату
                         binding.bonusQuoteText.text = secondProgressManager.getQuote()
 
-                        // 3. Проигрываем shine-анимации
+                        // Проигрываем shine анимацию
                         Heart.playLottieAnimation(binding.lottieViewShineOne)
                         Heart.playLottieAnimation(binding.lottieViewShineTwo)
 
-                        // 4. Обновляем UI прогресса (progressBar2)
+                        // Обновляем второй прогресс бар
                         binding.progressBar2.max = secondProgressManager.maxProgress
                         binding.progressBar2.progress = secondProgressManager.countSecondProgress
                         binding.progressText2.text = "${secondProgressManager.countSecondProgress} / ${secondProgressManager.maxProgress}"
@@ -225,37 +211,29 @@
 
                     }
 
-
-
-
+                    // Обновляем второй прогресс бар
                     binding.progressBar2.max = secondProgressManager.maxProgress
                     binding.progressBar2.progress = secondProgressManager.countSecondProgress
                     binding.progressText2.text = "${secondProgressManager.countSecondProgress} / ${secondProgressManager.maxProgress}"
-
-
-
                     val colorDrawableId2 = progressColors[(secondProgressManager.stageNumber - 1) % progressColors.size]
-
                     binding.progressBar2.progressDrawable = ContextCompat.getDrawable(this@MainActivity, colorDrawableId2)
 
 
+                    // Отправка обновлённого состояния в виджет
                     sendBroadcast(intent)
 
+                    // Обновление анимации нажатий
                     Heart.updateTapAnimationForStage(binding.lottieTapGold, currentStage)
-
-
 
 
                     // Действия при заполнении первого прогресс бара
                     if (goldProgressManager.isNextStage(currentStage)) {
-                        //То что просходит по достижению 101 стадии
-                        if (currentStage.number == 101) {
-
+                        if (currentStage.number == 101) { //101 фаза вечный оберег
                             countdownTimerManager.timerEndTime = Long.MAX_VALUE
                             countdownTimerManager.saveTimerEndTime(Long.MAX_VALUE)
-
-                            countdownTimerManager.stopTimer()
+                            countdownTimerManager.stopTimer() // останавливаем таймер
                             binding.timerText.text = getString(R.string.active_forever_amulet)
+                            // Отменяем фоновые задачи по сбросу
                             WorkManager.getInstance(this@MainActivity).cancelUniqueWork("resetGoldWorker")
                             // Скрываем оба прогресс-бара и их текст
                             binding.progressBar.visibility = View.GONE
@@ -263,7 +241,7 @@
                             binding.progressBar2.visibility = View.GONE
                             binding.progressText2.visibility = View.GONE
 
-                        } else { //Увеличивается время в таймере
+                        } else { // При переходе на следущую стадию увеличиваем длительность таймера
                             val now = System.currentTimeMillis()
                             val safeRemaining = countdownTimerManager.getRemainingTimeMillis()
 
@@ -276,35 +254,34 @@
                             val additionalMillis = 15_000L // 10 секунд
 
 
+                            // Рассчитываем новое время завершения таймера
                             val newTime = now + safeRemaining + additionalMillis
                             countdownTimerManager.timerEndTime = newTime
                             countdownTimerManager.saveTimerEndTime(newTime)
+
+                            // Перезапускаем таймер и планируем сброс
                             val delayMillis = newTime - System.currentTimeMillis()
-
                             countdownTimerManager.startTimer()
-
                             ResetScheduler.scheduleResetWorker(this@MainActivity, delayMillis)
 
                         }
-
+                        // Фиксируем, что стадия достигнута
                         goldProgressManager.markStageReached(currentStage)
 
+                        // shine-анимации перехода на новую стадию
                         Heart.playLottieAnimation(binding.lottieViewShineOne)
                         Heart.playLottieAnimation(binding.lottieViewShineTwo)
                     }
 
-
+                    // Обновляем отображение первого прогресс-бара после перехода на стадию
                     binding.progressBar.max = stageMax
                     binding.progressBar.progress = stageProgress.coerceAtMost(stageMax)
                     binding.progressText.text = "$stageProgress / $stageMax"
-
                     val colorDrawableId = progressColors[(currentStage.number - 1) % progressColors.size]
-
                     binding.progressBar.progressDrawable = ContextCompat.getDrawable(this@MainActivity, colorDrawableId)
 
 
-
-
+                    //Анимация звездочек каждый тап
                     when (secondProgressManager.countSecondProgress % 10) {
                             1 -> Heart.playLottieAnimation(lottie1)
                             2 -> Heart.playLottieAnimation(lottie2)
@@ -318,8 +295,9 @@
                             0 -> Heart.playLottieAnimation(lottie4)
                         }
 
+                    // Каждые 27 тапов на втором прогресс-баре — запускаем спец. анимацию "сердец"
+                    // Анимация зависит от текущего бонусного этапа
                     if (secondProgressManager.countSecondProgress % 27 == 0) {
-
 
                         // Выполнение следующего действия
                         when (secondProgressManager.currentStage.number) {
@@ -579,7 +557,7 @@
         override fun onResume() {
             super.onResume()
 
-
+            // При возвращении в активность — проверяем состояние таймера
             when (val state = countdownTimerManager.getTimerState()) {
                 is CountdownTimerManager.TimerState.Forever -> {
                     binding.timerText.text = getString(R.string.active_forever_amulet)
@@ -590,11 +568,13 @@
                 }
 
                 is CountdownTimerManager.TimerState.Running -> {
+                    // Запускаем таймер и планируем сброс
                     countdownTimerManager.startTimer()
                     ResetScheduler.scheduleResetWorker(this, state.remainingMillis)
                 }
 
                 is CountdownTimerManager.TimerState.Expired -> {
+                    // Время вышло — сброс
                     binding.timerText.text = getString(R.string.not_active_amulet)
                     HeartAnimation.applyResetUI(
                         context = this,

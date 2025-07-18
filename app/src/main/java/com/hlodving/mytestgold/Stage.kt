@@ -119,6 +119,8 @@
                 return UNKNOWN
             }
 
+
+            //Возвращает информацию о текущем прогрессе в стадии
             fun getStageData(gold: Int): Triple<Int, Int, Stage> {
                 var stageNumber = 1
                 var requiredGold = 100

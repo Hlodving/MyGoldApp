@@ -11,6 +11,7 @@ import android.content.Intent
 import android.os.Handler
 import android.os.Looper
 import android.widget.RemoteViews
+import androidx.core.content.ContextCompat
 
 class GoldWidget : AppWidgetProvider() {
 
@@ -138,10 +139,32 @@ class GoldWidget : AppWidgetProvider() {
         }
     }
 
+    private fun isServiceRunning(context: Context, serviceClass: Class<*>): Boolean {
+        val manager = context.getSystemService(Context.ACTIVITY_SERVICE) as android.app.ActivityManager
+        return manager.getRunningServices(Int.MAX_VALUE)
+            .any { it.service.className == serviceClass.name }
+    }
+
+
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
         for (id in appWidgetIds) {
             updateWidgetAnimation(context, appWidgetManager, id)
         }
+
+        val prefs = context.getSharedPreferences("GoldPrefs", Context.MODE_PRIVATE)
+        val isAnimationEnabled = prefs.getBoolean("widgetAnimationEnabled", true)
+
+        if (isAnimationEnabled && !isServiceRunning(context, WidgetAnimationService::class.java)) {
+            val serviceIntent = Intent(context, WidgetAnimationService::class.java)
+            ContextCompat.startForegroundService(context, serviceIntent)
+        }
+
         startAnimationCycle(context)
     }
+
+    override fun onDisabled(context: Context) {
+        // Этот метод вызывается, когда удалён последний экземпляр виджета с экрана
+        context.stopService(Intent(context, WidgetAnimationService::class.java))
+    }
+
 }
