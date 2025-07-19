@@ -45,13 +45,17 @@ class GoldWidget : AppWidgetProvider() {
         // Получаем настройки пользователя (включена ли анимация виджета)
         val prefs = context.getSharedPreferences("GoldPrefs", Context.MODE_PRIVATE)
         val isAnimationEnabled = prefs.getBoolean("widgetAnimationEnabled", true)
+        val timerEndTime = prefs.getLong("timerEndTime", 0L)
+        val now = System.currentTimeMillis()
+        val isOberegActive = timerEndTime == Long.MAX_VALUE || timerEndTime > now
 
-        // Если включена анимация и сервис ещё не запущен — запускаем его
-        if (isAnimationEnabled && !isServiceRunning(context, WidgetAnimationService::class.java)) {
+        // Если включена анимация, оберег активен и сервис ещё не запущен — запускаем его
+        if (isAnimationEnabled && isOberegActive && !isServiceRunning(context, WidgetAnimationService::class.java)) {
             val serviceIntent = Intent(context, WidgetAnimationService::class.java)
             ContextCompat.startForegroundService(context, serviceIntent)
         }
     }
+
 
     // Обновляет конкретный виджет: показывает статику (например, gold_cb), если анимация выключена
     private fun updateStaticWidget(context: Context, appWidgetManager: AppWidgetManager, appWidgetId: Int) {
@@ -68,9 +72,13 @@ class GoldWidget : AppWidgetProvider() {
         val stage = Stage.fromGold(currentGold)
 
         // Если стадия первая (0 золота) — показываем статичное изображение gold_cb
-        if (stage.number == 1) {
-            views.setImageViewResource(R.id.widgetImage, R.drawable.gold_cb)
+        val imageResId = if (stage.number == 1) {
+            R.drawable.gold_cb
+        } else {
+            R.drawable.gold // ← сразу ставим активную картинку
         }
+        views.setImageViewResource(R.id.widgetImage, imageResId)
+
 
         // Настраиваем поведение при клике по виджету — откроется MainActivity
         val intent = Intent(context, MainActivity::class.java)

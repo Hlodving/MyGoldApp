@@ -66,7 +66,7 @@
                 onTick = { formattedTime ->
                     binding.timerText.text = formattedTime
                 },
-                onFinished = { //Сброс прогресса при завершении таймера
+                onFinished = {
                     if (!secondProgressManager.justFilled) {
                         countdownTimerManager.resetHappened = true
                         goldProgressManager.reset()
@@ -80,11 +80,15 @@
                             countFirstProgress = goldProgressManager.count,
                             secondStageNumber = secondProgressManager.stageNumber
                         )
-
                     }
                     secondProgressManager.justFilled = false
+                },
+                onStopped = {
+                    // Останавливает анмацию в виджете
+                    ResetScheduler.stopWidgetAnimationService(this)
                 }
             )
+
 
 
             // Показываем цитату сразу при запуске

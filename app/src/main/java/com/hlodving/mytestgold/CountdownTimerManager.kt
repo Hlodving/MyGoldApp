@@ -7,7 +7,8 @@ import android.os.CountDownTimer
 class CountdownTimerManager(
     private val context: Context, // Для сохранения/загрузки таймера
     private val onTick: (String) -> Unit, // Обновляет UI времени
-    private val onFinished: () -> Unit // Выполняется при завершении таймера
+    private val onFinished: () -> Unit, // Выполняется при завершении таймера
+    private val onStopped: () -> Unit
 ) {
 
     var baseHoursToAdd: Long = 2L // Начальная прибавка — 2 часа
@@ -48,6 +49,7 @@ class CountdownTimerManager(
 
             override fun onFinish() {
                 onFinished()
+                onStopped() // ← Вызов остановки
             }
         }.start()
     }
