@@ -12,44 +12,41 @@ import android.widget.RemoteViews
 class WidgetAnimationService : Service() {
 
     private var frameHandler: Handler? = null
-    private var frameRunnable: Runnable? = null
     private var delayHandler: Handler? = null
+    private var frameRunnable: Runnable? = null
 
     private var currentFrame = 0
     private var useAura = false
+
+    private var isAnimationRunning = false
 
     override fun onBind(intent: Intent?): IBinder? = null
 
     override fun onCreate() {
         super.onCreate()
 
-        startForeground(1, createNotification()) // всегда первым!
+        startForeground(1, createNotification()) // Без этого Android 13+ убьёт сервис
 
         val prefs = getSharedPreferences("GoldPrefs", Context.MODE_PRIVATE)
         val isAnimationEnabled = prefs.getBoolean("widgetAnimationEnabled", true)
         val timerEndTime = prefs.getLong("timerEndTime", 0L)
         val now = System.currentTimeMillis()
 
-        val isOberegActive = when {
-            timerEndTime == Long.MAX_VALUE -> true
-            timerEndTime > now -> true
-            else -> false
-        }
+        val isOberegActive = timerEndTime == Long.MAX_VALUE || timerEndTime > now
 
         if (!isAnimationEnabled || !isOberegActive) {
-            stopSelf() // но уже после старта
+            stopSelf()
             return
         }
 
         startAnimationCycle()
     }
 
-
-
     override fun onDestroy() {
         super.onDestroy()
         frameHandler?.removeCallbacksAndMessages(null)
         delayHandler?.removeCallbacksAndMessages(null)
+        isAnimationRunning = false
     }
 
     private fun createNotification(): Notification {
@@ -64,34 +61,36 @@ class WidgetAnimationService : Service() {
 
         return NotificationCompat.Builder(this, channelId)
             .setContentTitle("Анимация оберега")
-            .setContentText("Анимация виджета активно работает")
+            .setContentText("Виджет-анимация активна")
             .setSmallIcon(R.drawable.gold_cb)
             .build()
     }
 
     private fun startAnimationCycle() {
-        delayHandler = Handler(Looper.getMainLooper())
-        delayHandler?.postDelayed({
-            playOneAnimation()
-        }, 0)
-    }
-
-    private fun playOneAnimation() {
-        frameHandler = Handler(Looper.getMainLooper())
+        if (isAnimationRunning) return
+        isAnimationRunning = true
         currentFrame = 0
         useAura = !useAura
+
         val totalFrames = if (useAura) 60 else 23
+        val frameDuration = 30L // миллисекунд на один кадр
+
+        frameHandler = Handler(Looper.getMainLooper())
+        delayHandler = Handler(Looper.getMainLooper())
 
         frameRunnable = object : Runnable {
             override fun run() {
                 updateAllWidgets()
+
                 currentFrame++
                 if (currentFrame < totalFrames) {
-                    frameHandler?.postDelayed(this, 30)
+                    frameHandler?.postDelayed(this, frameDuration)
                 } else {
+                    // Завершение анимации → пауза 15 сек → снова цикл
+                    isAnimationRunning = false
                     delayHandler?.postDelayed({
-                        playOneAnimation()
-                    }, 15000)
+                        startAnimationCycle()
+                    }, 15000L)
                 }
             }
         }
@@ -111,6 +110,7 @@ class WidgetAnimationService : Service() {
         }
 
         val resId = context.resources.getIdentifier(frameName, "drawable", context.packageName)
+
         for (id in ids) {
             val views = RemoteViews(context.packageName, R.layout.widget_gold)
             views.setImageViewResource(R.id.widgetImage, resId)
