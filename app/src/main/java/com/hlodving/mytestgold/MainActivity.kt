@@ -66,20 +66,25 @@
                     binding.timerText.text = formattedTime
                 },
                 onFinished = {
-                    if (!secondProgressManager.justFilled) {
-                        countdownTimerManager.resetHappened = true
-                        goldProgressManager.reset()
-                        countdownTimerManager.resetTimer()
+                    // 1) Флаг сброса (если где-то используете)
+                    countdownTimerManager.resetHappened = true
 
-                        // Просто обновляем весь UI после сброса
-                        HeartAnimation.applyResetUI(
-                            context = this,
-                            binding = binding,
-                            progressColors = progressColors,
-                            countFirstProgress = goldProgressManager.count,
-                            secondStageNumber = secondProgressManager.stageNumber
-                        )
-                    }
+                    // 2) Сброс первого прогресс-бара (золото)
+                    goldProgressManager.reset()
+
+                    // 3) Сброс самого таймера
+                    countdownTimerManager.resetTimer()
+
+                    // 4) Полное обновление UI (таймер, оба бара, виджет)
+                    HeartAnimation.applyResetUI(
+                        context = this,
+                        binding = binding,
+                        progressColors = progressColors,
+                        countFirstProgress = goldProgressManager.count,
+                        secondStageNumber = secondProgressManager.stageNumber
+                    )
+
+                    // 5) Сбрасываем флаг заполнения бонуса
                     secondProgressManager.justFilled = false
                 },
                 onStopped = {
