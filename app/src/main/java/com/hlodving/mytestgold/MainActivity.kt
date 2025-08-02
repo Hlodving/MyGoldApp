@@ -163,9 +163,8 @@
 
                 // Основная кнопка оберег
                 lottieHeartGold.setOnClickListener {
-                    // ... остальной код в setOnClickListener остается без изменений ...
+                    // Считаем глобальный клик
                     globalTapCounter.increment()
-
                     if (countdownTimerManager.isOberegForever()) return@setOnClickListener
 
                     val (stageProgress, stageMax, currentStage) = goldProgressManager.increment()
@@ -182,6 +181,8 @@
                     }
                     sendBroadcast(intent) // Отправка обновлённого состояния в виджет
 
+
+                    //Если заполнился второй прогресс бар
                     if (secondProgressManager.increment()) { // Увеличиваем таймер на время из второго прогресс бара
                         val bonusTime = secondProgressManager.currentStage.bonusTimeMillis
                         val newBonusEndTime = countdownTimerManager.getRemainingTimeMillis() + System.currentTimeMillis() + bonusTime
@@ -193,7 +194,22 @@
                         binding.bonusQuoteText.text = secondProgressManager.getQuote()
                         HeartAnimation.playLottieAnimation(binding.lottieViewShineOne)
                         HeartAnimation.playLottieAnimation(binding.lottieViewShineTwo)
+
+                        // «Прокачка» первого бара в фазу 2
+                        val (p, max, _) = goldProgressManager.getProgressInfo()
+                        if (goldProgressManager.getStage().number == 1) {
+                            val needed = max - p
+                            repeat(needed) { goldProgressManager.increment() }
+                            goldProgressManager.updateUI()
+                            GoldWidget.updateAllWidgets(this@MainActivity, goldProgressManager.count)
+                            // сразу меняем Lottie-файл на Gold_movement.json
+                            HeartAnimation.updateTapAnimationForStage(
+                                binding.lottieTapGold,
+                                goldProgressManager.getStage()
+                            )
+                        }
                     }
+
 
                     // Обновляем второй прогресс бар (этот блок нужно вызывать всегда, а не только при инкременте)
                     binding.progressBar2.max = secondProgressManager.maxProgress
@@ -203,7 +219,8 @@
                     binding.progressBar2.progressDrawable = ContextCompat.getDrawable(this@MainActivity, colorId2)
 
                     // Обновление анимации нажатий
-                    HeartAnimation.updateTapAnimationForStage(binding.lottieTapGold, currentStage)
+                    val actualStage = goldProgressManager.getStage()
+                    HeartAnimation.updateTapAnimationForStage(binding.lottieTapGold, actualStage)
 
                     // Действия при заполнении первого прогресс бара
                     if (goldProgressManager.isNextStage(currentStage)) {
