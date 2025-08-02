@@ -133,8 +133,6 @@
             }
 
             // === НАЧАЛО: ЕДИНЫЙ БЛОК ОБНОВЛЕНИЯ UI ===
-            // Этот код теперь является единственным источником правды для состояния UI при запуске
-            // Он выполнится ПОСЛЕ блока when, гарантируя правильное отображение для любого состояния
 
             // Обновляем первый прогресс-бар
             goldProgressManager.updateUI()
@@ -202,6 +200,9 @@
                             repeat(needed) { goldProgressManager.increment() }
                             goldProgressManager.updateUI()
                             GoldWidget.updateAllWidgets(this@MainActivity, goldProgressManager.count)
+
+                            goldProgressManager.markStageReached(goldProgressManager.getStage())
+
                             // сразу меняем Lottie-файл на Gold_movement.json
                             HeartAnimation.updateTapAnimationForStage(
                                 binding.lottieTapGold,
