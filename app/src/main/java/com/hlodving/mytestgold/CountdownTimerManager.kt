@@ -11,7 +11,7 @@ class CountdownTimerManager(
     private val onStopped: () -> Unit
 ) {
 
-    var baseHoursToAdd: Long = 2L // Начальная прибавка — 2 часа
+
     var resetHappened: Boolean = false // Флаг сброса
     private var countdownTimer: CountDownTimer? = null // Сам таймер
     var timerEndTime: Long = 0L // Время окончания в миллисекундах

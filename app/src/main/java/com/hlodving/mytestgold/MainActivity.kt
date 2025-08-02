@@ -239,7 +239,9 @@
                         } else { // При переходе на следущую стадию увеличиваем длительность таймера
                             val now = System.currentTimeMillis()
                             val safeRemaining = countdownTimerManager.getRemainingTimeMillis()
-                            val additionalMillis = 15_000L // 15 секунд для теста
+
+                            val additionalMillis = currentStage.number * 7_200_000L
+
 
                             val newTime = now + safeRemaining + additionalMillis
                             countdownTimerManager.timerEndTime = newTime
