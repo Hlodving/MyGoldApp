@@ -3,15 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.hlodving.mytestgold">
 
-
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
-
-
-
-
-
 
     <application
         android:allowBackup="true"
@@ -24,22 +18,28 @@
         android:theme="@style/Theme.MyTestGold"
         tools:targetApi="31">
 
+        <activity
+            android:name=".SettingsActivity"
+            android:exported="false" />
         <activity android:name=".ProgressActivity" />
         <activity android:name=".ProvidesInformation" />
         <activity android:name=".ConnectionActivity" />
 
-        <receiver android:name=".BootReceiver" android:enabled="true" android:exported="true">
+        <receiver
+            android:name=".BootReceiver"
+            android:enabled="true"
+            android:exported="true">
             <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
-
         <receiver
             android:name=".GoldWidget"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
+
             <meta-data
                 android:name="android.appwidget.provider"
                 android:resource="@xml/gold_widget_info" />
@@ -52,14 +52,13 @@
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".WidgetInfoActivity"
             android:screenOrientation="portrait" />
-
         <activity
             android:name=".OberegInfoActivity"
             android:screenOrientation="portrait" />
@@ -69,8 +68,6 @@
             android:enabled="true"
             android:exported="false"
             android:foregroundServiceType="dataSync" />
-
-
-
     </application>
+
 </manifest>

@@ -119,11 +119,27 @@
             // Показываем цитату сразу при запуске
             binding.bonusQuoteText.text = secondProgressManager.getQuote()
 
-            //Кнопка информации об обереге
-            binding.moreInfoButton.setOnClickListener {
+
+
+            // Кнопка настроек
+            binding.settingsButton.setOnClickListener {
+                val intent = Intent(this, SettingsActivity::class.java)
+                startActivity(intent)
+            }
+
+            //Кнопка Вопрос
+            binding.questionButton.setOnClickListener{
                 val intent = Intent(this, OberegInfoActivity::class.java)
                 startActivity(intent)
             }
+
+            //Кнопка Прогресс
+            binding.progressButton.setOnClickListener {
+                val intent = Intent(this, ProgressActivity::class.java)
+                startActivity(intent)
+            }
+
+
 
             //Тест кнопка
             binding.buttonAdd49.setOnClickListener {

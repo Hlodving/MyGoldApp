@@ -36,10 +36,6 @@ class OberegInfoActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-        // Обработка кнопки "yourProgressButton"
-        binding.yourProgressButton.setOnClickListener {
-            val intent = Intent(this, ProgressActivity::class.java)
-            startActivity(intent)
-        }
+
     }
 }
