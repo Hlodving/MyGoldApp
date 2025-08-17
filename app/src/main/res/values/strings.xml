@@ -64,7 +64,20 @@
     <string name="obereg_add_3">2. В открывшемся меню выберите раздел «Виджеты».</string>
     <string name="obereg_add_4">3. Найдите виджет с названием «Цифровой оберег».</string>
     <string name="obereg_add_5">4. Перетащите его на экран.</string>
-    <string name="obereg_add_6">5. Всё! Виджет будет активен.</string>
+    <string name="obereg_add_6">5. Всё! Виджет добавлен на экран</string>
+
+
+    <!-- Выдвижное меню -->
+    <string name="menu_title_obereg">Оберег</string>
+    <string name="menu_obereg_info">Информация</string>
+    <string name="menu_obereg_progress">Прогресс</string>
+    <string name="menu_obereg_settings">Настройки</string>
+    <string name="menu_title_sign_up">Аккаунт</string>
+    <string name="menu_sign_up">Регистрация</string>
+    <string name="menu_sign_in">Вход</string>
+    <string name="menu_sign_out">Выход</string>
+
+
 
 
 </resources>

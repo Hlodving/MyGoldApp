@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <item android:title="@string/menu_title_obereg">
+        <menu>
+            <item
+                android:title="@string/menu_obereg_info"
+                android:id="@+id/menu_obereg_info"
+                />
+
+            <item
+                android:title="@string/menu_obereg_progress"
+                android:id="@+id/menu_obereg_progress"
+                />
+
+            <item
+                android:title="@string/menu_obereg_settings"
+                android:id="@+id/menu_obereg_settings"
+                />
+
+        </menu>
+    </item>
+
+
+    <item android:title="@string/menu_title_sign_up">
+        <menu>
+            <item
+                android:title="@string/menu_sign_up"
+                android:id="@+id/menu_sign_up"
+                />
+
+            <item
+                android:title="@string/menu_sign_in"
+                android:id="@+id/menu_sign_in"
+                />
+
+            <item
+                android:title="@string/menu_sign_out"
+                android:id="@+id/menu_sign_out"
+                />
+
+        </menu>
+    </item>
+
+</menu>

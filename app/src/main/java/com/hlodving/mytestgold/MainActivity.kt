@@ -5,8 +5,11 @@
     import android.content.Intent
     import android.os.Bundle
     import android.view.View
+    import android.widget.Button
     import androidx.appcompat.app.AppCompatActivity
     import androidx.core.content.ContextCompat
+    import androidx.core.view.GravityCompat
+    import androidx.drawerlayout.widget.DrawerLayout
     import androidx.work.WorkManager
 
 
@@ -36,14 +39,14 @@
 
 
 
-
-
         lateinit var binding: ActivityMainBinding
         override fun onCreate(savedInstanceState: Bundle?) {
             super.onCreate(savedInstanceState)
             binding = ActivityMainBinding.inflate(layoutInflater)
             setContentView(binding.root)
 
+            val drawer = binding.drawerlayout
+            val openDrawerButton = binding.openDrawerButton
 
             //Инициализация первого прогресс-бара
             goldProgressManager = GoldProgressManager(this, binding, progressColors)
@@ -119,7 +122,9 @@
             // Показываем цитату сразу при запуске
             binding.bonusQuoteText.text = secondProgressManager.getQuote()
 
-
+            openDrawerButton.setOnClickListener {
+                drawer.openDrawer(GravityCompat.START)
+            }
 
             // Кнопка настроек
             binding.settingsButton.setOnClickListener {
