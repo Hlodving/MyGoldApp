@@ -6,11 +6,8 @@
     android:id="@+id/drawerlayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:openDrawer="start"
     android:fitsSystemWindows="true"
     tools:context=".MainActivity">
-
-
 
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -19,171 +16,166 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-        <Button
-            android:id="@+id/openDrawerButton"
-            android:layout_width="wrap_content"
+        <include
+            android:id="@+id/actionBarInclude"
+            layout="@layout/action_bar"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="Открыть меню"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+        <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/lottieTapGold"
+            android:layout_width="350dp"
+            android:layout_height="350dp"
             app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginBottom="24dp"/>
+            app:layout_constraintHorizontal_bias="0.545"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/actionBarInclude"
+            app:lottie_fileName="Gold_movement.json" />
 
 
+        <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/lottieViewShineOne"
+            android:layout_width="350dp"
+            android:layout_height="350dp"
+            app:layout_constraintTop_toBottomOf="@id/actionBarInclude"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:lottie_fileName="Gold_shine_one.json"
+            tools:layout_editor_absoluteY="16dp" />
 
-    <com.airbnb.lottie.LottieAnimationView
-        android:id="@+id/lottieTapGold"
-        android:layout_width="350dp"
-        android:layout_height="350dp"
-        android:layout_marginTop="16dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.545"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:lottie_fileName="Gold_movement.json" />
+        <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/lottieViewShineTwo"
+            android:layout_width="350dp"
+            app:layout_constraintTop_toBottomOf="@id/actionBarInclude"
+            android:layout_height="350dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:lottie_fileName="Gold_shine_two.json" />
 
+        <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/lottieViewShineThree"
+            android:layout_width="350dp"
+            android:layout_height="350dp"
+            app:layout_constraintTop_toBottomOf="@id/actionBarInclude"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:lottie_fileName="Gold_shine_three.json"
+            tools:layout_editor_absoluteY="16dp" />
 
-    <com.airbnb.lottie.LottieAnimationView
-        android:id="@+id/lottieViewShineOne"
-        android:layout_width="350dp"
-        android:layout_height="350dp"
-        android:layout_marginTop="16dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:lottie_fileName="Gold_shine_one.json" />
+        <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/lottie1"
+            android:layout_width="350dp"
+            android:layout_height="350dp"
+            app:layout_constraintTop_toBottomOf="@id/actionBarInclude"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:lottie_fileName="+1_1.json"
+            tools:layout_editor_absoluteY="16dp" />
 
-    <com.airbnb.lottie.LottieAnimationView
-        android:id="@+id/lottieViewShineTwo"
-        android:layout_width="350dp"
-        android:layout_height="350dp"
-        android:layout_marginTop="16dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:lottie_fileName="Gold_shine_two.json" />
+        <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/lottie2"
+            android:layout_width="350dp"
+            android:layout_height="350dp"
+            app:layout_constraintTop_toBottomOf="@id/actionBarInclude"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:lottie_fileName="+1_2.json"
+            tools:layout_editor_absoluteY="16dp" />
 
-    <com.airbnb.lottie.LottieAnimationView
-        android:id="@+id/lottieViewShineThree"
-        android:layout_width="350dp"
-        android:layout_height="350dp"
-        android:layout_marginTop="16dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:lottie_fileName="Gold_shine_three.json" />
+        <com.airbnb.lottie.LottieAnimationView
+            app:layout_constraintTop_toBottomOf="@id/actionBarInclude"
+            android:id="@+id/lottie3"
+            android:layout_width="350dp"
+            android:layout_height="350dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:lottie_fileName="+1_3.json"
+            tools:layout_editor_absoluteY="16dp" />
 
-    <com.airbnb.lottie.LottieAnimationView
-        android:id="@+id/lottie1"
-        android:layout_width="350dp"
-        android:layout_height="350dp"
-        android:layout_marginTop="16dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:lottie_fileName="+1_1.json" />
+        <com.airbnb.lottie.LottieAnimationView
+            app:layout_constraintTop_toBottomOf="@id/actionBarInclude"
+            android:id="@+id/lottie4"
+            android:layout_width="350dp"
+            android:layout_height="350dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:lottie_fileName="+1_4.json"
+            tools:layout_editor_absoluteY="16dp" />
 
-    <com.airbnb.lottie.LottieAnimationView
-        android:id="@+id/lottie2"
-        android:layout_width="350dp"
-        android:layout_height="350dp"
-        android:layout_marginTop="16dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:lottie_fileName="+1_2.json" />
+        <com.airbnb.lottie.LottieAnimationView
+            app:layout_constraintTop_toBottomOf="@id/actionBarInclude"
+            android:id="@+id/lottie5"
+            android:layout_width="350dp"
+            android:layout_height="350dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:lottie_fileName="+1_5.json"
+            tools:layout_editor_absoluteY="16dp" />
 
-    <com.airbnb.lottie.LottieAnimationView
-        android:id="@+id/lottie3"
-        android:layout_width="350dp"
-        android:layout_height="350dp"
-        android:layout_marginTop="16dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:lottie_fileName="+1_3.json" />
+        <com.airbnb.lottie.LottieAnimationView
+            app:layout_constraintTop_toBottomOf="@id/actionBarInclude"
+            android:id="@+id/lottie6"
+            android:layout_width="350dp"
+            android:layout_height="350dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:lottie_fileName="+1_6.json"
+            tools:layout_editor_absoluteY="16dp" />
 
-    <com.airbnb.lottie.LottieAnimationView
-        android:id="@+id/lottie4"
-        android:layout_width="350dp"
-        android:layout_height="350dp"
-        android:layout_marginTop="16dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:lottie_fileName="+1_4.json" />
+        <com.airbnb.lottie.LottieAnimationView
+            app:layout_constraintTop_toBottomOf="@id/actionBarInclude"
+            android:id="@+id/lottie7"
+            android:layout_width="350dp"
+            android:layout_height="350dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:lottie_fileName="+1_7.json"
+            tools:layout_editor_absoluteY="16dp" />
 
-    <com.airbnb.lottie.LottieAnimationView
-        android:id="@+id/lottie5"
-        android:layout_width="350dp"
-        android:layout_height="350dp"
-        android:layout_marginTop="16dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:lottie_fileName="+1_5.json" />
+        <com.airbnb.lottie.LottieAnimationView
+            app:layout_constraintTop_toBottomOf="@id/actionBarInclude"
+            android:id="@+id/lottie8"
+            android:layout_width="350dp"
+            android:layout_height="350dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:lottie_fileName="+1_8.json"
+            tools:layout_editor_absoluteY="16dp" />
 
-    <com.airbnb.lottie.LottieAnimationView
-        android:id="@+id/lottie6"
-        android:layout_width="350dp"
-        android:layout_height="350dp"
-        android:layout_marginTop="16dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:lottie_fileName="+1_6.json" />
-
-    <com.airbnb.lottie.LottieAnimationView
-        android:id="@+id/lottie7"
-        android:layout_width="350dp"
-        android:layout_height="350dp"
-        android:layout_marginTop="16dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:lottie_fileName="+1_7.json" />
-
-    <com.airbnb.lottie.LottieAnimationView
-        android:id="@+id/lottie8"
-        android:layout_width="350dp"
-        android:layout_height="350dp"
-        android:layout_marginTop="16dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:lottie_fileName="+1_8.json" />
-
-    <com.airbnb.lottie.LottieAnimationView
-        android:id="@+id/lottie9"
-        android:layout_width="350dp"
-        android:layout_height="350dp"
-        android:layout_marginTop="16dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:lottie_fileName="+1_9.json" />
+        <com.airbnb.lottie.LottieAnimationView
+            app:layout_constraintTop_toBottomOf="@id/actionBarInclude"
+            android:id="@+id/lottie9"
+            android:layout_width="350dp"
+            android:layout_height="350dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:lottie_fileName="+1_9.json"
+            tools:layout_editor_absoluteY="16dp" />
 
 
-    <com.airbnb.lottie.LottieAnimationView
-        android:id="@+id/lottieHeartGold"
-        android:layout_width="350dp"
-        android:layout_height="350dp"
-        android:layout_marginTop="16dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:lottie_fileName="Gold_heart_Full.json" />
+        <com.airbnb.lottie.LottieAnimationView
+            app:layout_constraintTop_toBottomOf="@id/actionBarInclude"
+            android:id="@+id/lottieHeartGold"
+            android:layout_width="350dp"
+            android:layout_height="350dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:lottie_fileName="Gold_heart_Full.json"
+            tools:layout_editor_absoluteY="16dp" />
 
 
-    <com.airbnb.lottie.LottieAnimationView
-        android:id="@+id/lottieHeartGoldFinish"
-        android:layout_width="350dp"
-        android:layout_height="350dp"
-        android:layout_marginTop="16dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:lottie_fileName="Gold_heart_Final.json" />
+        <com.airbnb.lottie.LottieAnimationView
+            app:layout_constraintTop_toBottomOf="@id/actionBarInclude"
+            android:id="@+id/lottieHeartGoldFinish"
+            android:layout_width="350dp"
+            android:layout_height="350dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:lottie_fileName="Gold_heart_Final.json"
+            tools:layout_editor_absoluteY="16dp" />
 
     <!-- Таймер -->
     <TextView
@@ -343,6 +335,8 @@
         app:tint="?android:textColorPrimary" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+
+
 
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/navView"

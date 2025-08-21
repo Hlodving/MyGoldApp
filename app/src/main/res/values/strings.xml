@@ -76,6 +76,8 @@
     <string name="menu_sign_up">Регистрация</string>
     <string name="menu_sign_in">Вход</string>
     <string name="menu_sign_out">Выход</string>
+    <string name="open">Вход</string>
+    <string name="close">Выход</string>
 
 
 

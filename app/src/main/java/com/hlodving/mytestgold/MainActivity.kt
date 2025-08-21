@@ -6,6 +6,7 @@
     import android.os.Bundle
     import android.view.View
     import android.widget.Button
+    import androidx.appcompat.app.ActionBarDrawerToggle
     import androidx.appcompat.app.AppCompatActivity
     import androidx.core.content.ContextCompat
     import androidx.core.view.GravityCompat
@@ -45,8 +46,18 @@
             binding = ActivityMainBinding.inflate(layoutInflater)
             setContentView(binding.root)
 
-            val drawer = binding.drawerlayout
-            val openDrawerButton = binding.openDrawerButton
+            setSupportActionBar(binding.actionBarInclude.toolbar)
+            supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
+            val toggle = ActionBarDrawerToggle(
+                this,
+                binding.drawerlayout,
+                binding.actionBarInclude.toolbar,
+                R.string.open,
+                R.string.close
+            )
+            binding.drawerlayout.addDrawerListener(toggle)
+            toggle.syncState()
 
             //Инициализация первого прогресс-бара
             goldProgressManager = GoldProgressManager(this, binding, progressColors)
@@ -122,9 +133,7 @@
             // Показываем цитату сразу при запуске
             binding.bonusQuoteText.text = secondProgressManager.getQuote()
 
-            openDrawerButton.setOnClickListener {
-                drawer.openDrawer(GravityCompat.START)
-            }
+
 
             // Кнопка настроек
             binding.settingsButton.setOnClickListener {
