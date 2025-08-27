@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "563820672780",
+    "project_id": "mytestgold",
+    "storage_bucket": "mytestgold.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:563820672780:android:b5e247d53d83d4ae4b7b29",
+        "android_client_info": {
+          "package_name": "com.hlodving.mytestgold"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCxJnsXv1R15qWT-sCuoSh77NJoL6rUmDQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

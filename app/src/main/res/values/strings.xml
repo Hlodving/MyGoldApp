@@ -28,6 +28,7 @@
     <string name="donat_info">Поблагодарить автора</string>
     <string name="settings">Настройки</string>
 
+    <!-- Цитаты -->
     <string name="bonus_stage_1">Ибо возмездие за труд — достойное.\n(1 Тим 5:18)</string>
     <string name="bonus_stage_2">В усердии не ослабевайте; духом пламенейте; Господу служите.\n(Рим 12:11)</string>
     <string name="bonus_stage_3">Бог считает не количество, а любовь, с которой сделано\n(Августин Блаженный.)</string>
@@ -79,6 +80,12 @@
     <string name="open">Вход</string>
     <string name="close">Выход</string>
 
+    <!-- Регистрация -->
+    <string name="email_hint">Email</string>
+    <string name="password_hint">Password</string>
+    <string name="sign_in_action">Войти</string>
+    <string name="sign_up_action">Зарегистрироваться</string>
+    <string name="forget_password">Забыли пароль?</string>
 
 
 

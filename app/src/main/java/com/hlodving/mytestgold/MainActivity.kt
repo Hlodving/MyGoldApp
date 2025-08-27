@@ -4,29 +4,39 @@
     import android.content.ComponentName
     import android.content.Intent
     import android.os.Bundle
+    import android.view.MenuItem
     import android.view.View
     import android.widget.Button
+    import android.widget.Toast
     import androidx.appcompat.app.ActionBarDrawerToggle
     import androidx.appcompat.app.AppCompatActivity
     import androidx.core.content.ContextCompat
     import androidx.core.view.GravityCompat
     import androidx.drawerlayout.widget.DrawerLayout
     import androidx.work.WorkManager
+    import com.google.android.material.navigation.NavigationView
 
 
     import com.hlodving.mytestgold.databinding.ActivityMainBinding
+    import com.hlodving.mytestgold.dialoghelper.DialogConst
+    import com.hlodving.mytestgold.dialoghelper.DialogHelper
 
-    class MainActivity : AppCompatActivity() {
+    class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
         // Переменная с таймером
         private lateinit var countdownTimerManager: CountdownTimerManager
+
         //Переменная с вторым прогресс баром
         private lateinit var secondProgressManager: BonusStageManager
+
         //Переменная с основным счетчиком
         private lateinit var globalTapCounter: GlobalTapCounter
+
         //Переменная с первым прогресс баром
         private lateinit var goldProgressManager: GoldProgressManager
 
+        //Переменная с регистрацией
+        private val dialogHelper = DialogHelper(this)
 
 
         private val progressColors = listOf(
@@ -39,13 +49,13 @@
         ) // Список стилей прогресс-бара по фазам
 
 
-
         lateinit var binding: ActivityMainBinding
         override fun onCreate(savedInstanceState: Bundle?) {
             super.onCreate(savedInstanceState)
             binding = ActivityMainBinding.inflate(layoutInflater)
             setContentView(binding.root)
 
+            //Выдвижное меню
             setSupportActionBar(binding.actionBarInclude.toolbar)
             supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
@@ -58,6 +68,7 @@
             )
             binding.drawerlayout.addDrawerListener(toggle)
             toggle.syncState()
+            binding.navView.setNavigationItemSelectedListener(this)
 
             //Инициализация первого прогресс-бара
             goldProgressManager = GoldProgressManager(this, binding, progressColors)
@@ -119,10 +130,12 @@
                     binding.progressBar2.visibility = View.GONE
                     binding.progressText2.visibility = View.GONE
                 }
+
                 is CountdownTimerManager.TimerState.Running -> {
                     countdownTimerManager.startTimer()
                     ResetScheduler.scheduleResetWorker(this, state.remainingMillis)
                 }
+
                 is CountdownTimerManager.TimerState.Expired -> {
                     // Если таймер истек, просто покажем текст.
                     // UI прогресс-баров и анимации обновится общим кодом ниже.
@@ -134,7 +147,6 @@
             binding.bonusQuoteText.text = secondProgressManager.getQuote()
 
 
-
             // Кнопка настроек
             binding.settingsButton.setOnClickListener {
                 val intent = Intent(this, SettingsActivity::class.java)
@@ -142,7 +154,7 @@
             }
 
             //Кнопка Вопрос
-            binding.questionButton.setOnClickListener{
+            binding.questionButton.setOnClickListener {
                 val intent = Intent(this, OberegInfoActivity::class.java)
                 startActivity(intent)
             }
@@ -152,7 +164,6 @@
                 val intent = Intent(this, ProgressActivity::class.java)
                 startActivity(intent)
             }
-
 
 
             //Тест кнопка
@@ -171,9 +182,12 @@
             // Обновляем второй прогресс-бар
             binding.progressBar2.max = secondProgressManager.maxProgress
             binding.progressBar2.progress = secondProgressManager.countSecondProgress
-            binding.progressText2.text = "${secondProgressManager.countSecondProgress} / ${secondProgressManager.maxProgress}"
-            val colorDrawableId2 = progressColors[(secondProgressManager.stageNumber - 1) % progressColors.size]
-            binding.progressBar2.progressDrawable = ContextCompat.getDrawable(this, colorDrawableId2)
+            binding.progressText2.text =
+                "${secondProgressManager.countSecondProgress} / ${secondProgressManager.maxProgress}"
+            val colorDrawableId2 =
+                progressColors[(secondProgressManager.stageNumber - 1) % progressColors.size]
+            binding.progressBar2.progressDrawable =
+                ContextCompat.getDrawable(this, colorDrawableId2)
 
             // Обновляем анимацию нажатий
             val (_, _, currentStageForAnim) = goldProgressManager.getProgressInfo()
@@ -202,10 +216,12 @@
                     //Обновление виджета
                     val intent = Intent(this@MainActivity, GoldWidget::class.java).apply {
                         action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
-                        putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS,
+                        putExtra(
+                            AppWidgetManager.EXTRA_APPWIDGET_IDS,
                             AppWidgetManager.getInstance(this@MainActivity).getAppWidgetIds(
                                 ComponentName(this@MainActivity, GoldWidget::class.java)
-                            ))
+                            )
+                        )
                     }
                     sendBroadcast(intent) // Отправка обновлённого состояния в виджет
 
@@ -213,11 +229,15 @@
                     //Если заполнился второй прогресс бар
                     if (secondProgressManager.increment()) { // Увеличиваем таймер на время из второго прогресс бара
                         val bonusTime = secondProgressManager.currentStage.bonusTimeMillis
-                        val newBonusEndTime = countdownTimerManager.getRemainingTimeMillis() + System.currentTimeMillis() + bonusTime
+                        val newBonusEndTime =
+                            countdownTimerManager.getRemainingTimeMillis() + System.currentTimeMillis() + bonusTime
                         countdownTimerManager.timerEndTime = newBonusEndTime
                         countdownTimerManager.saveTimerEndTime(newBonusEndTime)
                         countdownTimerManager.startTimer()
-                        ResetScheduler.scheduleResetWorker(this@MainActivity, newBonusEndTime - System.currentTimeMillis())
+                        ResetScheduler.scheduleResetWorker(
+                            this@MainActivity,
+                            newBonusEndTime - System.currentTimeMillis()
+                        )
 
                         binding.bonusQuoteText.text = secondProgressManager.getQuote()
                         HeartAnimation.playLottieAnimation(binding.lottieViewShineOne)
@@ -229,7 +249,10 @@
                             val needed = max - p
                             repeat(needed) { goldProgressManager.increment() }
                             goldProgressManager.updateUI()
-                            GoldWidget.updateAllWidgets(this@MainActivity, goldProgressManager.count)
+                            GoldWidget.updateAllWidgets(
+                                this@MainActivity,
+                                goldProgressManager.count
+                            )
 
                             goldProgressManager.markStageReached(goldProgressManager.getStage())
 
@@ -245,9 +268,12 @@
                     // Обновляем второй прогресс бар (этот блок нужно вызывать всегда, а не только при инкременте)
                     binding.progressBar2.max = secondProgressManager.maxProgress
                     binding.progressBar2.progress = secondProgressManager.countSecondProgress
-                    binding.progressText2.text = "${secondProgressManager.countSecondProgress} / ${secondProgressManager.maxProgress}"
-                    val colorId2 = progressColors[(secondProgressManager.stageNumber - 1) % progressColors.size]
-                    binding.progressBar2.progressDrawable = ContextCompat.getDrawable(this@MainActivity, colorId2)
+                    binding.progressText2.text =
+                        "${secondProgressManager.countSecondProgress} / ${secondProgressManager.maxProgress}"
+                    val colorId2 =
+                        progressColors[(secondProgressManager.stageNumber - 1) % progressColors.size]
+                    binding.progressBar2.progressDrawable =
+                        ContextCompat.getDrawable(this@MainActivity, colorId2)
 
                     // Обновление анимации нажатий
                     val actualStage = goldProgressManager.getStage()
@@ -260,7 +286,8 @@
                             countdownTimerManager.saveTimerEndTime(Long.MAX_VALUE)
                             countdownTimerManager.stopTimer() // останавливаем таймер
                             binding.timerText.text = getString(R.string.active_forever_amulet)
-                            WorkManager.getInstance(this@MainActivity).cancelUniqueWork("resetGoldWorker")
+                            WorkManager.getInstance(this@MainActivity)
+                                .cancelUniqueWork("resetGoldWorker")
                             binding.progressBar.visibility = View.GONE
                             binding.progressText.visibility = View.GONE
                             binding.progressBar2.visibility = View.GONE
@@ -293,17 +320,17 @@
 
                     //Анимация звездочек каждый тап
                     when (secondProgressManager.countSecondProgress % 10) {
-                            1 -> Heart.playLottieAnimation(lottie1)
-                            2 -> Heart.playLottieAnimation(lottie2)
-                            3 -> Heart.playLottieAnimation(lottie5)
-                            4 -> Heart.playLottieAnimation(lottie7)
-                            5 -> Heart.playLottieAnimation(lottie4)
-                            6 -> Heart.playLottieAnimation(lottie8)
-                            7 -> Heart.playLottieAnimation(lottie9)
-                            8 -> Heart.playLottieAnimation(lottie6)
-                            9 -> Heart.playLottieAnimation(lottie3)
-                            0 -> Heart.playLottieAnimation(lottie4)
-                        }
+                        1 -> Heart.playLottieAnimation(lottie1)
+                        2 -> Heart.playLottieAnimation(lottie2)
+                        3 -> Heart.playLottieAnimation(lottie5)
+                        4 -> Heart.playLottieAnimation(lottie7)
+                        5 -> Heart.playLottieAnimation(lottie4)
+                        6 -> Heart.playLottieAnimation(lottie8)
+                        7 -> Heart.playLottieAnimation(lottie9)
+                        8 -> Heart.playLottieAnimation(lottie6)
+                        9 -> Heart.playLottieAnimation(lottie3)
+                        0 -> Heart.playLottieAnimation(lottie4)
+                    }
 
                     // Каждые 27 тапов на втором прогресс-баре — запускаем спец. анимацию "сердец"
                     // Анимация зависит от текущего бонусного этапа
@@ -319,6 +346,7 @@
                                 )
                                 Heart.playLottieAnimation(lottieTapGold, 0.19f, 0.22f)
                             }
+
                             2 -> { //Два серца
                                 Heart.playNextHeartAnimation(
                                     binding.lottieHeartGold,
@@ -327,21 +355,23 @@
                                 )
                                 Heart.playLottieAnimation(lottieTapGold, 0.19f, 0.22f)
                             }
+
                             3 -> { //Три сердца
                                 Heart.playNextHeartAnimation(
                                     binding.lottieHeartGold,
                                     0.135f, 0.151f, 0.17f,
                                     0.148f, 0.165f, 0.185f
                                 )
-                               Heart.playLottieAnimation(lottieTapGold, 0.19f,0.22f)
+                                Heart.playLottieAnimation(lottieTapGold, 0.19f, 0.22f)
                             }
+
                             4 -> { //Четыре и три сердца
                                 Heart.playNextHeartAnimation(
                                     binding.lottieHeartGold,
                                     0.135f, 0.207f, 0.17f,
                                     0.148f, 0.225f, 0.185f
                                 )
-                               Heart.playLottieAnimation(lottieTapGold, 0.19f,0.22f)
+                                Heart.playLottieAnimation(lottieTapGold, 0.19f, 0.22f)
                             }
 
                             5 -> { //Четыре сердца
@@ -350,7 +380,7 @@
                                     0.19f, 0.207f, 0.226f,
                                     0.205f, 0.225f, 0.24f
                                 )
-                                Heart.playLottieAnimation(lottieTapGold, 0.19f,0.22f)
+                                Heart.playLottieAnimation(lottieTapGold, 0.19f, 0.22f)
                             }
 
                             6 -> {  //Пять и четыре сердеца
@@ -359,7 +389,7 @@
                                     0.243f, 0.207f, 0.280f,
                                     0.258f, 0.225f, 0.295f
                                 )
-                                Heart.playLottieAnimation(lottieTapGold, 0.19f,0.22f)
+                                Heart.playLottieAnimation(lottieTapGold, 0.19f, 0.22f)
                             }
 
                             7 -> {  //Пять сердец
@@ -368,15 +398,16 @@
                                     0.243f, 0.262f, 0.280f,
                                     0.258f, 0.276f, 0.295f
                                 )
-                               Heart.playLottieAnimation(lottieTapGold, 0.19f,0.22f)
+                                Heart.playLottieAnimation(lottieTapGold, 0.19f, 0.22f)
                             }
+
                             8 -> {  // Шесть и пять сердец
                                 Heart.playNextHeartAnimation(
                                     binding.lottieHeartGold,
                                     0.298f, 0.262f, 0.352f,
                                     0.311f, 0.276f, 0.368f
                                 )
-                               Heart.playLottieAnimation(lottieTapGold, 0.19f,0.22f)
+                                Heart.playLottieAnimation(lottieTapGold, 0.19f, 0.22f)
                             }
 
                             9 -> {  // Шесть сердец
@@ -385,15 +416,16 @@
                                     0.298f, 0.333f, 0.352f,
                                     0.311f, 0.351f, 0.368f
                                 )
-                                Heart.playLottieAnimation(lottieTapGold, 0.19f,0.22f)
+                                Heart.playLottieAnimation(lottieTapGold, 0.19f, 0.22f)
                             }
+
                             10 -> {  // Семь и шесть сердец
                                 Heart.playNextHeartAnimation(
                                     binding.lottieHeartGold,
                                     0.371f, 0.333f, 0.402f,
                                     0.387f, 0.351f, 0.421f
                                 )
-                               Heart.playLottieAnimation(lottieTapGold, 0.19f,0.22f)
+                                Heart.playLottieAnimation(lottieTapGold, 0.19f, 0.22f)
                             }
 
                             11 -> {  // Семь сердец
@@ -402,40 +434,45 @@
                                     0.371f, 0.388f, 0.402f,
                                     0.387f, 0.4f, 0.421f
                                 )
-                                Heart.playLottieAnimation(lottieTapGold, 0.19f,0.22f)
+                                Heart.playLottieAnimation(lottieTapGold, 0.19f, 0.22f)
                             }
+
                             12 -> {  // Восемь сердец
                                 Heart.playNextHeartAnimation(
                                     binding.lottieHeartGold,
                                     0.424f, 0.442f, 0.46f,
                                     0.439f, 0.457f, 0.475f
                                 )
-                                Heart.playLottieAnimation(lottieTapGold, 0.19f,0.22f)
+                                Heart.playLottieAnimation(lottieTapGold, 0.19f, 0.22f)
                             }
+
                             13 -> {//  Девять сердец
                                 Heart.playNextHeartAnimation(
                                     binding.lottieHeartGold,
                                     0.478f, 0.496f, 0.514f,
                                     0.493f, 0.511f, 0.529f
                                 )
-                                Heart.playLottieAnimation(lottieTapGold, 0.19f,0.22f)
+                                Heart.playLottieAnimation(lottieTapGold, 0.19f, 0.22f)
                             }
+
                             14 -> {//  Десять и девять сердец
                                 Heart.playNextHeartAnimation(
                                     binding.lottieHeartGold,
                                     0.478f, 0.546f, 0.562f,
                                     0.493f, 0.560f, 0.576f
                                 )
-                               Heart.playLottieAnimation(lottieTapGold, 0.19f,0.22f)
+                                Heart.playLottieAnimation(lottieTapGold, 0.19f, 0.22f)
                             }
+
                             15 -> {//  Десять сердец
                                 Heart.playNextHeartAnimation(
                                     binding.lottieHeartGold,
                                     0.532f, 0.546f, 0.562f,
                                     0.545f, 0.560f, 0.576f
                                 )
-                                Heart.playLottieAnimation(lottieTapGold, 0.19f,0.22f)
+                                Heart.playLottieAnimation(lottieTapGold, 0.19f, 0.22f)
                             }
+
                             16 -> {//  Одиннадцать и десять сердец
                                 Heart.playNextHeartAnimation(
                                     binding.lottieHeartGold,
@@ -443,112 +480,126 @@
                                     0.593f, 0.560f, 0.625f
                                 )
 
-                               Heart.playLottieAnimation(lottieTapGold, 0.19f,0.22f)
+                                Heart.playLottieAnimation(lottieTapGold, 0.19f, 0.22f)
                             }
+
                             17 -> {//  Одиннадцать сердец
                                 Heart.playNextHeartAnimation(
                                     binding.lottieHeartGold,
                                     0.578f, 0.595f, 0.612f,
                                     0.593f, 0.610f, 0.625f
                                 )
-                               Heart.playLottieAnimation(lottieTapGold, 0.19f,0.22f)
+                                Heart.playLottieAnimation(lottieTapGold, 0.19f, 0.22f)
                             }
+
                             18 -> {//  Двенадцать и одиннадцать сердец
                                 Heart.playNextHeartAnimation(
                                     binding.lottieHeartGold,
                                     0.627f, 0.595f, 0.662f,
                                     0.640f, 0.610f, 0.678f
                                 )
-                               Heart.playLottieAnimation(lottieTapGold, 0.19f,0.22f)
+                                Heart.playLottieAnimation(lottieTapGold, 0.19f, 0.22f)
                             }
+
                             19 -> {//   Двенадцать сердец
                                 Heart.playNextHeartAnimation(
                                     binding.lottieHeartGold,
                                     0.627f, 0.643f, 0.662f,
                                     0.640f, 0.660f, 0.678f
                                 )
-                               Heart.playLottieAnimation(lottieTapGold, 0.19f,0.22f)
+                                Heart.playLottieAnimation(lottieTapGold, 0.19f, 0.22f)
                             }
+
                             20 -> {//  Тринадцать и двенадцать сердец
                                 Heart.playNextHeartAnimation(
                                     binding.lottieHeartGold,
                                     0.680f, 0.643f, 0.713f,
                                     0.695f, 0.660f, 0.727f
                                 )
-                               Heart.playLottieAnimation(lottieTapGold, 0.19f,0.22f)
+                                Heart.playLottieAnimation(lottieTapGold, 0.19f, 0.22f)
                             }
+
                             21 -> {//  Тринадцать сердец
                                 Heart.playNextHeartAnimation(
                                     binding.lottieHeartGold,
                                     0.680f, 0.697f, 0.713f,
                                     0.695f, 0.710f, 0.727f
                                 )
-                               Heart.playLottieAnimation(lottieTapGold, 0.19f,0.22f)
+                                Heart.playLottieAnimation(lottieTapGold, 0.19f, 0.22f)
                             }
+
                             22 -> {// Четырнадцать и тринадцать сердец
                                 Heart.playNextHeartAnimation(
                                     binding.lottieHeartGold,
                                     0.730f, 0.697f, 0.764f,
                                     0.745f, 0.710f, 0.780f
                                 )
-                               Heart.playLottieAnimation(lottieTapGold, 0.19f,0.22f)
+                                Heart.playLottieAnimation(lottieTapGold, 0.19f, 0.22f)
                             }
+
                             23 -> {//  Четырнадцать сердец
                                 Heart.playNextHeartAnimation(
                                     binding.lottieHeartGold,
                                     0.730f, 0.748f, 0.764f,
                                     0.745f, 0.762f, 0.780f
                                 )
-                               Heart.playLottieAnimation(lottieTapGold, 0.19f,0.22f)
+                                Heart.playLottieAnimation(lottieTapGold, 0.19f, 0.22f)
                             }
+
                             24 -> {//  Пятнадцать и четырнадцать сердец
                                 Heart.playNextHeartAnimation(
                                     binding.lottieHeartGold,
                                     0.782f, 0.748f, 0.816f,
                                     0.798f, 0.762f, 0.830f
                                 )
-                               Heart.playLottieAnimation(lottieTapGold, 0.19f,0.22f)
+                                Heart.playLottieAnimation(lottieTapGold, 0.19f, 0.22f)
                             }
+
                             25 -> {//  Пятнадцать сердец
                                 Heart.playNextHeartAnimation(
                                     binding.lottieHeartGold,
                                     0.782f, 0.799f, 0.816f,
                                     0.798f, 0.815f, 0.830f
                                 )
-                               Heart.playLottieAnimation(lottieTapGold, 0.19f,0.22f)
-                                }
+                                Heart.playLottieAnimation(lottieTapGold, 0.19f, 0.22f)
+                            }
+
                             26 -> {  //  Шеснадцать и пятнадцать сердец
                                 Heart.playNextHeartAnimation(
                                     binding.lottieHeartGold,
                                     0.832f, 0.799f, 0.865f,
                                     0.845f, 0.815f, 0.880f
                                 )
-                                Heart.playLottieAnimation(lottieTapGold, 0.19f,0.22f)
+                                Heart.playLottieAnimation(lottieTapGold, 0.19f, 0.22f)
                             }
+
                             27 -> {  //  Шестнадцать сердец
                                 Heart.playNextHeartAnimation(
                                     binding.lottieHeartGold,
                                     0.832f, 0.848f, 0.865f,
                                     0.845f, 0.863f, 0.880f
                                 )
-                                Heart.playLottieAnimation(lottieTapGold, 0.19f,0.22f)
+                                Heart.playLottieAnimation(lottieTapGold, 0.19f, 0.22f)
                             }
+
                             28 -> {  //  Семнадцать и шеснадцать сердец
                                 Heart.playNextHeartAnimation(
                                     binding.lottieHeartGold,
                                     0.883f, 0.848f, 0.917f,
                                     0.898f, 0.863f, 0.930f
                                 )
-                                Heart.playLottieAnimation(lottieTapGold, 0.19f,0.22f)
+                                Heart.playLottieAnimation(lottieTapGold, 0.19f, 0.22f)
                             }
+
                             29 -> {  // Семнадцать сердец
                                 Heart.playNextHeartAnimation(
                                     binding.lottieHeartGold,
                                     0.883f, 0.900f, 0.917f,
                                     0.898f, 0.915f, 0.930f
                                 )
-                                Heart.playLottieAnimation(lottieTapGold, 0.19f,0.22f)
+                                Heart.playLottieAnimation(lottieTapGold, 0.19f, 0.22f)
                             }
+
                             30 -> {  //  Много сердец
                                 Heart.playNextHeartAnimation(
                                     binding.lottieHeartGold,
@@ -556,7 +607,7 @@
                                     0.966f, 0.981f, 0.999f
                                 )
 
-                                Heart.playLottieAnimation(lottieTapGold, 0.19f,0.22f)
+                                Heart.playLottieAnimation(lottieTapGold, 0.19f, 0.22f)
                             }
                         }
                     }
@@ -602,8 +653,38 @@
         override fun onPause() {
             super.onPause()
         }
-    }
 
+        override fun onNavigationItemSelected(item: MenuItem): Boolean {
+            when (item.itemId) {
+                R.id.menu_obereg_info -> {
+                    Toast.makeText(this,"Presset menu obereg info", Toast.LENGTH_LONG).show()
+                }
+
+                R.id.menu_obereg_progress -> {
+                    Toast.makeText(this,"menu_obereg_progress", Toast.LENGTH_LONG).show()
+                }
+
+                R.id.menu_obereg_settings -> {
+                    Toast.makeText(this,"menu_obereg_settings", Toast.LENGTH_LONG).show()
+                }
+
+                R.id.menu_sign_up -> {
+                    dialogHelper.createSignDialog(DialogConst.SING_UP_STATE)
+                }
+
+                R.id.menu_sign_in -> {
+                    dialogHelper.createSignDialog(DialogConst.SING_IN_STATE)
+                }
+
+                R.id.menu_sign_out -> {
+                    Toast.makeText(this,"menu_sign_out", Toast.LENGTH_LONG).show()
+                }
+            }
+            binding.drawerlayout.closeDrawer(GravityCompat.START)
+            return true
+        }
+
+    }
 
 
 
