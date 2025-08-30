@@ -7,6 +7,7 @@
     import android.view.MenuItem
     import android.view.View
     import android.widget.Button
+    import android.widget.TextView
     import android.widget.Toast
     import androidx.appcompat.app.ActionBarDrawerToggle
     import androidx.appcompat.app.AppCompatActivity
@@ -15,6 +16,8 @@
     import androidx.drawerlayout.widget.DrawerLayout
     import androidx.work.WorkManager
     import com.google.android.material.navigation.NavigationView
+    import com.google.firebase.auth.FirebaseAuth
+    import com.google.firebase.auth.FirebaseUser
 
 
     import com.hlodving.mytestgold.databinding.ActivityMainBinding
@@ -22,6 +25,8 @@
     import com.hlodving.mytestgold.dialoghelper.DialogHelper
 
     class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
+
+        private lateinit var  tvAccount: TextView
 
         // Переменная с таймером
         private lateinit var countdownTimerManager: CountdownTimerManager
@@ -37,6 +42,7 @@
 
         //Переменная с регистрацией
         private val dialogHelper = DialogHelper(this)
+        val mAuth = FirebaseAuth.getInstance()
 
 
         private val progressColors = listOf(
@@ -49,26 +55,20 @@
         ) // Список стилей прогресс-бара по фазам
 
 
+
+
         lateinit var binding: ActivityMainBinding
         override fun onCreate(savedInstanceState: Bundle?) {
             super.onCreate(savedInstanceState)
             binding = ActivityMainBinding.inflate(layoutInflater)
             setContentView(binding.root)
 
+
             //Выдвижное меню
             setSupportActionBar(binding.actionBarInclude.toolbar)
             supportActionBar?.setDisplayHomeAsUpEnabled(true)
+            init()
 
-            val toggle = ActionBarDrawerToggle(
-                this,
-                binding.drawerlayout,
-                binding.actionBarInclude.toolbar,
-                R.string.open,
-                R.string.close
-            )
-            binding.drawerlayout.addDrawerListener(toggle)
-            toggle.syncState()
-            binding.navView.setNavigationItemSelectedListener(this)
 
             //Инициализация первого прогресс-бара
             goldProgressManager = GoldProgressManager(this, binding, progressColors)
@@ -615,6 +615,26 @@
             }
         }
 
+        override fun onStart(){
+            super.onStart()
+            uiUpdate(mAuth.currentUser)
+        }
+
+        private fun init(){
+        val toggle = ActionBarDrawerToggle(
+            this,
+            binding.drawerlayout,
+            binding.actionBarInclude.toolbar,
+            R.string.open,
+            R.string.close
+        )
+        binding.drawerlayout.addDrawerListener(toggle)
+        toggle.syncState()
+        binding.navView.setNavigationItemSelectedListener(this)
+        tvAccount = binding.navView.getHeaderView(0).findViewById(R.id.tvAccountEmail)
+        }
+
+
         override fun onResume() {
             super.onResume()
 
@@ -677,11 +697,20 @@
                 }
 
                 R.id.menu_sign_out -> {
-                    Toast.makeText(this,"menu_sign_out", Toast.LENGTH_LONG).show()
+                    uiUpdate(null)
+                    mAuth.signOut()
                 }
             }
             binding.drawerlayout.closeDrawer(GravityCompat.START)
             return true
+        }
+
+        fun uiUpdate(user: FirebaseUser?){
+            tvAccount.text = if(user == null){
+                resources.getString(R.string.not_reg)
+            } else {
+                user.email
+            }
         }
 
     }

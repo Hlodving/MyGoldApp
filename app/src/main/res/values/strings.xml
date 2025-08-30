@@ -79,6 +79,7 @@
     <string name="menu_sign_out">Выход</string>
     <string name="open">Вход</string>
     <string name="close">Выход</string>
+    <string name="not_reg">Войдите или зарегистрируйтесь!</string>
 
     <!-- Регистрация -->
     <string name="email_hint">Email</string>
@@ -86,6 +87,10 @@
     <string name="sign_in_action">Войти</string>
     <string name="sign_up_action">Зарегистрироваться</string>
     <string name="forget_password">Забыли пароль?</string>
+    <string name="sign_up_error">Неудалось зарегистрироваться</string>
+    <string name="sign_in_error">Неудалось войти</string>
+    <string name="send_verification_error">Неудалось отправить email для подтверждения!</string>
+    <string name="send_verification_done">На вашу почту была отправленна ссылка для подтверждения вашего аккааунта, пожалуйста подтвердите ваш аккаунт</string>
 
 
 
