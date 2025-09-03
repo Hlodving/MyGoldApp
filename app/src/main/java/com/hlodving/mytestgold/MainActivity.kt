@@ -18,6 +18,7 @@
     import com.google.android.material.navigation.NavigationView
     import com.google.firebase.auth.FirebaseAuth
     import com.google.firebase.auth.FirebaseUser
+    import com.hlodving.mytestgold.database.DbManager
 
 
     import com.hlodving.mytestgold.databinding.ActivityMainBinding
@@ -171,6 +172,9 @@
                 repeat(49) {
                     binding.lottieHeartGold.performClick()
                 }
+                val dbManager = DbManager()
+                DbManager().publishAd()
+
             }
 
             // === НАЧАЛО: ЕДИНЫЙ БЛОК ОБНОВЛЕНИЯ UI ===

@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "563820672780",
+    "firebase_url": "https://mytestgold-default-rtdb.europe-west1.firebasedatabase.app",
     "project_id": "mytestgold",
     "storage_bucket": "mytestgold.firebasestorage.app"
   },
