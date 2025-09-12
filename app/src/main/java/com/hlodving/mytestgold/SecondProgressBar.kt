@@ -73,6 +73,14 @@ class BonusStageManager(private val context: Context) {
         countSecondProgress = prefs.getInt("bonusProgress", 0)
     }
 
+    // метод для обновления состояния из Firebase
+    fun updateState(newProgress: Int, newStage: Int) {
+        countSecondProgress = newProgress
+        stageNumber = newStage
+        saveState()
+    }
+
+
     //Сохраняет текущее состояние второго прогресс бара
     fun saveState() {
         val prefs = context.getSharedPreferences("GoldPrefs", Context.MODE_PRIVATE)

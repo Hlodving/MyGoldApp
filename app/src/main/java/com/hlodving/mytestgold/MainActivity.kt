@@ -25,7 +25,10 @@
     import com.hlodving.mytestgold.dialoghelper.DialogConst
     import com.hlodving.mytestgold.dialoghelper.DialogHelper
 
-    class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
+    class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener, DbManager.DatabaseCallback {
+
+        //ПЕРЕМЕННАЯ ДЛЯ УПРАВЛЕНИЯ БАЗОЙ ДАННЫХ
+        private lateinit var dbManager: DbManager
 
         private lateinit var  tvAccount: TextView
 
@@ -70,6 +73,8 @@
             supportActionBar?.setDisplayHomeAsUpEnabled(true)
             init()
 
+            //ИНИЦИАЛИЗАЦИЯ DBMANAGER
+            dbManager = DbManager(this)
 
             //Инициализация первого прогресс-бара
             goldProgressManager = GoldProgressManager(this, binding, progressColors)
@@ -172,8 +177,6 @@
                 repeat(49) {
                     binding.lottieHeartGold.performClick()
                 }
-                val dbManager = DbManager()
-                DbManager().publishAd()
 
             }
 
@@ -211,6 +214,16 @@
                 lottieHeartGold.setOnClickListener {
                     // Считаем глобальный клик
                     globalTapCounter.increment()
+
+
+                    //СОХРАНЕНИЕ ДАННЫХ В FIREBASE ПРИ КАЖДОМ НАЖАТИИ
+                    dbManager.saveData(
+                        globalTapCounter.totalTaps,
+                        secondProgressManager.countSecondProgress,
+                        secondProgressManager.stageNumber
+                    )
+
+
                     if (countdownTimerManager.isOberegForever()) return@setOnClickListener
 
                     val (stageProgress, stageMax, currentStage) = goldProgressManager.increment()
@@ -619,9 +632,13 @@
             }
         }
 
-        override fun onStart(){
+        override fun onStart() {
             super.onStart()
             uiUpdate(mAuth.currentUser)
+            //ЗАГРУЗКА ДАННЫХ ИЗ FIREBASE ПРИ ЗАПУСКЕ, ЕСЛИ ПОЛЬЗОВАТЕЛЬ АВТОРИЗОВАН
+            if (mAuth.currentUser != null) {
+                dbManager.loadData()
+            }
         }
 
         private fun init(){
@@ -674,8 +691,16 @@
         }
 
 
+        //СОХРАНЕНИЕ ДАННЫХ В FIREBASE ПРИ ПРИОСТАНОВКЕ АКТИВНОСТИ
         override fun onPause() {
             super.onPause()
+            if (mAuth.currentUser != null) {
+                dbManager.saveData(
+                    globalTapCounter.totalTaps,
+                    secondProgressManager.countSecondProgress,
+                    secondProgressManager.stageNumber
+                )
+            }
         }
 
         override fun onNavigationItemSelected(item: MenuItem): Boolean {
@@ -701,7 +726,17 @@
                 }
 
                 R.id.menu_sign_out -> {
+
+                    // СОХРАНЕНИЕ ДАННЫХ ПЕРЕД ВЫХОДОМ
+                    if (mAuth.currentUser != null) {
+                        dbManager.saveData(
+                            globalTapCounter.totalTaps,
+                            secondProgressManager.countSecondProgress,
+                            secondProgressManager.stageNumber
+                        )
+                    }
                     uiUpdate(null)
+                    Toast.makeText(this,"Вы вышли из аккаунта", Toast.LENGTH_SHORT).show()
                     mAuth.signOut()
                 }
             }
@@ -709,14 +744,35 @@
             return true
         }
 
-        fun uiUpdate(user: FirebaseUser?){
-            tvAccount.text = if(user == null){
+        // UIUpdate теперь публичный и инициирует загрузку данных после входа
+        fun uiUpdate(user: FirebaseUser?) {
+            tvAccount.text = if (user == null) {
                 resources.getString(R.string.not_reg)
             } else {
                 user.email
             }
+            // ЗАГРУЗКА ДАННЫХ ИЗ FIREBASE СРАЗУ ПОСЛЕ УСПЕШНОЙ АВТОРИЗАЦИИ
+            if (user != null) {
+                Toast.makeText(this,"Вы вошли в аккаунт", Toast.LENGTH_SHORT).show()
+                dbManager.loadData()
+            }
         }
 
+        // МЕТОД ДЛЯ ОБРАБОТКИ ДАННЫХ, ПОЛУЧЕННЫХ ИЗ FIREBASE
+        override fun onDataLoaded(totalTaps: Int, bonusProgress: Int, bonusStage: Int) {
+            // ОБНОВЛЯЕМ ЛОКАЛЬНЫЕ ПЕРЕМЕННЫЕ
+            globalTapCounter.updateTotalTaps(totalTaps)
+            secondProgressManager.updateState(bonusProgress, bonusStage)
+
+            // ОБНОВЛЯЕМ UI
+            goldProgressManager.updateUI()
+            binding.progressBar2.max = secondProgressManager.maxProgress
+            binding.progressBar2.progress = secondProgressManager.countSecondProgress
+            binding.progressText2.text = "${secondProgressManager.countSecondProgress} / ${secondProgressManager.maxProgress}"
+            val colorDrawableId2 = progressColors[(secondProgressManager.stageNumber - 1) % progressColors.size]
+            binding.progressBar2.progressDrawable = ContextCompat.getDrawable(this, colorDrawableId2)
+            binding.bonusQuoteText.text = secondProgressManager.getQuote()
+        }
     }
 
 
