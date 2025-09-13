@@ -88,6 +88,7 @@
     <string name="dialog_reset_email_message">Для восстановления пароля укажите ваш Email адресс</string>
     <string name="sign_up_action">Зарегистрироваться</string>
     <string name="forget_password">Забыли пароль?</string>
+    <string name="alias_hint">Псевдоним</string>
     <string name="sign_up_error">Не удалось зарегистрироваться</string>
     <string name="sign_in_error">Не удалось войти</string>
     <string name="email_reset_password_was_sent">Вам было отправлено письмо для сброса пароля</string>

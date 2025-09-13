@@ -13,18 +13,20 @@ class DbManager(private val dbCallback: DatabaseCallback) {
 
     // Интерфейс для обработки коллбэков данных
     interface DatabaseCallback {
-        fun onDataLoaded(totalTaps: Int, bonusProgress: Int, bonusStage: Int)
+        fun onDataLoaded(totalTaps: Int, bonusProgress: Int, bonusStage: Int, alias: String)
     }
 
+
     // Сохраняет данные пользователя в Firebase
-    fun saveData(totalTaps: Int, bonusProgress: Int, bonusStage: Int) {
+    fun saveData(totalTaps: Int, bonusProgress: Int, bonusStage: Int, alias: String) {
         val userId = auth.currentUser?.uid ?: return
         val userRef = db.getReference("users").child(userId)
 
         val userData = mapOf(
             "globalTapCounter" to totalTaps,
             "bonusProgress" to bonusProgress,
-            "bonusStage" to bonusStage
+            "bonusStage" to bonusStage,
+            "alias" to alias
         )
         userRef.setValue(userData)
     }
@@ -40,8 +42,14 @@ class DbManager(private val dbCallback: DatabaseCallback) {
                     val totalTaps = snapshot.child("globalTapCounter").getValue(Int::class.java) ?: 0
                     val bonusProgress = snapshot.child("bonusProgress").getValue(Int::class.java) ?: 0
                     val bonusStage = snapshot.child("bonusStage").getValue(Int::class.java) ?: 1
+                    val alias = snapshot.child("alias").getValue(String::class.java) ?: auth.currentUser?.email ?: "Псевдоним" // Получаем псевдоним
 
-                    dbCallback.onDataLoaded(totalTaps, bonusProgress, bonusStage)
+                    dbCallback.onDataLoaded(totalTaps, bonusProgress, bonusStage, alias)
+                } else {
+                    // Если данных нет (пользователь только что зарегистрировался),
+                    // передаем дефолтные значения и email как псевдоним по умолчанию
+                    val alias = auth.currentUser?.email ?: "Псевдоним"
+                    dbCallback.onDataLoaded(0, 0, 1, alias)
                 }
             }
 

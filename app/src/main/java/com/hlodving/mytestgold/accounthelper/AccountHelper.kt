@@ -4,19 +4,25 @@ import android.widget.Toast
 import com.google.firebase.auth.FirebaseUser
 import com.hlodving.mytestgold.MainActivity
 import com.hlodving.mytestgold.R
+import com.hlodving.mytestgold.database.DbManager
 
 class AccountHelper(act: MainActivity) {
     private val act = act
-    fun signUpWithEmail(email: String, password: String){
-        if(email.isNotEmpty() && password.isNotEmpty()){
-            act.mAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener {task->
 
-                if(task.isSuccessful){
-                    sendEmailVerification(task.result?.user!!)
-                    act.uiUpdate(task.result?.user)
-
+    // ссылка на DbManager, передавая MainActivity как коллбэк
+    private val dbManager = DbManager(act)
+    fun signUpWithEmail(email: String, password: String, alias: String) {
+        if (email.isNotEmpty() && password.isNotEmpty() && alias.isNotEmpty()) {
+            act.mAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    val user = task.result?.user!!
+                    sendEmailVerification(user)
+                    // Сохраняем псевдоним и начальные данные в Firebase
+                    dbManager.saveData(0, 0, 1, alias)
+                    act.uiUpdate(user)
                 } else {
-                    Toast.makeText(act,act.resources.getString(R.string.sign_up_error), Toast.LENGTH_LONG).show()
+                    val errorMessage = task.exception?.message ?: act.resources.getString(R.string.sign_up_error)
+                    Toast.makeText(act, errorMessage, Toast.LENGTH_LONG).show()
                 }
 
             }

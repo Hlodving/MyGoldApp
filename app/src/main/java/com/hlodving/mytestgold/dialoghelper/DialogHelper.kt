@@ -30,27 +30,35 @@ class DialogHelper(act: MainActivity) {
         dialog.show()
     }
 
-    private fun setDialogState(index: Int, rootDialogElement: SignDialogBinding
-    ) {
-        if (index == DialogConst.SING_UP_STATE){
+    private fun setDialogState(index: Int, rootDialogElement: SignDialogBinding) {
+        if (index == DialogConst.SING_UP_STATE) {
             rootDialogElement.tvSingTitle.text = act.resources.getString(R.string.menu_sign_up)
             rootDialogElement.btSignUpIn.text = act.resources.getString(R.string.sign_up_action)
+            rootDialogElement.edSignAlias.visibility = View.VISIBLE // Показываем поле псевдонима
         } else {
             rootDialogElement.tvSingTitle.text = act.resources.getString(R.string.menu_sign_in)
             rootDialogElement.btSignUpIn.text = act.resources.getString(R.string.sign_in_action)
             rootDialogElement.btForgetP.visibility = View.VISIBLE
+            rootDialogElement.edSignAlias.visibility = View.GONE // Скрываем поле псевдонима
         }
     }
 
     private fun setOnClickSignUpIn(index: Int,rootDialogElement: SignDialogBinding, dialog: AlertDialog){
         dialog.dismiss()
         if(index == DialogConst.SING_UP_STATE){
-            accHelper.signUpWithEmail(rootDialogElement.edSignEmail.text.toString(),
-                rootDialogElement.edSignPassword.text.toString())
-        }else{
+            val email = rootDialogElement.edSignEmail.text.toString()
+            val password = rootDialogElement.edSignPassword.text.toString()
+            val alias = rootDialogElement.edSignAlias.text.toString() // Получаем псевдоним
+
+            if (alias.isNotEmpty()) {
+                // Передаём псевдоним в AccountHelper
+                accHelper.signUpWithEmail(email, password, alias)
+            } else {
+                Toast.makeText(act, "Пожалуйста, введите псевдоним", Toast.LENGTH_LONG).show()
+            }
+        } else {
             accHelper.signInWithEmail(rootDialogElement.edSignEmail.text.toString(),
                 rootDialogElement.edSignPassword.text.toString())
-
         }
     }
 

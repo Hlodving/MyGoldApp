@@ -48,6 +48,9 @@
         private val dialogHelper = DialogHelper(this)
         val mAuth = FirebaseAuth.getInstance()
 
+            //Переменная с псевдонимом
+        private lateinit var userAlias: String
+
 
         private val progressColors = listOf(
             R.drawable.progress_bar_green,
@@ -220,7 +223,8 @@
                     dbManager.saveData(
                         globalTapCounter.totalTaps,
                         secondProgressManager.countSecondProgress,
-                        secondProgressManager.stageNumber
+                        secondProgressManager.stageNumber,
+                        userAlias
                     )
 
 
@@ -698,7 +702,8 @@
                 dbManager.saveData(
                     globalTapCounter.totalTaps,
                     secondProgressManager.countSecondProgress,
-                    secondProgressManager.stageNumber
+                    secondProgressManager.stageNumber,
+                    userAlias
                 )
             }
         }
@@ -732,7 +737,8 @@
                         dbManager.saveData(
                             globalTapCounter.totalTaps,
                             secondProgressManager.countSecondProgress,
-                            secondProgressManager.stageNumber
+                            secondProgressManager.stageNumber,
+                            userAlias
                         )
                     }
                     uiUpdate(null)
@@ -744,26 +750,23 @@
             return true
         }
 
-        // UIUpdate теперь публичный и инициирует загрузку данных после входа
+        // Инициирует загрузку данных после входа
         fun uiUpdate(user: FirebaseUser?) {
-            tvAccount.text = if (user == null) {
-                resources.getString(R.string.not_reg)
+            if (user == null) {
+                tvAccount.text = resources.getString(R.string.not_reg)
             } else {
-                user.email
-            }
-            // ЗАГРУЗКА ДАННЫХ ИЗ FIREBASE СРАЗУ ПОСЛЕ УСПЕШНОЙ АВТОРИЗАЦИИ
-            if (user != null) {
+                // Загружаем данные из Firebase, чтобы получить псевдоним
                 Toast.makeText(this,"Вы вошли в аккаунт", Toast.LENGTH_SHORT).show()
                 dbManager.loadData()
             }
         }
 
         // МЕТОД ДЛЯ ОБРАБОТКИ ДАННЫХ, ПОЛУЧЕННЫХ ИЗ FIREBASE
-        override fun onDataLoaded(totalTaps: Int, bonusProgress: Int, bonusStage: Int) {
+        override fun onDataLoaded(totalTaps: Int, bonusProgress: Int, bonusStage: Int, alias: String) {
             // ОБНОВЛЯЕМ ЛОКАЛЬНЫЕ ПЕРЕМЕННЫЕ
             globalTapCounter.updateTotalTaps(totalTaps)
             secondProgressManager.updateState(bonusProgress, bonusStage)
-
+            this.userAlias = alias
             // ОБНОВЛЯЕМ UI
             goldProgressManager.updateUI()
             binding.progressBar2.max = secondProgressManager.maxProgress
@@ -772,6 +775,9 @@
             val colorDrawableId2 = progressColors[(secondProgressManager.stageNumber - 1) % progressColors.size]
             binding.progressBar2.progressDrawable = ContextCompat.getDrawable(this, colorDrawableId2)
             binding.bonusQuoteText.text = secondProgressManager.getQuote()
+
+            // Обновляем текст в выдвижном меню, чтобы отображать псевдоним
+            tvAccount.text = alias
         }
     }
 
