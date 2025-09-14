@@ -96,6 +96,7 @@
     <string name="send_verification_done">На вашу почту была отправленна ссылка для подтверждения вашего аккааунта, пожалуйста подтвердите ваш аккаунт</string>
     <string name="reset_password_title">Восстановление пароля</string>
     <string name="restore_password">Восстановить</string>
+    <string name="password_confirm_hint">Повторите пароль</string>
 
 
 
