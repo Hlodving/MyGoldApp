@@ -192,39 +192,38 @@
         app:layout_constraintEnd_toEndOf="parent" />
 
 
-
-    <FrameLayout
-        android:id="@+id/progressFrame"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="32dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/questionButton">
-
-
-        <ProgressBar
-            android:id="@+id/progressBar"
-            style="?android:attr/progressBarStyleHorizontal"
-            android:layout_width="match_parent"
-            android:layout_height="30dp"
-            android:layout_gravity="center"
-            android:max="200"
-            android:progress="0"
-            android:progressDrawable="@drawable/progress_bar_green" />
-
-        <TextView
-            android:id="@+id/progressText"
-            android:layout_width="wrap_content"
+        <FrameLayout
+            android:id="@+id/progressFrame"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="0 / 200"
-            android:textColor="#FFFFFF"
-            android:textSize="16sp"
-            android:textStyle="bold" />
-    </FrameLayout>
+            android:layout_marginStart="32dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="32dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/timerText">
+
+
+            <ProgressBar
+                android:id="@+id/progressBar"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="match_parent"
+                android:layout_height="30dp"
+                android:layout_gravity="center"
+                android:max="200"
+                android:progress="0"
+                android:progressDrawable="@drawable/progress_bar_green" />
+
+            <TextView
+                android:id="@+id/progressText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="0 / 200"
+                android:textColor="#FFFFFF"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+        </FrameLayout>
 
     <FrameLayout
         android:id="@+id/progressFrame2"
@@ -289,50 +288,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/progressFrame2" />
 
-    <ImageButton
-        android:id="@+id/settingsButton"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="16dp"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:contentDescription="@string/settings"
-        android:padding="8dp"
-        android:scaleType="fitCenter"
-        android:src="@drawable/setting_icon"
-        app:layout_constraintEnd_toStartOf="@+id/questionButton"
-        app:layout_constraintTop_toBottomOf="@+id/timerText"
-        app:tint="?android:textColorPrimary" />
 
-    <ImageButton
-        android:id="@+id/questionButton"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:layout_marginTop="8dp"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:contentDescription="@string/about_amulet"
-        android:padding="8dp"
-        android:scaleType="fitCenter"
-        android:src="@drawable/question_icon"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/timerText"
-        app:tint="?android:textColorPrimary" />
-
-    <ImageButton
-        android:id="@+id/progressButton"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:contentDescription="рейтиег"
-        android:padding="8dp"
-        android:scaleType="fitCenter"
-        android:src="@drawable/star_icon"
-        app:layout_constraintStart_toEndOf="@+id/questionButton"
-        app:layout_constraintTop_toBottomOf="@+id/timerText"
-        app:tint="?android:textColorPrimary" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 

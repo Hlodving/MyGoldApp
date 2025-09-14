@@ -156,24 +156,6 @@
             binding.bonusQuoteText.text = secondProgressManager.getQuote()
 
 
-            // Кнопка настроек
-            binding.settingsButton.setOnClickListener {
-                val intent = Intent(this, SettingsActivity::class.java)
-                startActivity(intent)
-            }
-
-            //Кнопка Вопрос
-            binding.questionButton.setOnClickListener {
-                val intent = Intent(this, OberegInfoActivity::class.java)
-                startActivity(intent)
-            }
-
-            //Кнопка Прогресс
-            binding.progressButton.setOnClickListener {
-                val intent = Intent(this, ProgressActivity::class.java)
-                startActivity(intent)
-            }
-
 
             //Тест кнопка
             binding.buttonAdd49.setOnClickListener {
@@ -711,15 +693,15 @@
         override fun onNavigationItemSelected(item: MenuItem): Boolean {
             when (item.itemId) {
                 R.id.menu_obereg_info -> {
-                    Toast.makeText(this,"Presset menu obereg info", Toast.LENGTH_LONG).show()
+                    startActivity(Intent(this@MainActivity, OberegInfoActivity::class.java))
                 }
 
                 R.id.menu_obereg_progress -> {
-                    Toast.makeText(this,"menu_obereg_progress", Toast.LENGTH_LONG).show()
+                    startActivity(Intent(this@MainActivity, ProgressActivity::class.java))
                 }
 
                 R.id.menu_obereg_settings -> {
-                    Toast.makeText(this,"menu_obereg_settings", Toast.LENGTH_LONG).show()
+                    startActivity(Intent(this@MainActivity, SettingsActivity::class.java))
                 }
 
                 R.id.menu_sign_up -> {
