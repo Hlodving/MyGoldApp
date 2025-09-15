@@ -99,5 +99,15 @@
     <string name="password_confirm_hint">Повторите пароль</string>
 
 
+    <!-- Таблица лидеров -->
+    <string name="leaderboard_title">Таблица лидеров (топ-7)</string>
+    <string name="my_place_placeholder">Ваше место: —</string>
+    <string name="my_alias_placeholder">Псевдоним: —</string>
+    <string name="my_score_placeholder">Счёт: —</string>
+
+    <string name="my_place_fmt">Ваше место: %1$s</string>
+    <string name="my_alias_fmt">Псевдоним: %1$s</string>
+    <string name="my_score_fmt">Счёт: %1$d</string>
+
 
 </resources>
