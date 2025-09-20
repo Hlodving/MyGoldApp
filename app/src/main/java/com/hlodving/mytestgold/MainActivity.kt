@@ -738,7 +738,6 @@
                 tvAccount.text = resources.getString(R.string.not_reg)
             } else {
                 // Загружаем данные из Firebase, чтобы получить псевдоним
-                Toast.makeText(this,"Вы вошли в аккаунт", Toast.LENGTH_SHORT).show()
                 dbManager.loadData()
             }
         }

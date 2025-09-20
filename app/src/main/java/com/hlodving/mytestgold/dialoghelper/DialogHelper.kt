@@ -14,56 +14,64 @@ class DialogHelper(private val act: MainActivity) {
 
     fun createSignDialog(index: Int) {
         val builder = AlertDialog.Builder(act)
-        val rootDialogElement = SignDialogBinding.inflate(act.layoutInflater)
-        builder.setView(rootDialogElement.root)
+        val root = SignDialogBinding.inflate(act.layoutInflater)
+        builder.setView(root.root)
 
         isResetPasswordState = false
-        setDialogState(index, rootDialogElement)
+        setDialogState(index, root)
 
         val dialog = builder.create()
-        rootDialogElement.btSignUpIn.setOnClickListener {
-            setOnClickSignUpIn(index, rootDialogElement, dialog)
+
+        root.btSignUpIn.setOnClickListener {
+            setOnClickSignUpIn(index, root, dialog)
         }
 
-        rootDialogElement.btForgetP.setOnClickListener {
+        root.btForgetP.setOnClickListener {
             if (isResetPasswordState) {
-                setOnClickResetPassword(rootDialogElement, dialog)
+                setOnClickResetPassword(root, dialog)
             } else {
-                setResetPasswordState(rootDialogElement)
+                setResetPasswordState(root)
             }
         }
 
         dialog.show()
     }
 
-    private fun setDialogState(index: Int, rootDialogElement: SignDialogBinding) {
+    private fun setDialogState(index: Int, root: SignDialogBinding) {
         if (index == DialogConst.SING_UP_STATE) {
-            rootDialogElement.tvSingTitle.text = act.resources.getString(R.string.menu_sign_up)
-            rootDialogElement.btSignUpIn.text = act.resources.getString(R.string.sign_up_action)
-            rootDialogElement.edSignAlias.visibility = View.VISIBLE
-            rootDialogElement.edSignPasswordConfirm.visibility = View.VISIBLE
-            rootDialogElement.btForgetP.visibility = View.GONE
-            rootDialogElement.edSignPassword.visibility = View.VISIBLE
-            rootDialogElement.btSignUpIn.visibility = View.VISIBLE
+            // Регистрация
+            root.tvSingTitle.text = act.getString(R.string.menu_sign_up)
+            root.btSignUpIn.text = act.getString(R.string.sign_up_action)
+
+            root.edSignAlias.visibility = View.VISIBLE
+            root.tilSignPassword.visibility = View.VISIBLE
+            root.tilSignPasswordConfirm.visibility = View.VISIBLE
+
+            root.btForgetP.visibility = View.GONE
+            root.btSignUpIn.visibility = View.VISIBLE
+            root.tvDialogMessage.visibility = View.GONE
         } else {
-            rootDialogElement.tvSingTitle.text = act.resources.getString(R.string.menu_sign_in)
-            rootDialogElement.btSignUpIn.text = act.resources.getString(R.string.sign_in_action)
-            rootDialogElement.btForgetP.visibility = View.VISIBLE
-            rootDialogElement.edSignAlias.visibility = View.GONE
-            rootDialogElement.edSignPasswordConfirm.visibility = View.GONE // Скрываем поле подтверждения
-            rootDialogElement.edSignPassword.visibility = View.VISIBLE
-            rootDialogElement.btSignUpIn.visibility = View.VISIBLE
-            rootDialogElement.btForgetP.text = act.resources.getString(R.string.forget_password)
-            rootDialogElement.tvDialogMessage.visibility = View.GONE
+            // Вход
+            root.tvSingTitle.text = act.getString(R.string.menu_sign_in)
+            root.btSignUpIn.text = act.getString(R.string.sign_in_action)
+
+            root.edSignAlias.visibility = View.GONE
+            root.tilSignPasswordConfirm.visibility = View.GONE
+            root.tilSignPassword.visibility = View.VISIBLE
+
+            root.btForgetP.visibility = View.VISIBLE
+            root.btForgetP.text = act.getString(R.string.forget_password)
+            root.btSignUpIn.visibility = View.VISIBLE
+            root.tvDialogMessage.visibility = View.GONE
         }
     }
 
-    private fun setOnClickSignUpIn(index: Int, rootDialogElement: SignDialogBinding, dialog: AlertDialog) {
+    private fun setOnClickSignUpIn(index: Int, root: SignDialogBinding, dialog: AlertDialog) {
         if (index == DialogConst.SING_UP_STATE) {
-            val email = rootDialogElement.edSignEmail.text.toString()
-            val password = rootDialogElement.edSignPassword.text.toString()
-            val passwordConfirm = rootDialogElement.edSignPasswordConfirm.text.toString()
-            val alias = rootDialogElement.edSignAlias.text.toString()
+            val email = root.edSignEmail.text.toString()
+            val password = root.edSignPassword.text.toString()
+            val passwordConfirm = root.edSignPasswordConfirm.text.toString()
+            val alias = root.edSignAlias.text.toString()
 
             if (email.isNotEmpty() && password.isNotEmpty() && passwordConfirm.isNotEmpty() && alias.isNotEmpty()) {
                 if (password == passwordConfirm) {
@@ -76,35 +84,40 @@ class DialogHelper(private val act: MainActivity) {
                 Toast.makeText(act, "Пожалуйста, заполните все поля", Toast.LENGTH_LONG).show()
             }
         } else {
-            accHelper.signInWithEmail(
-                rootDialogElement.edSignEmail.text.toString(),
-                rootDialogElement.edSignPassword.text.toString()
-            )
-            dialog.dismiss()
+            val email = root.edSignEmail.text.toString()
+            val password = root.edSignPassword.text.toString()
+            if (email.isNotEmpty() && password.isNotEmpty()) {
+                accHelper.signInWithEmail(email, password)
+                dialog.dismiss()
+            } else {
+                Toast.makeText(act, "Введите email и пароль", Toast.LENGTH_LONG).show()
+            }
         }
     }
 
-    private fun setResetPasswordState(rootDialogElement: SignDialogBinding) {
+    private fun setResetPasswordState(root: SignDialogBinding) {
         isResetPasswordState = true
-        rootDialogElement.edSignPassword.visibility = View.GONE
-        rootDialogElement.edSignPasswordConfirm.visibility = View.GONE // Скрываем поле подтверждения
-        rootDialogElement.btSignUpIn.visibility = View.GONE
-        rootDialogElement.btForgetP.text = act.resources.getString(R.string.restore_password)
-        rootDialogElement.tvSingTitle.text = act.resources.getString(R.string.reset_password_title)
-        rootDialogElement.tvDialogMessage.visibility = View.VISIBLE
+        // Прячем поля пароля целиком
+        root.tilSignPassword.visibility = View.GONE
+        root.tilSignPasswordConfirm.visibility = View.GONE
+        root.btSignUpIn.visibility = View.GONE
+
+        root.btForgetP.text = act.getString(R.string.restore_password)
+        root.tvSingTitle.text = act.getString(R.string.reset_password_title)
+        root.tvDialogMessage.visibility = View.VISIBLE
     }
 
-    private fun setOnClickResetPassword(rootDialogElement: SignDialogBinding, dialog: AlertDialog) {
-        if (rootDialogElement.edSignEmail.text.isNotEmpty()) {
-            act.mAuth.sendPasswordResetEmail(rootDialogElement.edSignEmail.text.toString())
-                .addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        Toast.makeText(act, R.string.email_reset_password_was_sent, Toast.LENGTH_LONG).show()
-                    } else {
-                        Toast.makeText(act, "Ошибка: ${task.exception?.message}", Toast.LENGTH_LONG).show()
-                    }
-                    dialog.dismiss()
+    private fun setOnClickResetPassword(root: SignDialogBinding, dialog: AlertDialog) {
+        val email = root.edSignEmail.text.toString()
+        if (email.isNotEmpty()) {
+            act.mAuth.sendPasswordResetEmail(email).addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    Toast.makeText(act, R.string.email_reset_password_was_sent, Toast.LENGTH_LONG).show()
+                } else {
+                    Toast.makeText(act, "Ошибка: ${task.exception?.message}", Toast.LENGTH_LONG).show()
                 }
+                dialog.dismiss()
+            }
         } else {
             Toast.makeText(act, "Пожалуйста, введите ваш email", Toast.LENGTH_LONG).show()
         }

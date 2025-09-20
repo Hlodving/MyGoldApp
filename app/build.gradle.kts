@@ -49,7 +49,7 @@ dependencies {
     implementation(libs.googleid)
     implementation(libs.firebase.database)
     kapt("com.github.bumptech.glide:compiler:5.0.4")
-
+    implementation("com.google.android.material:material:1.12.0")
     implementation(libs.androidx.core.ktx)
     implementation("com.airbnb.android:lottie:6.6.0")
     implementation(libs.androidx.appcompat)

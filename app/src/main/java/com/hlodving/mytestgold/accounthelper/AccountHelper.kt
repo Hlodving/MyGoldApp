@@ -34,6 +34,7 @@ class AccountHelper(act: MainActivity) {
             act.mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener {task->
 
                 if(task.isSuccessful){
+                    Toast.makeText(act, act.getString(R.string.sign_in_success), Toast.LENGTH_SHORT).show()
                     act.uiUpdate(task.result?.user)
 
                 } else {
