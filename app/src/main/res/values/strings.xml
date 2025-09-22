@@ -27,6 +27,8 @@
     <string name="donat">2202 2050 0076 8587</string>
     <string name="donat_info">Поблагодарить автора</string>
     <string name="settings">Настройки</string>
+    <string name="animation_on">"Включить анимацию"</string>
+    <string name="animation_off">"Отключить анимацию"</string>
 
     <!-- Цитаты -->
     <string name="bonus_stage_1">Ибо возмездие за труд — достойное.\n(1 Тим 5:18)</string>
@@ -111,6 +113,10 @@
     <string name="my_place_fmt">Ваше место: %1$s</string>
     <string name="my_alias_fmt">Псевдоним: %1$s</string>
     <string name="my_score_fmt">Счёт: %1$d</string>
+    <string name="leaderboard">Таблица лидеров (топ-7)</string>
+    <string name="place">Место: —</string>
+    <string name="nickname">Псевдоним: —</string>
+    <string name="score">Счёт: —</string>
 
 
 </resources>

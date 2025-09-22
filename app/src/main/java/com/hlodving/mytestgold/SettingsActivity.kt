@@ -47,9 +47,9 @@ class SettingsActivity : AppCompatActivity() {
 
     private fun updateToggleButtonText(isEnabled: Boolean) {
         binding.toggleAnimationButton.text = if (isEnabled) {
-            "Отключить анимацию"
+            getString(R.string.animation_off)
         } else {
-            "Включить анимацию"
+            getString(R.string.animation_on)
         }
     }
 }
