@@ -29,6 +29,8 @@
     <string name="settings">Настройки</string>
     <string name="animation_on">"Включить анимацию"</string>
     <string name="animation_off">"Отключить анимацию"</string>
+    <string name="copie">"Скопировано"</string>
+
 
     <!-- Цитаты -->
     <string name="bonus_stage_1">Ибо возмездие за труд — достойное.\n(1 Тим 5:18)</string>

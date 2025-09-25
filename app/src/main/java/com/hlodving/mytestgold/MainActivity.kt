@@ -157,14 +157,6 @@
 
 
 
-            //Тест кнопка
-            binding.buttonAdd49.setOnClickListener {
-                repeat(49) {
-                    binding.lottieHeartGold.performClick()
-                }
-
-            }
-
             // === НАЧАЛО: ЕДИНЫЙ БЛОК ОБНОВЛЕНИЯ UI ===
 
             // Обновляем первый прогресс-бар

@@ -5,75 +5,65 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp"
-    android:background="?android:colorBackground">
+    android:paddingStart="16dp"
+    android:paddingEnd="16dp"
+    android:background="?android:colorBackground"
+    tools:context=".ConnectionActivity">
 
-
+    <!-- Заголовок -->
     <TextView
         android:id="@+id/oberegTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="38dp"
-        android:layout_marginTop="16dp"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
         android:text="@string/power_amulet"
         android:textColor="?android:textColorPrimary"
         android:textSize="28sp"
         android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
+        android:includeFontPadding="false"
+        android:letterSpacing="0.02"
+        android:textAlignment="center"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent" />
 
+    <!-- Важное -->
     <TextView
         android:id="@+id/oberegImportant"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:gravity="center_horizontal"
         android:text="@string/obereg_importent"
         android:textColor="?android:textColorPrimary"
         android:textSize="18sp"
         android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:textAlignment="center"
+        android:includeFontPadding="false"
+        app:layout_constraintTop_toBottomOf="@id/oberegTitle"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/oberegTitle" />
+        app:layout_constraintEnd_toEndOf="parent" />
 
-
+    <!-- Подзаголовок -->
     <TextView
         android:id="@+id/oberegImportantHome"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:gravity="center_horizontal"
-        android:text="@string/obereg_widget_information"
-        android:textColor="?android:textColorPrimary"
-        android:textSize="18sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/oberegImportant" />
-
-
-    <TextView
-        android:id="@+id/desc1"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="32dp"
-        android:gravity="center_horizontal"
-        android:text="@string/obereg_desc_1"
+        android:layout_marginTop="10dp"
+        android:includeFontPadding="false"
+        android:text="@string/obereg_widget_information"
+        android:textAlignment="center"
         android:textColor="?android:textColorPrimary"
-        android:textSize="18sp"
+        android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/widgetHelpButton" />
+        app:layout_constraintTop_toBottomOf="@id/oberegImportant" />
 
-
+    <!-- Кнопка: как добавить виджет -->
     <Button
         android:id="@+id/widgetHelpButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="12dp"
         android:backgroundTint="@android:color/holo_blue_dark"
         android:elevation="6dp"
         android:paddingStart="24dp"
@@ -84,16 +74,48 @@
         android:textAllCaps="false"
         android:textColor="@android:color/white"
         android:textSize="16sp"
+        app:layout_constraintTop_toBottomOf="@id/oberegImportantHome"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Разделитель -->
+    <View
+        android:id="@+id/divider1"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:layout_marginTop="16dp"
+        android:background="@android:color/darker_gray"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/oberegImportantHome" />
+        app:layout_constraintTop_toBottomOf="@+id/widgetHelpButton" />
 
+    <!-- Описание -->
+
+
+    <!-- Кнопка: предоставить разрешения/инфу -->
+    <TextView
+        android:id="@+id/desc1"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:includeFontPadding="false"
+        android:lineSpacingExtra="4dp"
+        android:text="@string/obereg_desc_1"
+        android:textAlignment="center"
+        android:textColor="?android:textColorPrimary"
+        android:textSize="20sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/divider1" />
 
     <Button
         android:id="@+id/providesInformationButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="12dp"
         android:backgroundTint="@android:color/holo_blue_dark"
         android:elevation="6dp"
         android:paddingStart="24dp"
@@ -108,24 +130,38 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/desc1" />
 
-    <TextView
-        android:id="@+id/oberegСonnection"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:gravity="center_horizontal"
-        android:text="@string/obereg_widget_connection"
-        android:textColor="?android:textColorPrimary"
-        android:textSize="18sp"
+    <!-- Разделитель -->
+    <View
+        android:id="@+id/divider2"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:layout_marginTop="16dp"
+        android:background="@android:color/darker_gray"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/providesInformationButton" />
+
+    <!-- Кнопка: перейти к подключению -->
+    <TextView
+        android:id="@+id/oberegСonnection"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:includeFontPadding="false"
+        android:text="@string/obereg_widget_connection"
+        android:textAlignment="center"
+        android:textColor="?android:textColorPrimary"
+        android:textSize="20sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/divider2" />
 
     <Button
         android:id="@+id/connectionButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="12dp"
         android:backgroundTint="@android:color/holo_blue_dark"
         android:elevation="6dp"
         android:paddingStart="24dp"
@@ -138,9 +174,13 @@
         android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/oberegСonnection" />
+        app:layout_constraintTop_toBottomOf="@id/oberegСonnection" />
 
-
-
-
+    <!-- Нижний отступ, чтобы ничего не прилипало к краю -->
+    <View
+        android:layout_width="0dp"
+        android:layout_height="12dp"
+        app:layout_constraintTop_toBottomOf="@id/connectionButton"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
 </androidx.constraintlayout.widget.ConstraintLayout>
