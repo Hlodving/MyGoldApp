@@ -11,6 +11,8 @@ class DbManager(private val dbCallback: DatabaseCallback) {
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
     private val db: FirebaseDatabase = FirebaseDatabase.getInstance()
 
+
+
     // Интерфейс для обработки коллбэков данных
     interface DatabaseCallback {
         fun onDataLoaded(totalTaps: Int, bonusProgress: Int, bonusStage: Int, alias: String)
@@ -18,18 +20,24 @@ class DbManager(private val dbCallback: DatabaseCallback) {
 
 
     // Сохраняет данные пользователя в Firebase
-    fun saveData(totalTaps: Int, bonusProgress: Int, bonusStage: Int, alias: String) {
+    fun saveProgress(totalTaps: Int, bonusProgress: Int, bonusStage: Int) {
         val userId = auth.currentUser?.uid ?: return
-        val userRef = db.getReference("users").child(userId)
-
-        val userData = mapOf(
+        val ref = db.getReference("users").child(userId)
+        val map = mapOf(
             "globalTapCounter" to totalTaps,
             "bonusProgress" to bonusProgress,
-            "bonusStage" to bonusStage,
-            "alias" to alias
+            "bonusStage" to bonusStage
         )
-        userRef.setValue(userData)
+        ref.updateChildren(map)
     }
+    fun saveAlias(alias: String) {
+        val userId = auth.currentUser?.uid ?: return
+        db.getReference("users").child(userId).child("alias").setValue(alias)
+    }
+
+
+
+
 
     // Загружает данные пользователя из Firebase
     fun loadData() {
@@ -38,24 +46,30 @@ class DbManager(private val dbCallback: DatabaseCallback) {
 
         userRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                if (snapshot.exists()) {
-                    val totalTaps = snapshot.child("globalTapCounter").getValue(Int::class.java) ?: 0
-                    val bonusProgress = snapshot.child("bonusProgress").getValue(Int::class.java) ?: 0
-                    val bonusStage = snapshot.child("bonusStage").getValue(Int::class.java) ?: 1
-                    val alias = snapshot.child("alias").getValue(String::class.java) ?: auth.currentUser?.email ?: "Псевдоним" // Получаем псевдоним
+                val totalTaps = snapshot.child("globalTapCounter").getValue(Int::class.java) ?: 0
+                val bonusProgress = snapshot.child("bonusProgress").getValue(Int::class.java) ?: 0
+                val bonusStage = snapshot.child("bonusStage").getValue(Int::class.java) ?: 1
 
-                    dbCallback.onDataLoaded(totalTaps, bonusProgress, bonusStage, alias)
-                } else {
-                    // Если данных нет (пользователь только что зарегистрировался),
-                    // передаем дефолтные значения и email как псевдоним по умолчанию
-                    val alias = auth.currentUser?.email ?: "Псевдоним"
-                    dbCallback.onDataLoaded(0, 0, 1, alias)
+                val aliasFromDb = snapshot.child("alias").getValue(String::class.java)
+
+                // alias для UI (displayName -> email local-part -> Гость)
+                val fallbackAlias =
+                    auth.currentUser?.displayName?.takeIf { !it.isNullOrBlank() } ?:
+                    auth.currentUser?.email?.substringBefore("@")?.takeIf { !it.isNullOrBlank() } ?:
+                    "Гость"
+
+                val aliasForUi = aliasFromDb?.takeIf { it.isNotBlank() } ?: fallbackAlias
+
+                // если alias отсутствует или пуст – сохраним нормализованный
+                if (aliasFromDb.isNullOrBlank()) {
+                    userRef.child("alias").setValue(aliasForUi)
                 }
+
+                dbCallback.onDataLoaded(totalTaps, bonusProgress, bonusStage, aliasForUi)
             }
 
-            override fun onCancelled(error: DatabaseError) {
-                // Здесь можно добавить обработку ошибок
-            }
+            override fun onCancelled(error: DatabaseError) { /* TODO: лог */ }
         })
     }
+
 }

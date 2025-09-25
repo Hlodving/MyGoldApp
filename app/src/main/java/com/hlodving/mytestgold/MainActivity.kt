@@ -45,11 +45,11 @@
         private lateinit var goldProgressManager: GoldProgressManager
 
         //Переменная с регистрацией
-        private val dialogHelper = DialogHelper(this)
+        private val dialogHelper by lazy { DialogHelper(this) }
         val mAuth = FirebaseAuth.getInstance()
 
             //Переменная с псевдонимом
-        private lateinit var userAlias: String
+            private var userAlias: String = "Гость"
 
 
         private val progressColors = listOf(
@@ -61,6 +61,8 @@
             R.drawable.progress_bar_red
         ) // Список стилей прогресс-бара по фазам
 
+        // ...
+        private var userDataReady: Boolean = false
 
 
 
@@ -189,16 +191,21 @@
 
                 // Основная кнопка оберег
                 lottieHeartGold.setOnClickListener {
-                    // Считаем глобальный клик
+
+
+                    if (!userDataReady && mAuth.currentUser != null) {
+                        Toast.makeText(this@MainActivity, "Загружаю профиль…", Toast.LENGTH_SHORT).show()
+                        return@setOnClickListener
+                    }
+
+                    // Счётчик кликов (локально)
                     globalTapCounter.increment()
 
-
                     //СОХРАНЕНИЕ ДАННЫХ В FIREBASE ПРИ КАЖДОМ НАЖАТИИ
-                    dbManager.saveData(
+                    dbManager.saveProgress(
                         globalTapCounter.totalTaps,
                         secondProgressManager.countSecondProgress,
-                        secondProgressManager.stageNumber,
-                        userAlias
+                        secondProgressManager.stageNumber
                     )
 
 
@@ -612,11 +619,8 @@
 
         override fun onStart() {
             super.onStart()
+            userDataReady = false
             uiUpdate(mAuth.currentUser)
-            //ЗАГРУЗКА ДАННЫХ ИЗ FIREBASE ПРИ ЗАПУСКЕ, ЕСЛИ ПОЛЬЗОВАТЕЛЬ АВТОРИЗОВАН
-            if (mAuth.currentUser != null) {
-                dbManager.loadData()
-            }
         }
 
         private fun init(){
@@ -672,15 +676,15 @@
         //СОХРАНЕНИЕ ДАННЫХ В FIREBASE ПРИ ПРИОСТАНОВКЕ АКТИВНОСТИ
         override fun onPause() {
             super.onPause()
-            if (mAuth.currentUser != null) {
-                dbManager.saveData(
+            if (mAuth.currentUser != null && userDataReady) {
+                dbManager.saveProgress(
                     globalTapCounter.totalTaps,
                     secondProgressManager.countSecondProgress,
-                    secondProgressManager.stageNumber,
-                    userAlias
+                    secondProgressManager.stageNumber
                 )
             }
         }
+
 
         override fun onNavigationItemSelected(item: MenuItem): Boolean {
             when (item.itemId) {
@@ -708,11 +712,10 @@
 
                     // СОХРАНЕНИЕ ДАННЫХ ПЕРЕД ВЫХОДОМ
                     if (mAuth.currentUser != null) {
-                        dbManager.saveData(
+                        dbManager.saveProgress(
                             globalTapCounter.totalTaps,
                             secondProgressManager.countSecondProgress,
-                            secondProgressManager.stageNumber,
-                            userAlias
+                            secondProgressManager.stageNumber
                         )
                     }
                     uiUpdate(null)
@@ -727,6 +730,7 @@
         // Инициирует загрузку данных после входа
         fun uiUpdate(user: FirebaseUser?) {
             if (user == null) {
+                userDataReady = false
                 tvAccount.text = resources.getString(R.string.not_reg)
             } else {
                 // Загружаем данные из Firebase, чтобы получить псевдоним
@@ -736,11 +740,13 @@
 
         // МЕТОД ДЛЯ ОБРАБОТКИ ДАННЫХ, ПОЛУЧЕННЫХ ИЗ FIREBASE
         override fun onDataLoaded(totalTaps: Int, bonusProgress: Int, bonusStage: Int, alias: String) {
-            // ОБНОВЛЯЕМ ЛОКАЛЬНЫЕ ПЕРЕМЕННЫЕ
+            // alias уже нормализован в DbManager.loadData()
+            userAlias = alias
+            tvAccount.text = alias
+
             globalTapCounter.updateTotalTaps(totalTaps)
             secondProgressManager.updateState(bonusProgress, bonusStage)
-            this.userAlias = alias
-            // ОБНОВЛЯЕМ UI
+
             goldProgressManager.updateUI()
             binding.progressBar2.max = secondProgressManager.maxProgress
             binding.progressBar2.progress = secondProgressManager.countSecondProgress
@@ -749,9 +755,9 @@
             binding.progressBar2.progressDrawable = ContextCompat.getDrawable(this, colorDrawableId2)
             binding.bonusQuoteText.text = secondProgressManager.getQuote()
 
-            // Обновляем текст в выдвижном меню, чтобы отображать псевдоним
-            tvAccount.text = alias
+            userDataReady = true
         }
+
     }
 
 
