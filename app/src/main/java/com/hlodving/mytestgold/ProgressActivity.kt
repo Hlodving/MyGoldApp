@@ -19,6 +19,7 @@ import com.hlodving.mytestgold.databinding.ActivityProgressBinding
 import java.text.NumberFormat
 import java.util.Locale
 
+// Таблица топ-7
 class ProgressActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityProgressBinding
@@ -36,21 +37,18 @@ class ProgressActivity : AppCompatActivity() {
         binding = ActivityProgressBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Поднимаем нижний блок над системной панелью (кнопками/жестовой панелью)
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { _, insets ->
             val bottomInset = insets.getInsets(WindowInsetsCompat.Type.systemBars()).bottom
             val lp = binding.myBlock.layoutParams as ConstraintLayout.LayoutParams
-            // Базовый отступ 12dp + системный низ
             val base = (12 * resources.displayMetrics.density).toInt()
             lp.bottomMargin = base + bottomInset
             binding.myBlock.layoutParams = lp
             insets
         }
 
-
         myUid = auth.currentUser?.uid
 
-        // сначала мои данные -> место -> топ7
+
         loadMyInfo {
             updateMyBlock()
             loadMyRank {
@@ -60,7 +58,8 @@ class ProgressActivity : AppCompatActivity() {
         }
     }
 
-    /** --------- Загрузка моих данных --------- */
+
+     //Загрузка моих данных: alias и score из /users/<uid>
     private fun loadMyInfo(onDone: () -> Unit) {
         val uid = myUid
         if (uid == null) { onDone(); return }
@@ -71,13 +70,16 @@ class ProgressActivity : AppCompatActivity() {
                 myScore = s.child("globalTapCounter").getValue(Int::class.java) ?: 0
                 onDone()
             }
-            override fun onCancelled(e: DatabaseError) { onDone() }
+            override fun onCancelled(e: DatabaseError) {
+                onDone()
+            }
         })
     }
 
-    /** --------- Подсчёт моего места --------- */
+
+     // Подсчёт моего места в таблице.
     private fun loadMyRank(onDone: () -> Unit) {
-        val threshold = myScore + 1.0 // строго >
+        val threshold = myScore + 1.0
         db.orderByChild("globalTapCounter")
             .startAt(threshold)
             .addListenerForSingleValueEvent(object : ValueEventListener {
@@ -85,17 +87,21 @@ class ProgressActivity : AppCompatActivity() {
                     myRank = s.childrenCount.toInt() + 1
                     onDone()
                 }
-                override fun onCancelled(e: DatabaseError) { onDone() }
+                override fun onCancelled(e: DatabaseError) {
+                    onDone()
+                }
             })
     }
 
-    /** --------- Топ-7 и отрисовка таблицы --------- */
+
+     //Получение топ-7 по счёту и отрисовка таблицы.
+
     private fun loadTop7AndRender() {
         db.orderByChild("globalTapCounter")
             .limitToLast(7)
             .addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(s: DataSnapshot) {
-                    val rows = mutableListOf<Triple<String, Int, String>>() // alias, score, uid
+                    val rows = mutableListOf<Triple<String, Int, String>>()
                     s.children.forEach { user ->
                         val alias = user.child("alias").getValue(String::class.java)
                             ?: (user.child("email").getValue(String::class.java) ?: "Пользователь")
@@ -107,39 +113,44 @@ class ProgressActivity : AppCompatActivity() {
                     renderTable(sorted)
                 }
                 override fun onCancelled(e: DatabaseError) {
-                    Toast.makeText(this@ProgressActivity, "Ошибка загрузки топа: ${e.message}", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        this@ProgressActivity,
+                        "Ошибка загрузки топа: ${e.message}",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             })
     }
 
-    /** --------- Рендер таблицы без дополнительных файлов --------- */
+
+    //Рендер таблицы (шапка + строки данных) в TableLayout без дополнительных адаптеров.
     private fun renderTable(data: List<Triple<String, Int, String>>) {
         val table = binding.leaderboardTable
         table.removeAllViews()
-
-        // Заголовок
-        addRow(table,
+        addRow(
+            table,
             pos = "№",
             alias = "Псевдоним",
             score = "Счёт",
             isHeader = true
         )
 
-        // Строки 1..N
         data.forEachIndexed { index, (alias, score, uid) ->
+            // Подсвечиваем мою строку
             val isMe = (uid == myUid)
             addRow(
                 table,
                 pos = (index + 1).toString(),
                 alias = alias,
-                score = nf.format(score),
+                score = nf.format(score), // форматируем счёт через NumberFormat
                 isHeader = false,
                 highlight = isMe
             )
         }
     }
 
-    /** --------- Утилита создания строки --------- */
+
+     //Утилита добавления строки (шапка или обычная) в таблицу.
     private fun addRow(
         table: TableLayout,
         pos: String,
@@ -155,26 +166,27 @@ class ProgressActivity : AppCompatActivity() {
             )
             weightSum = 1f
             setPadding(dp(8), dp(6), dp(8), dp(6))
-            if (isHeader) setBackgroundColor(0x11000000) // лёгкий фон шапки
-            if (highlight) setBackgroundColor(0x113980FF) // подсветка своей строки
+            if (isHeader) setBackgroundColor(0x11000000)
+            if (highlight) setBackgroundColor(0x113980FF)
         }
 
         fun cell(text: String, weight: Float, gravity: Int = Gravity.START): TextView {
             return TextView(this).apply {
                 this.text = text
                 setPadding(dp(4), dp(2), dp(4), dp(2))
+                // Ширина по весу (0) и вес — для равномерного распределения
                 layoutParams = TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, weight)
-                if (isHeader) setTypeface(typeface, Typeface.BOLD)
+                if (isHeader) setTypeface(typeface, Typeface.BOLD) // жирный шрифт для шапки
                 this.gravity = gravity
             }
         }
 
-        tr.addView(cell(pos,    0.18f, Gravity.CENTER)) // №
-        tr.addView(cell(alias,  0.52f, Gravity.START))  // Псевдоним
-        tr.addView(cell(score,  0.30f, Gravity.END))    // Счёт
+        tr.addView(cell(pos,    0.18f, Gravity.CENTER)) // № (центр)
+        tr.addView(cell(alias,  0.52f, Gravity.START))  // Псевдоним (влево)
+        tr.addView(cell(score,  0.30f, Gravity.END))    // Счёт (вправо)
 
         table.addView(tr)
-        // разделитель
+
         val sep = View(this).apply {
             setBackgroundColor(0x22000000)
             layoutParams = TableLayout.LayoutParams(
@@ -184,9 +196,12 @@ class ProgressActivity : AppCompatActivity() {
         table.addView(sep)
     }
 
+    // Конвертация dp → px
     private fun dp(v: Int): Int = (v * resources.displayMetrics.density).toInt()
 
-    /** --------- Обновление нижнего блока --------- */
+
+     //Обновление нижнего блока с моими показателями.
+
     private fun updateMyBlock() {
         binding.myPlace.text = "Место: " + (if (myRank <= 0) "—" else myRank.toString())
         binding.myAlias.text = "Псевдоним: $myAlias"
