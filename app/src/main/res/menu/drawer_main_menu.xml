@@ -3,8 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:showIn="navigation_view">
 
-    <item android:title="@string/menu_title_obereg">
-        <menu>
+    <group
+        android:id="@+id/group_obereg"
+        android:checkableBehavior="single">
             <item
                 android:title="@string/menu_obereg_info"
                 android:id="@+id/menu_obereg_info"
@@ -19,13 +20,11 @@
                 android:title="@string/menu_obereg_settings"
                 android:id="@+id/menu_obereg_settings"
                 />
+    </group>
 
-        </menu>
-    </item>
-
-
-    <item android:title="@string/menu_title_sign_up">
-        <menu>
+    <group
+        android:id="@+id/group_auth"
+        android:checkableBehavior="none">
             <item
                 android:title="@string/menu_sign_up"
                 android:id="@+id/menu_sign_up"
@@ -40,8 +39,5 @@
                 android:title="@string/menu_sign_out"
                 android:id="@+id/menu_sign_out"
                 />
-
-        </menu>
-    </item>
-
+    </group>
 </menu>

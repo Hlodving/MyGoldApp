@@ -73,11 +73,9 @@
 
 
     <!-- Выдвижное меню -->
-    <string name="menu_title_obereg">Оберег</string>
-    <string name="menu_obereg_info">Информация</string>
+    <string name="menu_obereg_info">Оберег</string>
     <string name="menu_obereg_progress">Прогресс</string>
     <string name="menu_obereg_settings">Настройки</string>
-    <string name="menu_title_sign_up">Аккаунт</string>
     <string name="menu_sign_up">Регистрация</string>
     <string name="menu_sign_in">Вход</string>
     <string name="menu_sign_out">Выход</string>
