@@ -111,6 +111,7 @@
     <string name="could_not_determine_user">"Не удалось определить пользователя"</string>
     <string name="wrong_password">Неверный пароль. Попробуйте еще раз.</string>
     <string name="account_deleted">Аккаунт и все данные успешно удалены</string>
+    <string name="account_not_enter">Пользователь не авторизован</string>
 
 
 

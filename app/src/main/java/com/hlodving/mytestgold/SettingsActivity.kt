@@ -48,7 +48,11 @@ class SettingsActivity : AppCompatActivity() {
 
         // Обработчик для кнопки удаления аккаунта
         binding.deleteAccountButton.setOnClickListener {
-            showDeleteConfirmationDialog()
+            if (auth.currentUser == null) {
+                Toast.makeText(this, R.string.account_not_enter, Toast.LENGTH_SHORT).show()
+            } else {
+                showDeleteConfirmationDialog()
+            }
         }
     }
 
