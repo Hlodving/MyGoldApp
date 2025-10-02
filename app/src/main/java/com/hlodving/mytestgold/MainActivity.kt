@@ -18,6 +18,7 @@
     import com.google.android.material.navigation.NavigationView
     import com.google.firebase.auth.FirebaseAuth
     import com.google.firebase.auth.FirebaseUser
+    import com.google.firebase.database.FirebaseDatabase
     import com.hlodving.mytestgold.database.DbManager
 
 
@@ -69,6 +70,10 @@
         lateinit var binding: ActivityMainBinding
         override fun onCreate(savedInstanceState: Bundle?) {
             super.onCreate(savedInstanceState)
+            
+            //Включаем кэширование
+            FirebaseDatabase.getInstance().setPersistenceEnabled(true)
+
             binding = ActivityMainBinding.inflate(layoutInflater)
             setContentView(binding.root)
 

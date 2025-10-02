@@ -30,6 +30,7 @@
     <string name="animation_on">"Включить анимацию"</string>
     <string name="animation_off">"Отключить анимацию"</string>
     <string name="copie">"Скопировано"</string>
+    <string name="no_internet_connection">Нет подключения к сети. Таблица лидеров недоступна.</string>
 
 
     <!-- Цитаты -->

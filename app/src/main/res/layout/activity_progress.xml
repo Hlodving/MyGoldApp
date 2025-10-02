@@ -17,19 +17,35 @@
         android:text="@string/leaderboard"
         android:textSize="20sp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@id/scroll"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- Блок с предупреждением об отсутствии сети -->
+    <TextView
+        android:id="@+id/noInternetWarning"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:background="#11FF0000"
+        android:gravity="center"
+        android:padding="12dp"
+        android:text="@string/no_internet_connection"
+        android:textColor="@android:color/holo_red_dark"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/titleLeaderboard" />
 
     <ScrollView
         android:id="@+id/scroll"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:layout_marginTop="8dp"
         android:fillViewport="true"
         android:contentDescription="Список лидеров"
         android:accessibilityLiveRegion="polite"
-        app:layout_constraintTop_toBottomOf="@id/titleLeaderboard"
+        app:layout_constraintTop_toBottomOf="@id/noInternetWarning"
         app:layout_constraintBottom_toTopOf="@id/myBlock"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">

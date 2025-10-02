@@ -48,13 +48,24 @@ class ProgressActivity : AppCompatActivity() {
 
         myUid = auth.currentUser?.uid
 
-
-        loadMyInfo {
-            updateMyBlock()
-            loadMyRank {
+        // Проверяем наличие интернет-соединения
+        if (NetworkUtils.isNetworkAvailable(this)) {
+            // Если сеть есть, скрываем предупреждение и загружаем данные
+            binding.noInternetWarning.visibility = View.GONE
+            loadMyInfo {
                 updateMyBlock()
-                loadTop7AndRender()
+                loadMyRank {
+                    updateMyBlock()
+                    loadTop7AndRender()
+                }
             }
+        } else {
+            // Если сети нет, показываем предупреждение и не загружаем данные
+            binding.noInternetWarning.visibility = View.VISIBLE
+            // Можно также показать Toast для большей наглядности
+            Toast.makeText(this, "Проверьте подключение к интернету", Toast.LENGTH_LONG).show()
+            // Очищаем блок с данными пользователя
+            updateMyBlockWithOfflineStatus()
         }
     }
 
@@ -206,5 +217,11 @@ class ProgressActivity : AppCompatActivity() {
         binding.myPlace.text = "Место: " + (if (myRank <= 0) "—" else myRank.toString())
         binding.myAlias.text = "Псевдоним: $myAlias"
         binding.myScore.text = "Счёт: ${nf.format(myScore)}"
+    }
+
+    private fun updateMyBlockWithOfflineStatus() {
+        binding.myPlace.text = "Место: —"
+        binding.myAlias.text = "Псевдоним: (нет сети)"
+        binding.myScore.text = "Счёт: —"
     }
 }
