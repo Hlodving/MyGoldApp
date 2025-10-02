@@ -1,19 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Базовая тема для тёмного режима -->
+
     <style name="Base.Theme.MyTestGold" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Цвет фона -->
-        <item name="android:colorBackground">@color/dark_gray</item>
-
-        <!-- Цвет статус-бара (одинаковый с фоном) -->
+        <item name="android:colorBackground">@color/green_dark</item>
+        <item name="colorPrimary">@color/dark_gray</item>
         <item name="android:statusBarColor">@color/dark_gray</item>
-
-        <!-- Белые иконки в статус-баре -->
         <item name="android:windowLightStatusBar">false</item>
-
-        <!-- Белый основной цвет текста -->
         <item name="android:textColor">@color/text_primary</item>
+
+        <item name="materialAlertDialogTheme">@style/MyAlertDialogStyle</item>
+        <item name="textInputStyle">@style/MyOutlinedTextInputLayout</item>
     </style>
 
-    <!-- Наследуем тему -->
     <style name="Theme.MyTestGold" parent="Base.Theme.MyTestGold" />
+
+    <style name="MyAlertDialogStyle" parent="ThemeOverlay.Material3.MaterialAlertDialog">
+        <item name="colorPrimary">@color/text_primary</item>
+        <item name="colorOnSurface">@color/text_primary</item>
+    </style>
+
+    <style name="MyOutlinedTextInputLayout" parent="Widget.Material3.TextInputLayout.OutlinedBox">
+        <item name="hintTextColor">@color/text_primary</item>
+    </style>
+
+
+
 </resources>

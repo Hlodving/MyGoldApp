@@ -83,7 +83,7 @@
     <string name="close">Выход</string>
     <string name="not_reg">Войдите или зарегистрируйтесь!</string>
 
-    <!-- Регистрация -->
+    <!-- Аккаунт -->
     <string name="email_hint">Email</string>
     <string name="password_hint">Пароль</string>
     <string name="sign_in_action">Войти</string>
@@ -101,6 +101,16 @@
     <string name="restore_password">Восстановить</string>
     <string name="password_confirm_hint">Повторите пароль</string>
     <string name="sign_in_success">Вы вошли в аккаунт</string>
+    <string name="delete_account">Удаление аккаунта</string>
+    <string name="warning_delete_account">Вы уверены, что хотите удалить свой аккаунт?</string>
+    <string name="delete">Удалить</string>
+    <string name="cancellation">Отмена</string>
+    <string name="enter_password_delete">Введите ваш пароль для удаления аккаунта.</string>
+    <string name="confirmation">Подтвердить</string>
+    <string name="empty_password">Пароль не может быть пустым</string>
+    <string name="could_not_determine_user">"Не удалось определить пользователя"</string>
+    <string name="wrong_password">Неверный пароль. Попробуйте еще раз.</string>
+    <string name="account_deleted">Аккаунт и все данные успешно удалены</string>
 
 
 

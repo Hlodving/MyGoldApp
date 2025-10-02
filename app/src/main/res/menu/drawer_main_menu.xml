@@ -5,7 +5,7 @@
 
     <group
         android:id="@+id/group_obereg"
-        android:checkableBehavior="single">
+        android:checkableBehavior="none">
             <item
                 android:title="@string/menu_obereg_info"
                 android:id="@+id/menu_obereg_info"
