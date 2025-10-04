@@ -2,6 +2,8 @@ package com.hlodving.mytestgold.accounthelper
 
 import android.widget.Toast
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.UserProfileChangeRequest
+import com.google.firebase.database.FirebaseDatabase
 import com.hlodving.mytestgold.MainActivity
 import com.hlodving.mytestgold.R
 import com.hlodving.mytestgold.database.DbManager
@@ -19,18 +21,35 @@ class AccountHelper(private val act: MainActivity) {
                     .addOnCompleteListener { task ->
                         if (task.isSuccessful) {
                             val user = task.result?.user!!
+
+                            // 1. Отправляем письмо для верификации
                             sendEmailVerification(user)
+
+                            // 2. Обновляем displayName в профиле Firebase (хорошая практика)
+                            val profileUpdates = UserProfileChangeRequest.Builder()
+                                .setDisplayName(alias)
+                                .build()
+                            user.updateProfile(profileUpdates)
+
+                            // 3. Сохраняем начальный прогресс и псевдоним
                             dbManager.saveProgress(0, 0, 1)
                             dbManager.saveAlias(alias)
 
+                            // 4. ДОБАВИТЬ: Сохраняем флаг, что почта НЕ подтверждена
+                            FirebaseDatabase.getInstance().getReference("users")
+                                .child(user.uid)
+                                .child("emailVerified")
+                                .setValue(false)
+
+                            // 5. ИЗМЕНИТЬ: Обновляем UI, чтобы пользователь сразу вошел в аккаунт
+                            act.uiUpdate(user)
+
+                            // 6. ИЗМЕНИТЬ: Показываем более дружелюбное сообщение
                             Toast.makeText(
                                 act,
-                                R.string.send_verification_done,
+                                "Регистрация успешна! Для защиты аккаунта подтвердите почту.",
                                 Toast.LENGTH_LONG
                             ).show()
-
-                            act.mAuth.signOut()
-
 
                         } else {
                             val errorMessage = task.exception?.message
@@ -48,22 +67,23 @@ class AccountHelper(private val act: MainActivity) {
              act.mAuth.signInWithEmailAndPassword(email, password)
                  .addOnCompleteListener { task ->
                      if (task.isSuccessful) {
-                         // Пользователь успешно ввел логин/пароль, теперь проверим почту
                          val user = task.result?.user
-                         if (user != null && user.isEmailVerified) {
-                             // Почта подтверждена, всё в порядке
+                         if (user != null) {
+                             // Пользователь успешно вошел, обновляем UI
                              Toast.makeText(act, act.getString(R.string.sign_in_success), Toast.LENGTH_SHORT).show()
                              act.uiUpdate(user)
-                         } else {
-                             Toast.makeText(
-                                 act,
-                                 R.string.check_email,
-                                 Toast.LENGTH_LONG
-                             ).show()
 
-                             act.mAuth.signOut()
+                             // Если почта не подтверждена, просто покажем дополнительное напоминание
+                             if (!user.isEmailVerified) {
+                                 Toast.makeText(
+                                     act,
+                                     "Пожалуйста, подтвердите вашу почту, чтобы защитить аккаунт.",
+                                     Toast.LENGTH_LONG
+                                 ).show()
+                             }
                          }
                      } else {
+                         // Ошибка входа (неверный пароль и т.д.)
                          Toast.makeText(
                              act,
                              act.resources.getString(R.string.sign_in_error),

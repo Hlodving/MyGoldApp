@@ -20,6 +20,12 @@ class GlobalTapCounter(private val context: Context) {
         save()
     }
 
+    //Сброс значения
+    fun reset() {
+        totalTaps = 0
+        save()
+    }
+
     // метод для обновления значения из Firebase
     fun updateTotalTaps(newTaps: Int) {
         totalTaps = newTaps

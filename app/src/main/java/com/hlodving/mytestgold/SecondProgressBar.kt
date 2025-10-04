@@ -104,6 +104,14 @@ class BonusStageManager(private val context: Context) {
         return false
     }
 
+    //Сброс состояния
+    fun resetState() {
+        stageNumber = 1
+        countSecondProgress = 0
+        justFilled = false
+        saveState()
+    }
+
     //Подставляет строку с цитатой в зависимости от фазы
     fun getQuote(): String {
         val quoteId = context.resources.getIdentifier(

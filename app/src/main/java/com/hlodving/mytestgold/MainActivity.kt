@@ -49,7 +49,9 @@
         private val dialogHelper by lazy { DialogHelper(this) }
         val mAuth = FirebaseAuth.getInstance()
 
-            //Переменная с псевдонимом
+        private lateinit var authStateListener: FirebaseAuth.AuthStateListener
+
+        //Переменная с псевдонимом
             private var userAlias: String = "Гость"
 
 
@@ -77,6 +79,7 @@
             binding = ActivityMainBinding.inflate(layoutInflater)
             setContentView(binding.root)
 
+            setupAuthStateListener()
 
             //Выдвижное меню
             setSupportActionBar(binding.actionBarInclude.toolbar)
@@ -625,7 +628,7 @@
         override fun onStart() {
             super.onStart()
             userDataReady = false
-            uiUpdate(mAuth.currentUser)
+            mAuth.addAuthStateListener(authStateListener)
         }
 
         private fun init(){
@@ -723,9 +726,11 @@
                             secondProgressManager.stageNumber
                         )
                     }
-                    uiUpdate(null)
-                    Toast.makeText(this,"Вы вышли из аккаунта", Toast.LENGTH_SHORT).show()
                     mAuth.signOut()
+
+                    clearLocalUserData()
+
+                    Toast.makeText(this,"Вы вышли из аккаунта", Toast.LENGTH_SHORT).show()
                 }
             }
             binding.drawerlayout.closeDrawer(GravityCompat.START)
@@ -734,11 +739,26 @@
 
         // Инициирует загрузку данных после входа
         fun uiUpdate(user: FirebaseUser?) {
+            // Получаем доступ к меню из NavigationView
+            val menu = binding.navView.menu
+
             if (user == null) {
                 userDataReady = false
                 tvAccount.text = resources.getString(R.string.not_reg)
+                menu.findItem(R.id.menu_sign_in).isVisible = true
+                menu.findItem(R.id.menu_sign_up).isVisible = true
+                menu.findItem(R.id.menu_sign_out).isVisible = false
+                clearLocalUserData()
+                updateUIAfterReset()
             } else {
-                // Загружаем данные из Firebase, чтобы получить псевдоним
+                menu.findItem(R.id.menu_sign_in).isVisible = false
+                menu.findItem(R.id.menu_sign_up).isVisible = false
+                menu.findItem(R.id.menu_sign_out).isVisible = true
+                
+                val dbRef = FirebaseDatabase.getInstance().getReference("users").child(user.uid)
+                dbRef.child("emailVerified").setValue(user.isEmailVerified)
+
+                // Загружаем все остальные данные из Firebase
                 dbManager.loadData()
             }
         }
@@ -761,6 +781,48 @@
             binding.bonusQuoteText.text = secondProgressManager.getQuote()
 
             userDataReady = true
+        }
+
+        //Обновление кнопок меню
+        private fun setupAuthStateListener() {
+            authStateListener = FirebaseAuth.AuthStateListener { firebaseAuth ->
+                val user = firebaseAuth.currentUser
+                uiUpdate(user)
+            }
+        }
+
+
+        override fun onStop() {
+            super.onStop()
+            mAuth.removeAuthStateListener(authStateListener)
+        }
+
+        // метод для очистки всех локальных данных пользователя
+        private fun clearLocalUserData() {
+            globalTapCounter.reset()
+            goldProgressManager.reset()
+            secondProgressManager.resetState()
+        }
+
+
+        // метод для обновления UI после сброса
+        private fun updateUIAfterReset() {
+            // Обновляем первый прогресс-бар
+            goldProgressManager.updateUI()
+            GoldWidget.updateAllWidgets(this, goldProgressManager.count)
+
+            // Обновляем второй прогресс-бар
+            binding.progressBar2.max = secondProgressManager.maxProgress
+            binding.progressBar2.progress = secondProgressManager.countSecondProgress
+            binding.progressText2.text =
+                "${secondProgressManager.countSecondProgress} / ${secondProgressManager.maxProgress}"
+            val colorDrawableId2 =
+                progressColors[(secondProgressManager.stageNumber - 1) % progressColors.size]
+            binding.progressBar2.progressDrawable =
+                ContextCompat.getDrawable(this, colorDrawableId2)
+
+            // Обновляем цитату
+            binding.bonusQuoteText.text = secondProgressManager.getQuote()
         }
 
     }

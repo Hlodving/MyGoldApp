@@ -12,7 +12,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:layout_marginBottom="12dp"
         android:accessibilityHeading="true"
         android:text="@string/leaderboard"
         android:textSize="20sp"
@@ -20,6 +19,33 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/unverifiedWarning"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:background="#11FF9800"
+        android:gravity="center"
+        android:padding="12dp"
+        android:text="Ваш аккаунт не подтвержден. Проверьте почту, чтобы защитить свой прогресс."
+        android:textColor="@android:color/holo_red_dark"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/titleLeaderboard" />
+
+    <!-- НОВАЯ КНОПКА -->
+    <Button
+        android:id="@+id/resendVerificationButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="Отправить письмо повторно"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/unverifiedWarning" />
 
     <!-- Блок с предупреждением об отсутствии сети -->
     <TextView
@@ -35,7 +61,7 @@
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/titleLeaderboard" />
+        app:layout_constraintTop_toBottomOf="@id/resendVerificationButton" /> <!-- ИЗМЕНЕН КОНСТРЕЙНТ -->
 
     <ScrollView
         android:id="@+id/scroll"
