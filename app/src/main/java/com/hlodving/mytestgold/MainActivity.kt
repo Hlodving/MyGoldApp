@@ -800,7 +800,6 @@
         // метод для очистки всех локальных данных пользователя
         private fun clearLocalUserData() {
             globalTapCounter.reset()
-            goldProgressManager.reset()
             secondProgressManager.resetState()
         }
 
