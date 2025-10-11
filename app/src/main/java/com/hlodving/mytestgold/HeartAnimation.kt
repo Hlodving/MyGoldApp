@@ -1,4 +1,5 @@
-// Файл: HeartAnimation.kt
+// Файл: com/hlodving/mytestgold/HeartAnimation.kt
+
 package com.hlodving.mytestgold
 
 import android.content.Context
@@ -7,14 +8,16 @@ import com.airbnb.lottie.LottieAnimationView
 import com.airbnb.lottie.LottieDrawable
 import com.hlodving.mytestgold.databinding.ActivityMainBinding
 
-//Анимация в приложении
 object HeartAnimation {
 
     private var animationIndex = 0 // Чередует анимации
 
-
-    fun updateTapAnimationForStage(lottieView: LottieAnimationView, stage: Stage) {
-        val newAnimationFile = if (stage.number == 1) "Gold_movement_cb.json" else "Gold_movement.json"
+    /**
+     * Новая версия функции. Устанавливает анимацию нажатия в зависимости от того,
+     * активен ли оберег (есть ли время на таймере).
+     */
+    fun updateTapAnimation(lottieView: LottieAnimationView, isAmuletActive: Boolean) {
+        val newAnimationFile = if (isAmuletActive) "Gold_movement.json" else "Gold_movement_cb.json"
         lottieView.setAnimation(newAnimationFile)
     }
 
@@ -28,10 +31,10 @@ object HeartAnimation {
     ) {
         binding.timerText.text = context.getString(R.string.not_active_amulet)
 
-        val (stageProgress, stageMax, currentStage) = Stage.getStageData(countFirstProgress)
-        // Вызываем обновленную функцию
-        updateTapAnimationForStage(binding.lottieTapGold, currentStage)
+        // Вызываем обновленную функцию со значением false, так как UI сбрасывается
+        updateTapAnimation(binding.lottieTapGold, false)
 
+        val (stageProgress, stageMax, currentStage) = Stage.getStageData(countFirstProgress)
         binding.progressBar.max = stageMax
         binding.progressBar.progress = stageProgress
         binding.progressText.text = "$stageProgress / $stageMax"
