@@ -41,7 +41,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     // --- UI переменные и состояние ---
     private lateinit var tvAccount: TextView
-    private var userAlias: String = "Гость"
+    internal  var userAlias: String = "Гость"
     var userDataReady: Boolean = false // Публичный для доступа из GameEngine
 
     private val progressColors = listOf(
@@ -173,7 +173,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     override fun onPause() {
         super.onPause()
         if (mAuth.currentUser != null && userDataReady) {
-            dbManager.saveProgress(globalTapCounter.totalTaps, secondProgressManager.countSecondProgress, secondProgressManager.stageNumber)
+            dbManager.saveAllProgress(
+                globalTapCounter.totalTaps,
+                secondProgressManager.countSecondProgress,
+                secondProgressManager.stageNumber,
+                userAlias
+            )
         }
     }
 
@@ -190,14 +195,15 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.menu_obereg_info -> startActivity(Intent(this, OberegInfoActivity::class.java))
-            R.id.menu_obereg_progress -> startActivity(Intent(this, ProgressActivity::class.java))
-            R.id.menu_obereg_settings -> startActivity(Intent(this, SettingsActivity::class.java))
-            R.id.menu_sign_up -> dialogHelper.createSignDialog(DialogConst.SING_UP_STATE)
-            R.id.menu_sign_in -> dialogHelper.createSignDialog(DialogConst.SING_IN_STATE)
+            // ... (другие пункты меню)
             R.id.menu_sign_out -> {
                 if (mAuth.currentUser != null) {
-                    dbManager.saveProgress(globalTapCounter.totalTaps, secondProgressManager.countSecondProgress, secondProgressManager.stageNumber)
+                    dbManager.saveAllProgress(
+                        globalTapCounter.totalTaps,
+                        secondProgressManager.countSecondProgress,
+                        secondProgressManager.stageNumber,
+                        userAlias
+                    )
                 }
                 mAuth.signOut()
                 performLocalDataClear()

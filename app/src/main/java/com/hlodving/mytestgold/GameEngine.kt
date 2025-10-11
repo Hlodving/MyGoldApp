@@ -32,10 +32,11 @@ class GameEngine(
         tapCounter.increment()
 
         // 3. Сохраняем прогресс пользователя в Firebase (если он вошел)
-        dbManager.saveProgress(
+        dbManager.saveAllProgress(
             tapCounter.totalTaps,
             bonusManager.countSecondProgress,
-            bonusManager.stageNumber
+            bonusManager.stageNumber,
+            activity.userAlias
         )
 
         // 4. Если оберег вечный, дальнейшая логика не нужна
