@@ -142,13 +142,10 @@ class SettingsActivity : AppCompatActivity() {
     private fun performFinalDeletion() {
         val user = auth.currentUser ?: return
         val userId = user.uid
-        val updates = hashMapOf<String, Any?>(
-            "/users/$userId" to null,
-            "/leaderboard/$userId" to null
-        )
+        val userDbRef = db.getReference("users").child(userId)
 
         // 1. СНАЧАЛА удаляем данные пользователя из Realtime Database
-        db.reference.updateChildren(updates).addOnCompleteListener { dbTask ->
+        userDbRef.removeValue().addOnCompleteListener { dbTask ->
             if (dbTask.isSuccessful) {
                 // 2. И только ПОСЛЕ успешного удаления данных, удаляем аккаунт из Authentication
                 user.delete().addOnCompleteListener { authTask ->

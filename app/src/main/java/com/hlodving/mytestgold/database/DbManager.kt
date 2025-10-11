@@ -1,79 +1,75 @@
-    package com.hlodving.mytestgold.database
+package com.hlodving.mytestgold.database
 
-    import com.google.firebase.auth.FirebaseAuth
-    import com.google.firebase.database.DataSnapshot
-    import com.google.firebase.database.DatabaseError
-    import com.google.firebase.database.FirebaseDatabase
-    import com.google.firebase.database.ValueEventListener
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 
-    class DbManager(private val dbCallback: DatabaseCallback) {
+class DbManager(private val dbCallback: DatabaseCallback) {
 
-        private val auth: FirebaseAuth = FirebaseAuth.getInstance()
-        private val db: FirebaseDatabase = FirebaseDatabase.getInstance()
+    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
+    private val db: FirebaseDatabase = FirebaseDatabase.getInstance()
 
 
 
-        // Интерфейс для обработки коллбэков данных
-        interface DatabaseCallback {
-            fun onDataLoaded(totalTaps: Int, bonusProgress: Int, bonusStage: Int, alias: String)
-        }
+    // Интерфейс для обработки коллбэков данных
+    interface DatabaseCallback {
+        fun onDataLoaded(totalTaps: Int, bonusProgress: Int, bonusStage: Int, alias: String)
+    }
 
-        // Этот метод будет сохранять все данные в обе таблицы одновременно
-        fun saveAllProgress(totalTaps: Int, bonusProgress: Int, bonusStage: Int, alias: String) {
-            val userId = auth.currentUser?.uid ?: return
 
-            // Карта для многопутевого обновления
-            val updates = hashMapOf<String, Any>(
-                // 1. Пути для приватного узла /users
-                "/users/$userId/globalTapCounter" to totalTaps,
-                "/users/$userId/bonusProgress" to bonusProgress,
-                "/users/$userId/bonusStage" to bonusStage,
-                "/users/$userId/alias" to alias,
-
-                // 2. Пути для публичного узла /leaderboard
-                "/leaderboard/$userId/score" to totalTaps,
-                "/leaderboard/$userId/alias" to alias
-            )
-
-            // Выполняем одно атомарное обновление для всех путей
-            db.reference.updateChildren(updates)
-        }
+    // Сохраняет данные пользователя в Firebase
+    fun saveProgress(totalTaps: Int, bonusProgress: Int, bonusStage: Int) {
+        val userId = auth.currentUser?.uid ?: return
+        val ref = db.getReference("users").child(userId)
+        val map = mapOf(
+            "globalTapCounter" to totalTaps,
+            "bonusProgress" to bonusProgress,
+            "bonusStage" to bonusStage
+        )
+        ref.updateChildren(map)
+    }
+    fun saveAlias(alias: String) {
+        val userId = auth.currentUser?.uid ?: return
+        db.getReference("users").child(userId).child("alias").setValue(alias)
+    }
 
 
 
 
 
-        // Загружает данные пользователя из Firebase
-        fun loadData() {
-            val userId = auth.currentUser?.uid ?: return
-            val userRef = db.getReference("users").child(userId)
+    // Загружает данные пользователя из Firebase
+    fun loadData() {
+        val userId = auth.currentUser?.uid ?: return
+        val userRef = db.getReference("users").child(userId)
 
-            userRef.addListenerForSingleValueEvent(object : ValueEventListener {
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    val totalTaps = snapshot.child("globalTapCounter").getValue(Int::class.java) ?: 0
-                    val bonusProgress = snapshot.child("bonusProgress").getValue(Int::class.java) ?: 0
-                    val bonusStage = snapshot.child("bonusStage").getValue(Int::class.java) ?: 1
+        userRef.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val totalTaps = snapshot.child("globalTapCounter").getValue(Int::class.java) ?: 0
+                val bonusProgress = snapshot.child("bonusProgress").getValue(Int::class.java) ?: 0
+                val bonusStage = snapshot.child("bonusStage").getValue(Int::class.java) ?: 1
 
-                    val aliasFromDb = snapshot.child("alias").getValue(String::class.java)
+                val aliasFromDb = snapshot.child("alias").getValue(String::class.java)
 
-                    // alias для UI (displayName -> email local-part -> Гость)
-                    val fallbackAlias =
-                        auth.currentUser?.displayName?.takeIf { !it.isNullOrBlank() } ?:
-                        auth.currentUser?.email?.substringBefore("@")?.takeIf { !it.isNullOrBlank() } ?:
-                        "Гость"
+                // alias для UI (displayName -> email local-part -> Гость)
+                val fallbackAlias =
+                    auth.currentUser?.displayName?.takeIf { !it.isNullOrBlank() } ?:
+                    auth.currentUser?.email?.substringBefore("@")?.takeIf { !it.isNullOrBlank() } ?:
+                    "Гость"
 
-                    val aliasForUi = aliasFromDb?.takeIf { it.isNotBlank() } ?: fallbackAlias
+                val aliasForUi = aliasFromDb?.takeIf { it.isNotBlank() } ?: fallbackAlias
 
-                    // если alias отсутствует или пуст – сохраним нормализованный
-                    if (aliasFromDb.isNullOrBlank()) {
-                        userRef.child("alias").setValue(aliasForUi)
-                    }
-
-                    dbCallback.onDataLoaded(totalTaps, bonusProgress, bonusStage, aliasForUi)
+                // если alias отсутствует или пуст – сохраним нормализованный
+                if (aliasFromDb.isNullOrBlank()) {
+                    userRef.child("alias").setValue(aliasForUi)
                 }
 
-                override fun onCancelled(error: DatabaseError) { /* TODO: лог */ }
-            })
-        }
+                dbCallback.onDataLoaded(totalTaps, bonusProgress, bonusStage, aliasForUi)
+            }
 
+            override fun onCancelled(error: DatabaseError) { /* TODO: лог */ }
+        })
     }
+
+}

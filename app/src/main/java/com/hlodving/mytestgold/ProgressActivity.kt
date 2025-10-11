@@ -33,10 +33,10 @@ class ProgressActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityProgressBinding
     private val auth = FirebaseAuth.getInstance()
-    private val db: DatabaseReference = FirebaseDatabase.getInstance().getReference("leaderboard")
+    private val db: DatabaseReference = FirebaseDatabase.getInstance().getReference("users")
 
     // Ссылка на запрос для топ-7 игроков
-    private val topUsersRef: Query = db.orderByChild("score").limitToLast(7)
+    private val topUsersRef: Query = db.orderByChild("globalTapCounter").limitToLast(7)
     private lateinit var leaderboardListener: ValueEventListener
 
     private var myUid: String? = null
@@ -125,12 +125,10 @@ class ProgressActivity : AppCompatActivity() {
                 // После перезагрузки user.isEmailVerified будет иметь актуальное значение
                 amIVerified = currentUser.isEmailVerified
 
-                FirebaseDatabase.getInstance().getReference("users")
-                    .child(currentUser.uid)
-                    .child("emailVerified")
-                    .setValue(amIVerified)
+                // Синхронизируем актуальный статус с Realtime Database
+                db.child(currentUser.uid).child("emailVerified").setValue(amIVerified)
 
-
+                // Показываем или прячем плашку и кнопку НЕМЕДЛЕННО
                 if (amIVerified) {
                     binding.unverifiedWarning.visibility = View.GONE
                     binding.resendVerificationButton.visibility = View.GONE // Прячем кнопку
@@ -183,7 +181,7 @@ class ProgressActivity : AppCompatActivity() {
                 val rows = mutableListOf<Triple<String, Int, String>>()
                 s.children.forEach { user ->
                     val alias = user.child("alias").getValue(String::class.java) ?: "Пользователь"
-                    val score = user.child("score").getValue(Int::class.java) ?: 0
+                    val score = user.child("globalTapCounter").getValue(Int::class.java) ?: 0
                     val uid = user.key ?: ""
                     rows += Triple(alias, score, uid)
                 }
@@ -198,25 +196,29 @@ class ProgressActivity : AppCompatActivity() {
     // Загрузка моих данных: alias и score из /users/<uid>
     private fun loadMyInfo(onDone: () -> Unit) {
         val uid = myUid
-        if (uid == null) { /* ... */ return }
-        // Здесь мы намеренно обращаемся к "users", а не к "leaderboard"
-        FirebaseDatabase.getInstance().getReference("users").child(uid)
-            .addListenerForSingleValueEvent(object : ValueEventListener {
-                override fun onDataChange(s: DataSnapshot) {
-                    myAlias = s.child("alias").getValue(String::class.java) ?: auth.currentUser?.email ?: "Псевдоним"
-                    myScore = s.child("globalTapCounter").getValue(Int::class.java) ?: 0
-                    onDone()
-                }
-                override fun onCancelled(e: DatabaseError) { onDone() }
-            })
+        if (uid == null) {
+            // Если пользователя нет, то и предупреждать не о чем.
+            // amIVerified уже будет true по умолчанию или установлено ранее.
+            onDone()
+            return
+        }
+        db.child(uid).addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(s: DataSnapshot) {
+                myAlias = s.child("alias").getValue(String::class.java) ?: auth.currentUser?.email ?: "Псевдоним"
+                myScore = s.child("globalTapCounter").getValue(Int::class.java) ?: 0
+
+
+                onDone()
+            }
+            override fun onCancelled(e: DatabaseError) { onDone() }
+        })
     }
 
     // Подсчёт моего места в таблице.
     private fun loadMyRank(onDone: () -> Unit) {
-        // --- ИЗМЕНЕНИЕ ЗДЕСЬ ---
-        // Ищем в "leaderboard" по полю "score"
+        // Мы ищем всех пользователей, у кого очков больше, чем у нас
         val threshold = myScore + 1.0
-        db.orderByChild("score")
+        db.orderByChild("globalTapCounter")
             .startAt(threshold)
             .addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(s: DataSnapshot) {
