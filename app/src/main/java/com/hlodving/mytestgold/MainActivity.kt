@@ -146,6 +146,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         mainViewUpdater.updateTapAnimation(isAmuletActive)
         GoldWidget.updateAllWidgets(this, goldProgressManager.count)
 
+        mainViewUpdater.updateTotalTaps(globalTapCounter.totalTaps)
+
         // Запуск анимаций Lottie
         binding.apply {
             HeartAnimation.animationRestart(lottieHeartGold)
@@ -217,6 +219,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         mainViewUpdater.updateBonusProgress(secondProgressManager.countSecondProgress, secondProgressManager.maxProgress, secondProgressManager.stageNumber)
         mainViewUpdater.updateBonusQuote(secondProgressManager.getQuote())
 
+        mainViewUpdater.updateTotalTaps(globalTapCounter.totalTaps)
+
         userDataReady = true
     }
 
@@ -250,6 +254,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         val isAmuletActive = countdownTimerManager.getTimerState() !is CountdownTimerManager.TimerState.Expired
         mainViewUpdater.updateTapAnimation(isAmuletActive)
+
+        mainViewUpdater.updateTotalTaps(globalTapCounter.totalTaps)
 
         GoldWidget.updateAllWidgets(this, goldProgressManager.count)
     }

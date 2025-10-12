@@ -1,5 +1,3 @@
-// Файл: com/hlodving/mytestgold/GameEngine.kt
-
 package com.hlodving.mytestgold
 
 import android.widget.Toast
@@ -17,10 +15,8 @@ class GameEngine(
     private val viewUpdater: MainViewUpdater
 ) {
 
-    /**
-     * Этот метод вызывается каждый раз, когда пользователь нажимает на главный оберег.
-     * Он содержит всю игровую логику.
-     */
+        //Логика нажатия на оберег
+
     fun onHeartTapped() {
         // 1. Проверка, готовы ли данные пользователя (если он вошел в аккаунт)
         if (!activity.userDataReady && activity.mAuth.currentUser != null) {
@@ -30,6 +26,7 @@ class GameEngine(
 
         // 2. Увеличиваем общий счетчик тапов
         tapCounter.increment()
+        viewUpdater.updateTotalTaps(tapCounter.totalTaps)
 
         // 3. Сохраняем прогресс пользователя в Firebase (если он вошел)
         dbManager.saveProgress(

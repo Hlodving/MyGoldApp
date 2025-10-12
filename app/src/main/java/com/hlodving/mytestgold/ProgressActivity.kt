@@ -197,8 +197,6 @@ class ProgressActivity : AppCompatActivity() {
     private fun loadMyInfo(onDone: () -> Unit) {
         val uid = myUid
         if (uid == null) {
-            // Если пользователя нет, то и предупреждать не о чем.
-            // amIVerified уже будет true по умолчанию или установлено ранее.
             onDone()
             return
         }
@@ -301,13 +299,13 @@ class ProgressActivity : AppCompatActivity() {
     private fun updateMyBlock() {
         binding.myPlace.text = "Место: " + (if (myRank <= 0) "—" else myRank.toString())
         binding.myAlias.text = "Псевдоним: $myAlias"
-        binding.myScore.text = "Счёт: ${nf.format(myScore)}"
+        binding.myScore.text = "Ваш счёт: ${nf.format(myScore)}"
     }
 
     // Обновление блока при отсутствии интернет-соединения
     private fun updateMyBlockWithOfflineStatus() {
         binding.myPlace.text = "Место: —"
         binding.myAlias.text = "Псевдоним: (нет сети)"
-        binding.myScore.text = "Счёт: —"
+        binding.myScore.text = "Ваш счёт: —"
     }
 }

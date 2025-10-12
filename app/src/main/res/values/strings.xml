@@ -130,6 +130,7 @@
     <string name="place">Место: —</string>
     <string name="nickname">Псевдоним: —</string>
     <string name="score">Счёт: —</string>
+    <string name="my_score_label">Счёт: —</string>
 
 
 </resources>

@@ -29,6 +29,11 @@ class MainViewUpdater(
         binding.progressBar2.progressDrawable = ContextCompat.getDrawable(context, colorDrawableId)
     }
 
+    fun updateTotalTaps(taps: Int) {
+        val formattedTaps = java.text.NumberFormat.getInstance().format(taps)
+        binding.totalTapsText.text = "Ваш счет: $formattedTaps"
+    }
+
     fun updateTimer(formattedTime: String) {
         binding.timerText.text = formattedTime
     }
