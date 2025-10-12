@@ -15,8 +15,14 @@ class GameEngine(
     private val viewUpdater: MainViewUpdater
 ) {
 
-        //Логика нажатия на оберег
+    // Как часто сохранять прогресс
+    private val SAVE_THRESHOLD = 172
 
+    // Сколько тапов прошло с последнего сохранения
+    private var tapsSinceLastSave = 0
+
+
+    //Логика нажатия на оберег
     fun onHeartTapped() {
         // 1. Проверка, готовы ли данные пользователя (если он вошел в аккаунт)
         if (!activity.userDataReady && activity.mAuth.currentUser != null) {
@@ -28,12 +34,12 @@ class GameEngine(
         tapCounter.increment()
         viewUpdater.updateTotalTaps(tapCounter.totalTaps)
 
-        // 3. Сохраняем прогресс пользователя в Firebase (если он вошел)
-        dbManager.saveProgress(
-            tapCounter.totalTaps,
-            bonusManager.countSecondProgress,
-            bonusManager.stageNumber
-        )
+        // 4. ДОБАВЛЯЕМ ЛОГИКУ ПАКЕТНОГО СОХРАНЕНИЯ
+        tapsSinceLastSave++ // Увеличиваем наш новый счетчик
+        if (tapsSinceLastSave >= SAVE_THRESHOLD) {
+            saveProgressToFirebase()  // Вызываем сохранение
+            tapsSinceLastSave = 0     // Сбрасываем счетчик
+        }
 
         // 4. Если оберег вечный, дальнейшая логика не нужна
         if (timerManager.isOberegForever()) return
@@ -121,6 +127,18 @@ class GameEngine(
         // Анимация сердец каждые 27 тапов
         if (bonusManager.countSecondProgress > 0 && bonusManager.countSecondProgress % 27 == 0) {
             playHeartAnimationForStage(bonusManager.currentStage.number)
+        }
+    }
+
+        //Сохраняем прогресс пользователя
+    private fun saveProgressToFirebase() {
+        // Сохраняем, только если пользователь вошел в аккаунт
+        if (activity.mAuth.currentUser != null) {
+            dbManager.saveProgress(
+                tapCounter.totalTaps,
+                bonusManager.countSecondProgress,
+                bonusManager.stageNumber
+            )
         }
     }
 
