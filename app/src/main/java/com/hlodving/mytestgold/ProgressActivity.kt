@@ -65,7 +65,6 @@ class ProgressActivity : AppCompatActivity() {
         myUid = auth.currentUser?.uid
     }
 
-// В файле ProgressActivity.kt
 
     override fun onStart() {
         super.onStart()
@@ -110,7 +109,8 @@ class ProgressActivity : AppCompatActivity() {
         val currentUser = auth.currentUser
         if (currentUser == null) {
             // Если пользователя нет (гость), просто скрываем плашку и кнопку
-            binding.unverifiedWarning.visibility = View.GONE
+            binding.unverifiedWarning.visibility = View.VISIBLE
+            binding.unverifiedWarning.text = getString(R.string.register_to_see)
             binding.resendVerificationButton.visibility = View.GONE
             loadMyInfo {
                 updateMyBlock()
