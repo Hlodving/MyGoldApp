@@ -1,5 +1,3 @@
-// Файл: com/hlodving/mytestgold/MainActivity.kt
-
 package com.hlodving.mytestgold
 
 import android.content.Intent
