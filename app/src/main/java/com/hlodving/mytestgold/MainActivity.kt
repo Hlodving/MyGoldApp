@@ -10,6 +10,9 @@ import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
@@ -18,6 +21,7 @@ import com.hlodving.mytestgold.database.DbManager
 import com.hlodving.mytestgold.databinding.ActivityMainBinding
 import com.hlodving.mytestgold.dialoghelper.DialogConst
 import com.hlodving.mytestgold.dialoghelper.DialogHelper
+import java.util.concurrent.TimeUnit
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener, DbManager.DatabaseCallback {
 
@@ -86,6 +90,21 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             // Вся логика теперь в одном вызове!
             gameEngine.onHeartTapped()
         }
+
+
+        // Создаем запрос на периодический запуск нашего "Сторожа"
+        val workRequest = PeriodicWorkRequestBuilder<AnimationCheckWorker>(
+            15, // Периодичность (минимально возможная)
+            TimeUnit.MINUTES // Единица измерения
+        ).build()
+
+        // Ставим задачу в очередь WorkManager.
+        // Важно использовать уникальное имя и политику KEEP.
+        WorkManager.getInstance(this).enqueueUniquePeriodicWork(
+            "animation_checker", // Уникальное имя для нашей задачи
+            ExistingPeriodicWorkPolicy.KEEP, // KEEP означает: если задача с таким именем уже запланирована, ничего не делать.
+            workRequest
+        )
     }
 
     private fun initManagers() {

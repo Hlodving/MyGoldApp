@@ -122,7 +122,7 @@
     <string name="my_place_placeholder">Ваше место: —</string>
     <string name="my_alias_placeholder">Псевдоним: —</string>
     <string name="my_score_placeholder">Счёт: —</string>
-    <string name="register_to_see">Войдите или зарегистрируйтесь, чтобы видеть свой прогресс.</string>
+    <string name="register_to_see">Войдите или зарегистрируйтесь, чтобы сохранить свой прогресс.</string>
 
     <string name="my_place_fmt">Ваше место: %1$s</string>
     <string name="my_alias_fmt">Псевдоним: %1$s</string>

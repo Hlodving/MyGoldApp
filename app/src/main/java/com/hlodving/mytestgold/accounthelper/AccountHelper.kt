@@ -1,4 +1,3 @@
-// Файл: com/hlodving/mytestgold/accounthelper/AccountHelper.kt
 
 package com.hlodving.mytestgold.accounthelper
 
