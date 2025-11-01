@@ -45,11 +45,11 @@ class ConnectionActivity : AppCompatActivity() {
 
     private fun setupLegalLinks() {
         binding.privacyPolicyLink.setOnClickListener {
-            openUrl("https://docs.google.com/document/d/e/2PACX-1vT9wPvDVPMprRoKxomQOu7l-mYYi40l0WvpCyQLy9nmTqf4KfXj3h2EJCT5N3QXL1NmLotm2J50ATxO/pub")
+            openUrl(getString(R.string.politics_url))
         }
 
         binding.termsOfUseLink.setOnClickListener {
-            openUrl("https://docs.google.com/document/d/e/2PACX-1vQEQWLfTFtkXB6UF-NOpJZZVMDJmN9B9vYOvS_AWbOF-MI6F3RPr2lQ3iTH9aCcqIllA59ejFHLmtiu/pub")
+            openUrl(getString(R.string.agreement_url))
         }
     }
 
@@ -58,7 +58,7 @@ class ConnectionActivity : AppCompatActivity() {
             val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
             startActivity(intent)
         } catch (e: Exception) {
-            Toast.makeText(this, "Не удалось открыть ссылку", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, R.string.dont_open_link, Toast.LENGTH_SHORT).show()
         }
     }
 }

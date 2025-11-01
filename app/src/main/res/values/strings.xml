@@ -33,6 +33,9 @@
     <string name="legal_info">Правовая информация</string>
     <string name="privacy_policy">Политика конфиденциальности</string>
     <string name="terms_of_use">Пользовательское соглашение</string>
+    <string name="dont_open_link">Не удалось открыть ссылку</string>
+    <string name="politics_url">https://docs.google.com/document/d/e/2PACX-1vT9wPvDVPMprRoKxomQOu7l-mYYi40l0WvpCyQLy9nmTqf4KfXj3h2EJCT5N3QXL1NmLotm2J50ATxO/pub</string>
+    <string name="agreement_url">https://docs.google.com/document/d/e/2PACX-1vQEQWLfTFtkXB6UF-NOpJZZVMDJmN9B9vYOvS_AWbOF-MI6F3RPr2lQ3iTH9aCcqIllA59ejFHLmtiu/pub</string>
 
 
     <!-- Цитаты -->

@@ -35,8 +35,6 @@ class AccountHelper(private val act: MainActivity) {
                             .child("emailVerified")
                             .setValue(false)
 
-                        // ЭТА СТРОКА БОЛЬШЕ НЕ НУЖНА, ТАК КАК AuthStateListener СДЕЛАЕТ ВСЕ САМ
-                        // act.uiUpdate(user) // <- УДАЛЕНО
 
                         Toast.makeText(
                             act,
