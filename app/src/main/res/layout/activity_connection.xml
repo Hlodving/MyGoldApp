@@ -8,7 +8,7 @@
     android:paddingStart="16dp"
     android:paddingEnd="16dp">
 
-
+    <!-- Блок с Email -->
     <TextView
         android:id="@+id/oberegEmailinfo"
         android:layout_width="wrap_content"
@@ -23,7 +23,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-
     <TextView
         android:id="@+id/oberegEmail"
         android:layout_width="wrap_content"
@@ -36,8 +35,6 @@
         android:fontFamily="sans-serif-medium"
         android:textSize="20sp"
         android:textColor="?attr/colorOnSurface"
-        android:textIsSelectable="false"
-        android:longClickable="false"
         android:clickable="true"
         android:focusable="true"
         android:foreground="?attr/selectableItemBackgroundBorderless"
@@ -50,7 +47,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-
     <View
         android:id="@+id/divider1"
         android:layout_width="0dp"
@@ -60,7 +56,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/oberegEmail" />
 
-
+    <!-- Блок с поддержкой -->
     <TextView
         android:id="@+id/oberegDonatinfo"
         android:layout_width="wrap_content"
@@ -75,7 +71,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-
     <TextView
         android:id="@+id/oberegDonat"
         android:layout_width="wrap_content"
@@ -88,8 +83,6 @@
         android:minHeight="48dp"
         android:minWidth="48dp"
         android:textColor="@color/green_text"
-        android:textIsSelectable="false"
-        android:longClickable="false"
         android:clickable="true"
         android:focusable="true"
         android:foreground="?attr/selectableItemBackgroundBorderless"
@@ -104,9 +97,65 @@
 
 
     <View
+        android:id="@+id/divider2"
         android:layout_width="0dp"
-        android:layout_height="12dp"
-        app:layout_constraintTop_toBottomOf="@id/oberegDonat"
+        android:layout_height="1dp"
+        android:layout_marginTop="16dp"
+        android:background="?attr/colorOutline"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintTop_toBottomOf="@id/oberegDonat" />
+
+    <TextView
+        android:id="@+id/legalInfoTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/legal_info"
+        android:textSize="16sp"
+        android:letterSpacing="0.02"
+        android:textColor="?attr/colorOnSurfaceVariant"
+        android:includeFontPadding="false"
+        app:layout_constraintTop_toBottomOf="@+id/divider2"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <TextView
+        android:id="@+id/privacyPolicyLink"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="@string/privacy_policy"
+        android:textSize="18sp"
+        android:textColor="?attr/colorPrimary"
+        android:minHeight="48dp"
+        android:gravity="center"
+        android:clickable="true"
+        android:focusable="true"
+        android:foreground="?attr/selectableItemBackground"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        app:layout_constraintTop_toBottomOf="@+id/legalInfoTitle"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <TextView
+        android:id="@+id/termsOfUseLink"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="@string/terms_of_use"
+        android:textSize="18sp"
+        android:textColor="?attr/colorPrimary"
+        android:minHeight="48dp"
+        android:gravity="center"
+        android:clickable="true"
+        android:focusable="true"
+        android:foreground="?attr/selectableItemBackground"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        app:layout_constraintTop_toBottomOf="@+id/privacyPolicyLink"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

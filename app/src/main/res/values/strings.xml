@@ -18,9 +18,8 @@
     <string name="how_add_widget">Как добавить на экран телефона</string>
     <string name="obereg_importent">Оберег, в первую очередь, это символ показывающий принадлежность к христианской вере</string>
     <string name="obereg_widget_information">Поэтому его стоит разместить на видном месте — на домашней странице вашего телефона</string>
-    <string name="obereg_widget_connection">Связь</string>
+    <string name="obereg_widget_connection">О приложении</string>
     <string name="provides_information_button">Подробнее</string>
-    <string name="connection_button">Обратная связь</string>
     <string name="progress_button">Прогресс</string>
     <string name="email">digital.amulet@yandex.ru</string>
     <string name="email_info">Связаться с автором</string>
@@ -31,6 +30,9 @@
     <string name="animation_off">"Отключить анимацию"</string>
     <string name="copie">"Скопировано"</string>
     <string name="no_internet_connection">Нет подключения к сети. Таблица лидеров недоступна.</string>
+    <string name="legal_info">Правовая информация</string>
+    <string name="privacy_policy">Политика конфиденциальности</string>
+    <string name="terms_of_use">Пользовательское соглашение</string>
 
 
     <!-- Цитаты -->
@@ -113,6 +115,7 @@
     <string name="wrong_password">Неверный пароль. Попробуйте еще раз.</string>
     <string name="account_deleted">Аккаунт и все данные успешно удалены</string>
     <string name="account_not_enter">Пользователь не авторизован</string>
+    <string name="terms_and_policy_prompt">Я принимаю <a href="https://docs.google.com/document/d/e/2PACX-1vQEQWLfTFtkXB6UF-NOpJZZVMDJmN9B9vYOvS_AWbOF-MI6F3RPr2lQ3iTH9aCcqIllA59ejFHLmtiu/pub">Условия использования</a> и ознакомлен с <a href="https://docs.google.com/document/d/e/2PACX-1vT9wPvDVPMprRoKxomQOu7l-mYYi40l0WvpCyQLy9nmTqf4KfXj3h2EJCT5N3QXL1NmLotm2J50ATxO/pub">Политикой конфиденциальности</a></string>
 
 
 

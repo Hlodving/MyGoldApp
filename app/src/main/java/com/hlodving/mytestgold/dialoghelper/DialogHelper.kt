@@ -1,5 +1,6 @@
 package com.hlodving.mytestgold.dialoghelper
 
+import android.text.method.LinkMovementMethod
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -21,6 +22,21 @@ class DialogHelper(private val act: MainActivity) {
         setDialogState(index, root)
 
         val dialog = builder.create()
+
+        if (index == DialogConst.SING_UP_STATE) {
+            // 1. Делаем кнопку "Зарегистрироваться" неактивной по умолчанию.
+            root.btSignUpIn.isEnabled = false
+
+            // 2. Активируем ссылки в TextView, чтобы по ним можно было кликать.
+            root.tvTerms.movementMethod = LinkMovementMethod.getInstance()
+
+            // 3. Устанавливаем слушатель на чекбокс.
+            root.cbTerms.setOnCheckedChangeListener { _, isChecked ->
+                // Кнопка становится активной только тогда, когда поставлена галочка.
+                root.btSignUpIn.isEnabled = isChecked
+            }
+        }
+
 
         root.btSignUpIn.setOnClickListener {
             setOnClickSignUpIn(index, root, dialog)
@@ -50,6 +66,9 @@ class DialogHelper(private val act: MainActivity) {
             root.btForgetP.visibility = View.GONE
             root.btSignUpIn.visibility = View.VISIBLE
             root.tvDialogMessage.visibility = View.GONE
+
+            root.cbTerms.visibility = View.VISIBLE
+            root.tvTerms.visibility = View.VISIBLE
         } else {
             // Вход
             root.tvSingTitle.text = act.getString(R.string.menu_sign_in)
@@ -63,6 +82,9 @@ class DialogHelper(private val act: MainActivity) {
             root.btForgetP.text = act.getString(R.string.forget_password)
             root.btSignUpIn.visibility = View.VISIBLE
             root.tvDialogMessage.visibility = View.GONE
+
+            root.cbTerms.visibility = View.GONE
+            root.tvTerms.visibility = View.GONE
         }
     }
 
