@@ -89,20 +89,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             gameEngine.onHeartTapped()
         }
 
-
-        // Создаем запрос на периодический запуск нашего "Сторожа"
-        val workRequest = PeriodicWorkRequestBuilder<AnimationCheckWorker>(
-            15, // Периодичность (минимально возможная)
-            TimeUnit.MINUTES // Единица измерения
-        ).build()
-
-        // Ставим задачу в очередь WorkManager.
-        // Важно использовать уникальное имя и политику KEEP.
-        WorkManager.getInstance(this).enqueueUniquePeriodicWork(
-            "animation_checker", // Уникальное имя для нашей задачи
-            ExistingPeriodicWorkPolicy.KEEP, // KEEP означает: если задача с таким именем уже запланирована, ничего не делать.
-            workRequest
-        )
     }
 
     private fun initManagers() {
