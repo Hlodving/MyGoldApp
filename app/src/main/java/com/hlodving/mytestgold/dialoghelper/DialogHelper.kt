@@ -97,7 +97,7 @@ class DialogHelper(private val act: MainActivity) {
 
             if (email.isNotEmpty() && password.isNotEmpty() && passwordConfirm.isNotEmpty() && alias.isNotEmpty()) {
                 if (password == passwordConfirm) {
-                    accHelper.signUpWithEmail(email, password, alias)
+                    accHelper.signUpWithEmail(email, password, alias, "christian")
                     dialog.dismiss()
                 } else {
                     Toast.makeText(act, "Пароли не совпадают. Пожалуйста, проверьте введённые данные.", Toast.LENGTH_LONG).show()

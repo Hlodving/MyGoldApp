@@ -15,7 +15,7 @@ class DbManager(private val dbCallback: DatabaseCallback) {
 
     // Интерфейс для обработки коллбэков данных
     interface DatabaseCallback {
-        fun onDataLoaded(totalTaps: Int, bonusProgress: Int, bonusStage: Int, alias: String)
+        fun onDataLoaded(totalTaps: Int, bonusProgress: Int, bonusStage: Int, alias: String, faith: String?)
     }
 
 
@@ -35,6 +35,11 @@ class DbManager(private val dbCallback: DatabaseCallback) {
         db.getReference("users").child(userId).child("alias").setValue(alias)
     }
 
+    fun saveFaith(faith: String) {
+        val userId = auth.currentUser?.uid ?: return
+        db.getReference("users").child(userId).child("faith").setValue(faith)
+    }
+
 
 
 
@@ -50,9 +55,11 @@ class DbManager(private val dbCallback: DatabaseCallback) {
                 val bonusProgress = snapshot.child("bonusProgress").getValue(Int::class.java) ?: 0
                 val bonusStage = snapshot.child("bonusStage").getValue(Int::class.java) ?: 1
 
-                val aliasFromDb = snapshot.child("alias").getValue(String::class.java)
 
-                // alias для UI (displayName -> email local-part -> Гость)
+                val aliasFromDb = snapshot.child("alias").getValue(String::class.java)
+                val faithFromDb = snapshot.child("faith").getValue(String::class.java)
+
+
                 val fallbackAlias =
                     auth.currentUser?.displayName?.takeIf { !it.isNullOrBlank() } ?:
                     auth.currentUser?.email?.substringBefore("@")?.takeIf { !it.isNullOrBlank() } ?:
@@ -65,7 +72,7 @@ class DbManager(private val dbCallback: DatabaseCallback) {
                     userRef.child("alias").setValue(aliasForUi)
                 }
 
-                dbCallback.onDataLoaded(totalTaps, bonusProgress, bonusStage, aliasForUi)
+                dbCallback.onDataLoaded(totalTaps, bonusProgress, bonusStage, aliasForUi, faithFromDb)
             }
 
             override fun onCancelled(error: DatabaseError) { /* TODO: лог */ }

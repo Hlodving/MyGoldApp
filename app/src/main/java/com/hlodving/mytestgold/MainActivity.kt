@@ -44,6 +44,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     // --- UI переменные и состояние ---
     private lateinit var tvAccount: TextView
     private var userAlias: String = "Гость"
+
+    private var userFaith: String? = null
     var userDataReady: Boolean = false // Публичный для доступа из GameEngine
 
     private val progressColors = listOf(
@@ -67,7 +69,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         // ИСПРАВЛЕННЫЙ ВЫЗОВ КОНСТРУКТОРА:
         gameEngine = GameEngine(
             this,
-            binding, // <-- Параметр binding теперь на своем месте
+            binding,
             dbManager,
             goldProgressManager,
             secondProgressManager,
@@ -213,11 +215,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         return true
     }
 
-    override fun onDataLoaded(totalTaps: Int, bonusProgress: Int, bonusStage: Int, alias: String) {
+    override fun onDataLoaded(totalTaps: Int, bonusProgress: Int, bonusStage: Int, alias: String, faith: String?) {
         userAlias = alias
         tvAccount.text = alias
         globalTapCounter.updateTotalTaps(totalTaps)
         secondProgressManager.updateState(bonusProgress, bonusStage)
+        userFaith = faith
 
         mainViewUpdater.updateBonusProgress(secondProgressManager.countSecondProgress, secondProgressManager.maxProgress, secondProgressManager.stageNumber)
         mainViewUpdater.updateBonusQuote(secondProgressManager.getQuote())
@@ -242,6 +245,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private fun clearLocalUserData() {
         globalTapCounter.reset()
         secondProgressManager.resetState()
+        userFaith = null
     }
 
     private fun updateUIAfterReset() {

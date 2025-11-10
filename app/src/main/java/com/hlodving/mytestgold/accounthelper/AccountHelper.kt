@@ -13,7 +13,7 @@ class AccountHelper(private val act: MainActivity) {
 
     private val dbManager = DbManager(act)
 
-    fun signUpWithEmail(email: String, password: String, alias: String) {
+    fun signUpWithEmail(email: String, password: String, alias: String, faithType: String) {
         if (email.isNotEmpty() && password.isNotEmpty() && alias.isNotEmpty()) {
             act.mAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener { task ->
@@ -29,6 +29,7 @@ class AccountHelper(private val act: MainActivity) {
 
                         dbManager.saveProgress(0, 0, 1)
                         dbManager.saveAlias(alias)
+                        dbManager.saveFaith(faithType)
 
                         FirebaseDatabase.getInstance().getReference("users")
                             .child(user.uid)
