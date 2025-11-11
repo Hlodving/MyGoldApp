@@ -4,12 +4,14 @@ import android.graphics.Typeface
 import android.os.Bundle
 import android.view.Gravity
 import android.view.View
+import android.widget.ImageView
 import android.widget.TableLayout
 import android.widget.TableRow
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.google.firebase.auth.FirebaseAuth
@@ -24,7 +26,8 @@ data class LeaderboardUser(
     val uid: String,
     val alias: String,
     val score: Int,
-    val isVerified: Boolean
+    val isVerified: Boolean,
+    val faith: String? // ДОБАВЛЕНО ПОЛЕ ДЛЯ ВЕРЫ
 )
 
 
@@ -43,6 +46,7 @@ class ProgressActivity : AppCompatActivity() {
     private var myAlias: String = "—"
     private var myScore: Int = 0
     private var myRank: Int = 0
+    private var myFaith: String? = null // ДОБАВЛЕНО ПОЛЕ ДЛЯ МОЕЙ ВЕРЫ
     private val nf = NumberFormat.getIntegerInstance(Locale.getDefault())
 
     private var amIVerified: Boolean = true
@@ -178,14 +182,16 @@ class ProgressActivity : AppCompatActivity() {
     private fun attachLeaderboardListener() {
         leaderboardListener = object : ValueEventListener {
             override fun onDataChange(s: DataSnapshot) {
-                val rows = mutableListOf<Triple<String, Int, String>>()
-                s.children.forEach { user ->
-                    val alias = user.child("alias").getValue(String::class.java) ?: "Пользователь"
-                    val score = user.child("globalTapCounter").getValue(Int::class.java) ?: 0
-                    val uid = user.key ?: ""
-                    rows += Triple(alias, score, uid)
+                val users = mutableListOf<LeaderboardUser>() // ИСПОЛЬЗУЕМ НОВЫЙ КЛАСС LeaderboardUser
+                s.children.forEach { userSnapshot ->
+                    val uid = userSnapshot.key ?: ""
+                    val alias = userSnapshot.child("alias").getValue(String::class.java) ?: "Пользователь"
+                    val score = userSnapshot.child("globalTapCounter").getValue(Int::class.java) ?: 0
+                    val isVerified = userSnapshot.child("emailVerified").getValue(Boolean::class.java) ?: false
+                    val faith = userSnapshot.child("faith").getValue(String::class.java) // ПОЛУЧАЕМ ТИП ВЕРЫ
+                    users += LeaderboardUser(uid, alias, score, isVerified, faith)
                 }
-                val sorted = rows.sortedByDescending { it.second }
+                val sorted = users.sortedByDescending { it.score }
                 renderTable(sorted)
             }
             override fun onCancelled(e: DatabaseError) { /* ... */ }
@@ -193,7 +199,7 @@ class ProgressActivity : AppCompatActivity() {
         topUsersRef.addValueEventListener(leaderboardListener)
     }
 
-    // Загрузка моих данных: alias и score из /users/<uid>
+    // Загрузка моих данных: alias, score и faith из /users/<uid>
     private fun loadMyInfo(onDone: () -> Unit) {
         val uid = myUid
         if (uid == null) {
@@ -204,7 +210,7 @@ class ProgressActivity : AppCompatActivity() {
             override fun onDataChange(s: DataSnapshot) {
                 myAlias = s.child("alias").getValue(String::class.java) ?: auth.currentUser?.email ?: "Псевдоним"
                 myScore = s.child("globalTapCounter").getValue(Int::class.java) ?: 0
-
+                myFaith = s.child("faith").getValue(String::class.java) // ПОЛУЧАЕМ МОЮ ВЕРУ
 
                 onDone()
             }
@@ -231,20 +237,22 @@ class ProgressActivity : AppCompatActivity() {
     }
 
     // Рендер таблицы (шапка + строки данных) в TableLayout.
-    private fun renderTable(data: List<Triple<String, Int, String>>) {
+    private fun renderTable(data: List<LeaderboardUser>) { // ТЕПЕРЬ ПРИНИМАЕМ СПИСОК LeaderboardUser
         val table = binding.leaderboardTable
         table.removeAllViews()
-        addRow(table, pos = "№", alias = "Псевдоним", score = "Счёт", isHeader = true)
+        // ШАПКА ТАБЛИЦЫ
+        addRow(table, pos = "№", alias = "Псевдоним", score = "Счёт", isHeader = true, faith = null)
 
-        data.forEachIndexed { index, (alias, score, uid) ->
-            val isMe = (uid == myUid)
+        data.forEachIndexed { index, user ->
+            val isMe = (user.uid == myUid)
             addRow(
                 table,
                 pos = (index + 1).toString(),
-                alias = alias,
-                score = nf.format(score),
+                alias = user.alias,
+                score = nf.format(user.score),
                 isHeader = false,
-                highlight = isMe
+                highlight = isMe,
+                faith = user.faith // ПЕРЕДАЕМ ТИП ВЕРЫ В addRow
             )
         }
     }
@@ -252,7 +260,7 @@ class ProgressActivity : AppCompatActivity() {
     // Утилита добавления строки (шапка или обычная) в таблицу.
     private fun addRow(
         table: TableLayout, pos: String, alias: String, score: String,
-        isHeader: Boolean = false, highlight: Boolean = false
+        isHeader: Boolean = false, highlight: Boolean = false, faith: String? // ДОБАВЛЕНО faith
     ) {
         val tr = TableRow(this).apply {
             layoutParams = TableLayout.LayoutParams(
@@ -264,6 +272,41 @@ class ProgressActivity : AppCompatActivity() {
             if (isHeader) setBackgroundColor(0x11000000)
             if (highlight) setBackgroundColor(0x113980FF)
         }
+
+        // ИКОНКА ВЕРЫ (ДЛЯ НЕ-ШАПКИ)
+        if (!isHeader) {
+            val faithIcon = ImageView(this).apply {
+                layoutParams = TableRow.LayoutParams(dp(24), dp(24)).apply { // УСТАНАВЛИВАЕМ РАЗМЕР
+                    gravity = Gravity.CENTER_VERTICAL
+                    marginEnd = dp(8) // ОТСТУП СПРАВА
+                }
+                scaleType = ImageView.ScaleType.FIT_CENTER // Масштабирование
+                visibility = View.GONE // СКРЫТО ПО УМОЛЧАНИЮ
+
+                // УСТАНАВЛИВАЕМ ИКОНКУ В ЗАВИСИМОСТИ ОТ ТИПА ВЕРЫ
+                faith?.let {
+                    val drawableResId = when (it.toLowerCase()) {
+                        "christian" -> R.drawable.ic_faith_christian
+                        "islam" -> R.drawable.ic_faith_islam
+                        else -> null
+                    }
+                    drawableResId?.let { resId ->
+                        setImageDrawable(ContextCompat.getDrawable(context, resId))
+                        visibility = View.VISIBLE
+                    }
+                }
+            }
+            tr.addView(faithIcon)
+        } else {
+            // ДЛЯ ШАПКИ МЫ ДОБАВИМ ПУСТОЕ МЕСТО, ЧТОБЫ ВЫРАВНЯТЬ СТОЛБЦЫ
+            val emptySpace = View(this).apply {
+                layoutParams = TableRow.LayoutParams(dp(24), dp(24)).apply {
+                    marginEnd = dp(8)
+                }
+            }
+            tr.addView(emptySpace)
+        }
+
 
         fun cell(text: String, weight: Float, gravity: Int = Gravity.START): TextView {
             return TextView(this).apply {
@@ -300,6 +343,23 @@ class ProgressActivity : AppCompatActivity() {
         binding.myPlace.text = "Место: " + (if (myRank <= 0) "—" else myRank.toString())
         binding.myAlias.text = "Псевдоним: $myAlias"
         binding.myScore.text = "Ваш счёт: ${nf.format(myScore)}"
+
+        // ОБНОВЛЕНИЕ ИКОНКИ ВЕРЫ В БЛОКЕ "МОИ ДАННЫЕ"
+        myFaith?.let {
+            val drawableResId = when (it.toLowerCase()) {
+                "christian" -> R.drawable.ic_faith_christian
+                "islam" -> R.drawable.ic_faith_islam
+                else -> null
+            }
+            drawableResId?.let { resId ->
+                binding.myFaithIcon.setImageDrawable(ContextCompat.getDrawable(this, resId))
+                binding.myFaithIcon.visibility = View.VISIBLE
+            } ?: run {
+                binding.myFaithIcon.visibility = View.GONE
+            }
+        } ?: run {
+            binding.myFaithIcon.visibility = View.GONE
+        }
     }
 
     // Обновление блока при отсутствии интернет-соединения
@@ -307,5 +367,6 @@ class ProgressActivity : AppCompatActivity() {
         binding.myPlace.text = "Место: —"
         binding.myAlias.text = "Псевдоним: (нет сети)"
         binding.myScore.text = "Ваш счёт: —"
+        binding.myFaithIcon.visibility = View.GONE // СКРЫВАЕМ ИКОНКУ ПРИ ОТСУТСТВИИ СЕТИ
     }
 }

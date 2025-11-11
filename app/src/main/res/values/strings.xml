@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Цифровой оберег</string>
+    <string name="app_name">Цифровой оберег — христианский символ</string>
     <string name="about_amulet">Подробнее об обереге</string>
     <string name="add_amulet">Вы можете добавить оберег (виджет) на домашний экран</string>
     <string name="time">Осталось: 03:00:00</string>
@@ -103,6 +103,7 @@
     <string name="send_verification_error">Неудалось отправить email для подтверждения!</string>
     <string name="send_verification_done">На вашу почту была отправленна ссылка для подтверждения вашего аккааунта</string>
     <string name="check_email">Пожалуйста, подтвердите вашу почту</string>
+    <string name="check_email_gain">Ваш аккаунт не подтвержден. Проверьте почту, чтобы сохранить свой прогресс.</string>
     <string name="reset_password_title">Восстановление пароля</string>
     <string name="restore_password">Восстановить</string>
     <string name="password_confirm_hint">Повторите пароль</string>
