@@ -23,11 +23,20 @@ class ConnectionActivity : AppCompatActivity() {
 
         // Навешиваем копирование по тапу для email и доната
         binding.oberegEmail.copyOnTap()
-        binding.oberegDonat.copyOnTap()
+
+
 
         // Навешиваем открытие ссылок для правовых документов
         setupLegalLinks()
+
+
+        binding.oberegDonat.setOnClickListener {
+            openUrl(getString(R.string.donat))
+        }
     }
+
+
+
 
     private fun TextView.copyOnTap() {
         // Гарантируем, что режим выделения не перехватывает клик

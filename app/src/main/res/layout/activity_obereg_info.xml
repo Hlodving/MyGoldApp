@@ -15,17 +15,17 @@
         android:id="@+id/oberegTitle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="42dp"
+        android:includeFontPadding="false"
+        android:letterSpacing="0.02"
         android:text="@string/power_amulet"
+        android:textAlignment="center"
         android:textColor="?android:textColorPrimary"
         android:textSize="28sp"
         android:textStyle="bold"
-        android:includeFontPadding="false"
-        android:letterSpacing="0.02"
-        android:textAlignment="center"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <!-- Важное -->
     <TextView

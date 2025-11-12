@@ -23,8 +23,8 @@
     <string name="progress_button">Прогресс</string>
     <string name="email">digital.amulet@yandex.ru</string>
     <string name="email_info">Связаться с автором</string>
-    <string name="donat">2202 2050 0076 8587</string>
-    <string name="donat_info">Поблагодарить автора</string>
+    <string name="donat">https://boosty.to/digital_amulet/donate</string>
+    <string name="donat_info">Поддержать автора</string>
     <string name="settings">Настройки</string>
     <string name="animation_on">"Включить анимацию"</string>
     <string name="animation_off">"Отключить анимацию"</string>
