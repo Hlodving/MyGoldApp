@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     kotlin("kapt")
     alias(libs.plugins.google.gms.google.services)
+    id("com.google.firebase.crashlytics")
 }
 
 android {
@@ -42,6 +43,9 @@ android {
 }
 
 dependencies {
+    implementation(platform("com.google.firebase:firebase-bom:33.1.0")) // Убедись, что версия BOM актуальна
+    implementation("com.google.firebase:firebase-crashlytics-ktx")
+    implementation("com.google.firebase:firebase-analytics-ktx") // Рекомендуется для лучшей аналитики
     implementation("com.github.bumptech.glide:glide:5.0.4")
     implementation(libs.firebase.auth)
     implementation(libs.androidx.credentials)
