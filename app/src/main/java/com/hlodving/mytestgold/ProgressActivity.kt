@@ -174,9 +174,9 @@ class ProgressActivity : AppCompatActivity() {
 
     override fun onStop() {
         super.onStop()
-        // ВАЖНО: Удаляем слушатель, когда активность не видна,
-        // чтобы избежать утечек памяти и лишних операций.
-        topUsersRef.removeEventListener(leaderboardListener)
+        if (::leaderboardListener.isInitialized) {
+            topUsersRef.removeEventListener(leaderboardListener)
+        }
     }
 
     private fun attachLeaderboardListener() {
