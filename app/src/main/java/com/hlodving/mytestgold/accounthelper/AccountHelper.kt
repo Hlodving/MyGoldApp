@@ -61,8 +61,7 @@ class AccountHelper(private val act: MainActivity) {
                         if (user != null) {
                             Toast.makeText(act, act.getString(R.string.sign_in_success), Toast.LENGTH_SHORT).show()
 
-                            // ЭТА СТРОКА БОЛЬШЕ НЕ НУЖНА, ТАК КАК AuthStateListener СДЕЛАЕТ ВСЕ САМ
-                            // act.uiUpdate(user) // <- УДАЛЕНО
+
 
                             if (!user.isEmailVerified) {
                                 Toast.makeText(

@@ -25,13 +25,18 @@ class WidgetAnimationService : Service() {
     override fun onCreate() {
         super.onCreate()
 
-        startForeground(1, createNotification()) // Без этого Android 13+ убьёт сервис
+        try {
+            startForeground(1, createNotification())
+        } catch (e: Exception) {
+            // Android 12+ запрещает startForeground из фона
+            stopSelf()
+            return
+        }
 
         val prefs = getSharedPreferences("GoldPrefs", Context.MODE_PRIVATE)
         val isAnimationEnabled = prefs.getBoolean("widgetAnimationEnabled", true)
         val timerEndTime = prefs.getLong("timerEndTime", 0L)
         val now = System.currentTimeMillis()
-
         val isOberegActive = timerEndTime == Long.MAX_VALUE || timerEndTime > now
 
         if (!isAnimationEnabled || !isOberegActive) {
