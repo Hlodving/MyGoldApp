@@ -44,13 +44,30 @@ class AccountHelper(private val act: MainActivity) {
                         ).show()
 
                     } else {
-                        val errorMessage = task.exception?.message
-                            ?: act.resources.getString(R.string.sign_up_error)
+                        val errorMessage = when {
+                            task.exception?.message?.contains("password is invalid") == true ||
+                                    task.exception?.message?.contains("at least 6") == true ->
+                                "Пароль слишком короткий. Минимум 6 символов."
+
+                            task.exception?.message?.contains("email address is badly formatted") == true ->
+                                "Неверный формат email. Проверьте правильность написания."
+
+                            task.exception?.message?.contains("email address is already in use") == true ->
+                                "Этот email уже зарегистрирован. Попробуйте войти."
+
+                            task.exception?.message?.contains("network error") == true ->
+                                "Нет подключения к интернету. Проверьте соединение."
+
+                            task.exception?.message?.contains("too many requests") == true ->
+                                "Слишком много попыток. Подождите немного и попробуйте снова."
+
+                            else -> task.exception?.message ?: "Ошибка регистрации. Попробуйте ещё раз."
+                        }
                         Toast.makeText(act, errorMessage, Toast.LENGTH_LONG).show()
                     }
                 }
+            }
         }
-    }
 
     fun signInWithEmail(email: String, password: String) {
         if (email.isNotEmpty() && password.isNotEmpty()) {
@@ -72,11 +89,30 @@ class AccountHelper(private val act: MainActivity) {
                             }
                         }
                     } else {
-                        Toast.makeText(
-                            act,
-                            act.resources.getString(R.string.sign_in_error),
-                            Toast.LENGTH_LONG
-                        ).show()
+                        val errorMessage = when {
+                            task.exception?.message?.contains("password is invalid") == true ||
+                                    task.exception?.message?.contains("wrong-password") == true ->
+                                "Неверный пароль. Попробуйте ещё раз."
+
+                            task.exception?.message?.contains("no user record") == true ||
+                                    task.exception?.message?.contains("user-not-found") == true ->
+                                "Пользователь с таким email не найден."
+
+                            task.exception?.message?.contains("email address is badly formatted") == true ->
+                                "Неверный формат email."
+
+                            task.exception?.message?.contains("network error") == true ->
+                                "Нет подключения к интернету."
+
+                            task.exception?.message?.contains("too many requests") == true ->
+                                "Аккаунт временно заблокирован из-за множества неудачных попыток. Попробуйте позже."
+
+                            task.exception?.message?.contains("user disabled") == true ->
+                                "Этот аккаунт отключён. Обратитесь в поддержку."
+
+                            else -> "Ошибка входа. Проверьте данные и попробуйте снова."
+                        }
+                        Toast.makeText(act, errorMessage, Toast.LENGTH_LONG).show()
                     }
                 }
         }
